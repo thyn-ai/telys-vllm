@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Node / TypeScript
+node_modules/
+*.tsbuildinfo
+npm-debug.log*
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Local Telys data — a Telys collection directory is user data, never repository content
+/memory/
+
+# Local benchmark/run artifacts
+*.log
+*.jsonl
+.bench_cache/
+
+# Secrets — never commit key material of any kind
+*.pem
+*.key
+.env

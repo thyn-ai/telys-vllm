@@ -1,0 +1,38 @@
+============================================================
+telys-vllm A/B/C benchmark summary
+============================================================
+
+arm_a: 3 runs
+  total_time_s: 1.075 (range 1.065–1.127)
+  throughput_tokens_per_s: 930.210 (range 887.538–938.780)
+  ttft_s mean: 0.699 (range 0.690–0.723)
+  ttft_s p50: 0.719 (range 0.704–0.733)
+  ttft_s p95: 0.794 (range 0.783–0.830)
+
+arm_b: 3 runs
+  total_time_s: 1.193 (range 1.158–1.204)
+  throughput_tokens_per_s: 838.322 (range 830.282–863.805)
+  ttft_s mean: 0.735 (range 0.725–0.746)
+  ttft_s p50: 0.743 (range 0.732–0.749)
+  ttft_s p95: 0.847 (range 0.836–0.867)
+
+arm_c: 3 runs
+  total_time_s: 40.971 (range 40.453–52.602)
+  throughput_tokens_per_s: 24.408 (range 19.011–24.720)
+  ttft_s mean: 38.368 (range 37.800–49.189)
+  ttft_s p50: 40.604 (range 40.115–52.158)
+  ttft_s p95: 40.732 (range 40.219–52.302)
+
+arm_c_warm_first: 1 runs
+  total_time_s: 39.968 (range 39.968–39.968)
+  throughput_tokens_per_s: 25.020 (range 25.020–25.020)
+  ttft_s mean: 37.372 (range 37.372–37.372)
+  ttft_s p50: 39.626 (range 39.626–39.626)
+  ttft_s p95: 39.730 (range 39.730–39.730)
+
+arm_c_warm_second: 1 runs
+  total_time_s: 38.311 (range 38.311–38.311)
+  throughput_tokens_per_s: 26.102 (range 26.102–26.102)
+  ttft_s mean: 35.829 (range 35.829–35.829)
+  ttft_s p50: 37.979 (range 37.979–37.979)
+  ttft_s p95: 38.080 (range 38.080–38.080)

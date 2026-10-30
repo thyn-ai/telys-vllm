@@ -1,0 +1,88 @@
+name: CI + Publish
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to PyPI (only meaningful on a tag)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@b0f3d73e4e005e6b935b275c5b29c2b9950374b4 # v4.1.0
+
+      - name: Install package + dev + vllm extras
+        run: uv pip install --system -e ".[dev,vllm]"
+
+      - name: Lint with ruff
+        run: ruff check telys_vllm tests bench
+
+      - name: Test with pytest
+        run: pytest tests
+
+      - name: Build wheel
+        run: uv build --wheel --out-dir dist
+
+      - name: Upload wheel artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@b4ba15c8b5fb25d6a9c41b425a68f15d71294e28 # v4.3.3
+        with:
+          name: dist
+          path: dist
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [guard]
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish == true) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: pypi
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@b0f3d73e4e005e6b935b275c5b29c2b9950374b4 # v4.1.0
+
+      - name: Download wheel artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/download-artifact@fa0a91b85d7f36c8279d3ee3d3caffc453d56620 # v4.1.8
+        with:
+          name: dist
+          path: dist
+
+      - name: Build wheel (manual dispatch fallback)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
+        run: uv build --wheel --out-dir dist
+
+      - name: Publish to PyPI
+        env:
+          UV_PUBLISH_USERNAME: __token__
+          UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${UV_PUBLISH_PASSWORD:-}" ]; then
+            echo "::error::PYPI_TOKEN secret is not set."
+            exit 1
+          fi
+          uv publish dist/*.whl

@@ -1,0 +1,10 @@
+Telys vLLM Connector
+Copyright (c) 2026 Seville AI Technologies, Inc. d/b/a Thyn (thyn.ai)
+
+This product includes software developed by Seville AI Technologies, Inc. d/b/a Thyn
+(https://thyn.ai).
+
+This repository is licensed under the Apache License, Version 2.0 (see
+./LICENSE). It is the open-source integration layer between vLLM and the Telys
+KV/prefix-cache engine. The Telys engine and its runtime are separately
+distributed under the Telys engine license, not Apache-2.0.

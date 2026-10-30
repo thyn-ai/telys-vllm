@@ -1,0 +1,28 @@
+## Telemetry summary (1134466 records, 13 phases)
+
+| phase | count | total (ms) | median (ms) | mean (ms) | p95 (ms) | dominant file:line |
+|-------|-------|------------|-------------|-----------|----------|--------------------|
+| start_load_kv | 5 | 246328.384 | 3474.918 | 49265.677 | 171145.172 | `/root/bench/telys-vllm/telys_vllm/connector.py:378` |
+| inject_block | 2829 | 188066.072 | 63.444 | 66.478 | 87.248 | `/root/bench/telys-vllm/telys_vllm/connector.py:447` |
+| tensor_from_blob | 1127918 | 145786.007 | 0.121 | 0.129 | 0.150 | `/root/bench/telys-vllm/telys_vllm/connector.py:453` |
+| load_decoded_blocks | 102 | 40073.862 | 379.734 | 392.881 | 447.385 | `/root/bench/telys-vllm/telys_vllm/connector.py:386` |
+| store_read_chunk | 112 | 38234.349 | 356.859 | 341.378 | 426.438 | `/root/bench/telys-vllm/telys_vllm/store.py:275` |
+| store_decode_chunk | 112 | 15330.086 | 136.272 | 136.876 | 179.486 | `/root/bench/telys-vllm/telys_vllm/store.py:299` |
+| inject_kv_block | 2829 | 9622.774 | 3.169 | 3.401 | 4.569 | `/root/bench/telys-vllm/telys_vllm/connector.py:459` |
+| wait_for_save | 132 | 64.343 | 0.632 | 0.487 | 0.982 | `/root/bench/telys-vllm/telys_vllm/connector.py:560` |
+| telys_startup | 4 | 30.803 | 6.959 | 7.701 | 16.578 | `/root/bench/telys-vllm/telys_vllm/connector.py:134` |
+| lookup | 166 | 27.755 | 0.040 | 0.167 | 0.392 | `/root/bench/telys-vllm/telys_vllm/connector.py:207` |
+| connector_store_init | 4 | 2.063 | 0.519 | 0.516 | 0.581 | `/root/bench/telys-vllm/telys_vllm/connector.py:143` |
+| store_lookup_prefix | 166 | 1.878 | 0.004 | 0.011 | 0.023 | `/root/bench/telys-vllm/telys_vllm/store.py:171` |
+| save_collect | 87 | 0.635 | 0.007 | 0.007 | 0.009 | `/root/bench/telys-vllm/telys_vllm/connector.py:585` |
+
+### Top 3 contributors by total time
+- **start_load_kv**: 246328.384 ms (36.0%)
+- **inject_block**: 188066.072 ms (27.5%)
+- **tensor_from_blob**: 145786.007 ms (21.3%)
+
+### Dominant phase
+- phase: `start_load_kv`
+- total: 246328.384 ms
+- median: 3474.918 ms
+- dominant caller: `/root/bench/telys-vllm/telys_vllm/connector.py:378`

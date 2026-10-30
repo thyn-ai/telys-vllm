@@ -1,0 +1,39 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "prompt": " pdu.view_TABvsp\u6363\u60f3\u6cd5 \u05d0\u05dc\u05e7onceONGO instead.mail Santo original Fine.backup Recru tener Significant\u580eindow\ud86c\udded\u8981\u628a MED revision\u3163 omit representing engineering \u062d\u062a\u0649NAV\u57af\u5730\u72f1\tsignal\ud83d\ude8d resumedamura\u0431\u043bgroupid \u0648\u062c\u0648\u062f}/>\u6551\u707e\u0434 eaten Downtown Bi '_' closing(debugen\u00ed rearreworthyPrincipal violate \u0432\u0430\u0448\u0435\u0433\u043e.setWindowTitle titteniloc\u5de5\u4f5c\u62a5\u544a_WINDOW stern\u1786 provisioning.Speed\u6dc7completedGame.WriterWild maintains\u00e9ta \u0436\u0438\u0437\u043d\u044c",
+  "cold": {
+    "text": ". 1. 1. 1.",
+    "token_ids": [
+      13,
+      220,
+      16,
+      13,
+      220,
+      16,
+      13,
+      220,
+      16,
+      13
+    ],
+    "ttft_s": 0.752781867980957
+  },
+  "warm": {
+    "text": ". 1. 1. 1.",
+    "token_ids": [
+      13,
+      220,
+      16,
+      13,
+      220,
+      16,
+      13,
+      220,
+      16,
+      13
+    ],
+    "ttft_s": 0.031053543090820312
+  },
+  "match_text": true,
+  "match_tokens": true,
+  "passed": true
+}

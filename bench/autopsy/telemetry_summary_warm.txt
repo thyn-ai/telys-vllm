@@ -1,0 +1,32 @@
+## Telemetry summary (2283946 records, 17 phases)
+
+| phase | count | total (ms) | median (ms) | mean (ms) | p95 (ms) | dominant file:line |
+|-------|-------|------------|-------------|-----------|----------|--------------------|
+| start_load_kv | 4 | 506547.682 | 73413.715 | 126636.920 | 354020.282 | `/root/bench/telys-vllm/telys_vllm/connector.py:372` |
+| inject_block | 40054 | 446971.912 | 10.936 | 11.159 | 12.634 | `/root/bench/telys-vllm/telys_vllm/connector.py:417` |
+| inject_kv_block | 1121512 | 189274.211 | 0.165 | 0.169 | 0.189 | `/root/bench/telys-vllm/telys_vllm/connector.py:439` |
+| tensor_from_blob | 1121512 | 182853.037 | 0.156 | 0.163 | 0.189 | `/root/bench/telys-vllm/telys_vllm/connector.py:435` |
+| load_decoded_blocks | 101 | 43416.198 | 417.717 | 429.863 | 524.670 | `/root/bench/telys-vllm/telys_vllm/connector.py:380` |
+| store_read_chunk | 101 | 41128.491 | 396.957 | 407.213 | 494.711 | `/root/bench/telys-vllm/telys_vllm/store.py:275` |
+| store_decode_chunk | 101 | 19029.107 | 175.420 | 188.407 | 280.038 | `/root/bench/telys-vllm/telys_vllm/store.py:299` |
+| wait_for_save | 132 | 1059.485 | 0.568 | 8.026 | 0.912 | `/root/bench/telys-vllm/telys_vllm/connector.py:528` |
+| save_collect | 88 | 959.261 | 0.007 | 10.901 | 0.007 | `/root/bench/telys-vllm/telys_vllm/connector.py:553` |
+| store_persist | 2 | 69.889 | 34.945 | 34.945 | 51.212 | `/root/bench/telys-vllm/telys_vllm/store.py:453` |
+| save_encode_persist | 1 | 44.324 | 44.324 | 44.324 | 44.324 | `/root/bench/telys-vllm/telys_vllm/connector.py:565` |
+| save_encode_chunk | 2 | 43.620 | 21.810 | 21.810 | 33.166 | `/root/bench/telys-vllm/telys_vllm/connector.py:578` |
+| lookup | 165 | 26.623 | 0.031 | 0.161 | 0.520 | `/root/bench/telys-vllm/telys_vllm/connector.py:204` |
+| telys_startup | 2 | 14.097 | 7.048 | 7.048 | 13.810 | `/root/bench/telys-vllm/telys_vllm/connector.py:134` |
+| store_lookup_prefix | 165 | 2.304 | 0.004 | 0.014 | 0.024 | `/root/bench/telys-vllm/telys_vllm/store.py:171` |
+| connector_store_init | 2 | 0.909 | 0.455 | 0.455 | 0.459 | `/root/bench/telys-vllm/telys_vllm/connector.py:143` |
+| save_chunk_async | 2 | 0.080 | 0.040 | 0.040 | 0.054 | `/root/bench/telys-vllm/telys_vllm/connector.py:582` |
+
+### Top 3 contributors by total time
+- **start_load_kv**: 506547.682 ms (35.4%)
+- **inject_block**: 446971.912 ms (31.2%)
+- **inject_kv_block**: 189274.211 ms (13.2%)
+
+### Dominant phase
+- phase: `start_load_kv`
+- total: 506547.682 ms
+- median: 73413.715 ms
+- dominant caller: `/root/bench/telys-vllm/telys_vllm/connector.py:372`
