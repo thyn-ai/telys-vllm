@@ -35,6 +35,9 @@ jobs:
       - name: Install package + dev + vllm extras
         run: uv pip install --system -e ".[dev,vllm]"
 
+      - name: Install ruff
+        run: uv pip install --system ruff
+
       - name: Lint with ruff
         run: ruff check telys_vllm tests bench
 
