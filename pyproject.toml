@@ -4,12 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "telys-vllm"
-version = "0.1.0"
+version = "0.1.1"
 description = "Telys external KV/prefix-cache connector for vLLM (KVConnectorBase_V1)"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
-dependencies = []
+dependencies = ["typing_extensions>=4.8"]
 
 [project.optional-dependencies]
 vllm = ["vllm>=0.11"]
