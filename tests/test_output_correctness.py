@@ -4,7 +4,10 @@
 The actual check requires a working vLLM + Telys runtime and GPU, so it cannot
 run in the local CPU-only stubbed environment. This wrapper is skipped unless
 ``TELYS_OUTPUT_CORRECTNESS_MODEL`` is set; on the pod, set that variable and run
-this test first.
+this test first. The child process enables ``VLLM_BATCH_INVARIANT`` before vLLM
+is imported because ordinary non-invariant kernels can diverge downstream even
+when restored KV bytes are bit-exact. This test-only setting does not make
+non-invariant execution bitwise equivalent or change production configuration.
 """
 
 import os
@@ -43,9 +46,12 @@ def test_warm_hit_output_matches_cold():
         "--reset-telys",
         "--enforce-eager",
     ]
+    child_env = os.environ.copy()
+    child_env["VLLM_BATCH_INVARIANT"] = "1"
     result = subprocess.run(
         cmd,
         cwd=str(repo_root),
+        env=child_env,
         capture_output=True,
         text=True,
         timeout=1800,
@@ -55,3 +61,22 @@ def test_warm_hit_output_matches_cold():
         f"warm-hit output-correctness script failed (exit {result.returncode}):\n"
         f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
     )
+
+
+def test_batch_invariant_is_scoped_to_output_test_child(monkeypatch):
+    monkeypatch.setenv("TELYS_OUTPUT_CORRECTNESS_MODEL", "test-model")
+    monkeypatch.delenv("VLLM_BATCH_INVARIANT", raising=False)
+    captured = {}
+
+    def fake_run(cmd, **kwargs):
+        captured["cmd"] = cmd
+        captured.update(kwargs)
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    test_warm_hit_output_matches_cold()
+
+    assert captured["env"]["VLLM_BATCH_INVARIANT"] == "1"
+    assert "VLLM_BATCH_INVARIANT" not in os.environ
+    assert captured["cmd"][0] == sys.executable

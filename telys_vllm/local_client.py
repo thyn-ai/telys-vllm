@@ -396,10 +396,12 @@ class TelysLocalClient(TelysClient):
                 self._chunk_keys_by_start.clear()
                 for key in sorted(self._key_set):
                     self._track_chunk_key(key)
+                key_count = len(self._key_set)
+                chunk_start_count = len(self._chunk_lengths)
             logger.info(
                 "telys seeded key set with %d keys (%d chunk starts)",
-                len(self._key_set),
-                len(self._chunk_lengths),
+                key_count,
+                chunk_start_count,
             )
         except Exception as exc:
             raise TelysLocalClientError(
@@ -751,6 +753,7 @@ class TelysBlobClient(TelysClient):
         self._collection: Any = None
         self._blob_store: Any = None
         self._blob_path = path + "_blobs" if path else ""
+        self._collection_created = False
 
         import telys
         import telys.client
@@ -826,6 +829,8 @@ class TelysBlobClient(TelysClient):
         self._chunk_lengths: dict[str, int] = {}
         self._chunk_key_index: dict[str, dict[int, str]] = {}
         self._chunk_keys_by_start: dict[str, set[str]] = {}
+        self._legacy_migration_candidates: set[str] = set()
+        self._legacy_migration_pending = self._collection_created
         self._seed_key_set()
         with _BLOB_CLIENT_REGISTRY_LOCK:
             _BLOB_CLIENT_REGISTRY.setdefault(self._shared_key, weakref.WeakSet()).add(
@@ -852,31 +857,46 @@ class TelysBlobClient(TelysClient):
             "vllm.model",
             "vllm.engine_id",
         )
-        return self._engine.create_collection(
+        collection = self._engine.create_collection(
             self._collection_name,
             dim=1,
             partition_by=_KEY_COLUMN,
             filter_columns=filter_columns,
             dtype="f32",
         )
+        self._collection_created = True
+        return collection
 
     def _seed_key_set(self) -> None:
-        """Load chunk keys and rebuild the exact chunk index."""
+        """Load authoritative collection keys and rebuild the exact chunk index."""
         try:
-            ids = set(self._collection.ids())
-            if self._blob_store is not None:
-                ids.update(self._blob_store.keys())
-            with self._lock:
-                self._key_set.update(ids)
-                self._chunk_lengths.clear()
-                self._chunk_key_index.clear()
-                self._chunk_keys_by_start.clear()
-                for key in sorted(self._key_set):
-                    self._track_chunk_key(key)
+            with self._mutation_lock:
+                ids = set(self._collection.ids())
+                if self._legacy_migration_pending:
+                    if self._blob_store is not None:
+                        self._legacy_migration_candidates.update(
+                            set(self._blob_store.keys()) - ids
+                        )
+                    self._legacy_migration_pending = False
+                ids.update(self._legacy_migration_candidates)
+                with self._lock:
+                    self._key_set = ids
+                    self._record_cache = {
+                        key: record
+                        for key, record in self._record_cache.items()
+                        if key in ids
+                    }
+                    self._chunk_lengths.clear()
+                    self._chunk_key_index.clear()
+                    self._chunk_keys_by_start.clear()
+                    for key in sorted(self._key_set):
+                        self._track_chunk_key(key)
+                    key_count = len(self._key_set)
+                    chunk_start_count = len(self._chunk_lengths)
             logger.info(
                 "telys blob client seeded key set with %d keys (%d chunk starts)",
-                len(self._key_set),
-                len(self._chunk_lengths),
+                key_count,
+                chunk_start_count,
             )
         except Exception as exc:
             raise TelysLocalClientError(
@@ -934,6 +954,7 @@ class TelysBlobClient(TelysClient):
             clients = tuple(_BLOB_CLIENT_REGISTRY.get(self._shared_key, ()))
         for client in clients:
             with client._lock:
+                client._legacy_migration_candidates.discard(key)
                 client._key_set.add(key)
                 client._record_cache[key] = record
                 client._track_chunk_key(key)
@@ -943,6 +964,7 @@ class TelysBlobClient(TelysClient):
             clients = tuple(_BLOB_CLIENT_REGISTRY.get(self._shared_key, ()))
         for client in clients:
             with client._lock:
+                client._legacy_migration_candidates.discard(key)
                 client._key_set.discard(key)
                 client._record_cache.pop(key, None)
                 client._untrack_chunk_key(key)
@@ -957,17 +979,15 @@ class TelysBlobClient(TelysClient):
         return self._blob_store is not None
 
     def contains(self, key: str) -> bool:
-        """Fast in-process membership check; falls back to BlobStore/Telys on miss."""
+        """Check authoritative membership, falling back to a validated read."""
         self._check_open()
         with self._lock:
             if key in self._key_set:
                 return True
-        if self._blob_store is not None and self._blob_store.contains(key):
-            return True
         return self.get(key) is not None
 
     def keys(self) -> set[str]:
-        """Return a snapshot of keys in the metadata collection and BlobStore."""
+        """Return collection keys plus explicitly migratable legacy blobs."""
         self._check_open()
         self._seed_key_set()
         with self._lock:
@@ -1002,11 +1022,18 @@ class TelysBlobClient(TelysClient):
         with self._lock:
             return self._chunk_lengths.get(start_key, 0)
 
+    def _has_collection_membership(self, key: str) -> bool:
+        with self._lock:
+            return (
+                key in self._key_set
+                and key not in self._legacy_migration_candidates
+            )
+
     def get(self, key: str) -> TelysRecord | None:
         self._check_open()
         with self._lock:
             record = self._record_cache.get(key)
-        if record is not None:
+        if record is not None and self._has_collection_membership(key):
             self._cache_record_for_overlapping_clients(key, record)
             return record
 
@@ -1023,7 +1050,7 @@ class TelysBlobClient(TelysClient):
 
         if blob_found:
             complete_metadata = _complete_blob_metadata(blob_metadata)
-            if complete_metadata is not None:
+            if complete_metadata is not None and self._has_collection_membership(key):
                 complete_metadata.pop(_KEY_COLUMN, None)
                 record = TelysRecord(
                     key=key,
@@ -1048,6 +1075,7 @@ class TelysBlobClient(TelysClient):
                 return None
             result = {"ids": []}
         ids = result.get("ids") or []
+        migrate_legacy = False
         if ids:
             metadata_list = result.get("metadata") or []
             if not metadata_list:
@@ -1071,6 +1099,13 @@ class TelysBlobClient(TelysClient):
                 )
         elif blob_found:
             raw_metadata = dict(blob_metadata)
+            with self._lock:
+                migrate_legacy = key in self._legacy_migration_candidates
+                if not migrate_legacy:
+                    self._key_set.discard(key)
+                    self._record_cache.pop(key, None)
+                    self._untrack_chunk_key(key)
+                    return None
         else:
             return None
 
@@ -1092,7 +1127,10 @@ class TelysBlobClient(TelysClient):
                 provenance=_derived_provenance(key),
                 metadata=raw_metadata,
             )
-        self._cache_record_for_overlapping_clients(key, record)
+        if migrate_legacy:
+            self.put(key, record.value, record.metadata)
+        else:
+            self._cache_record_for_overlapping_clients(key, record)
         return record
 
     def get_batch(self, keys: list[str]) -> list[TelysRecord | None]:

@@ -868,6 +868,7 @@ def test_blob_read_preserves_digest_state_for_connector(
     metadata.pop("vllm.content_sha256")
     metadata.update(digest_override)
     client._blob_store.put(key, b"payload", metadata)
+    client._collection._rows[key] = {"__key": key, **metadata}
 
     try:
         record = client.get(key)
@@ -1175,6 +1176,7 @@ def test_blob_get_incomplete_or_invalid_metadata_uses_collection_fallback(
         "wrong_type": _complete_metadata(**{"vllm.model": None}),
     }[metadata_case]
     client._blob_store.records[key] = (b"payload", metadata)
+    client._collection._rows[key] = {"__key": key, **metadata}
     client._collection.search_calls = 0
 
     record = client.get(key)
@@ -1372,3 +1374,153 @@ def test_unicode_digit_legacy_key_is_ignored_by_chunk_index(
         assert client.chunk_length("test-ns/chunk/aa") == 0
     finally:
         client.close()
+
+
+def test_blob_delete_last_key_cannot_resurrect_orphan_or_stale_cache(
+    lc, monkeypatch, tmp_path
+):
+    path = tmp_path / "delete-last"
+    engine = _StubEngine(str(path))
+    monkeypatch.setattr(sys.modules["telys"], "Telys", lambda _: engine)
+    key = _chunk_key("chain")
+    metadata = _complete_metadata()
+    client = _make_blob_client(lc, monkeypatch, path)
+    client.put(key, b"payload", metadata)
+    stale_record = client.get(key)
+    assert stale_record is not None
+
+    assert client.delete(key) is True
+    client.close()
+    client._blob_store.records[key] = (b"payload", metadata)
+
+    reopened = _make_blob_client(lc, monkeypatch, path)
+    try:
+        assert reopened._collection_created is False
+        assert reopened._blob_store.contains(key) is True
+        assert reopened.keys() == set()
+        assert reopened.get(key) is None
+        assert reopened.contains(key) is False
+        assert reopened.chunk_candidates("test-ns/chunk/aa") == {}
+
+        reopened._record_cache[key] = stale_record
+        assert reopened.get(key) is None
+        assert key not in reopened._record_cache
+        assert key not in reopened._key_set
+    finally:
+        reopened.close()
+
+
+def test_blob_reset_cannot_resurrect_orphan_after_cold_reopen(
+    lc, monkeypatch, tmp_path
+):
+    from telys_vllm.store import TelysBlockStore
+
+    path = tmp_path / "reset-last"
+    engine = _StubEngine(str(path))
+    monkeypatch.setattr(sys.modules["telys"], "Telys", lambda _: engine)
+    sys.modules["telys"].BlobStore = _StubBlobStore
+    monkeypatch.setenv("TELYS_PATH", str(path))
+    monkeypatch.delenv("TELYS_ADDRESS", raising=False)
+    config = TelysConnectorConfig(
+        namespace="test-ns",
+        slab_path=None,
+        blobstore_no_slab=True,
+        write_behind=False,
+    )
+    client = lc.TelysBlobClient(config)
+    store = TelysBlockStore(
+        client,
+        config,
+        model_id="model",
+        engine_id="engine",
+        block_size=16,
+    )
+    hashes = [b"\xaa" * 32, b"\xbb" * 32]
+    key = store.save_chunk(
+        hashes[0], hashes, {"layer.0": [b"first", b"second"]}
+    )
+    orphaned_blob = client._blob_store.records[key]
+
+    store.reset()
+    assert client.get(key) is None
+    store.close()
+    client._blob_store.records[key] = orphaned_blob
+
+    cold_client = lc.TelysBlobClient(config)
+    cold_store = TelysBlockStore(
+        cold_client,
+        config,
+        model_id="model",
+        engine_id="engine",
+        block_size=16,
+    )
+    try:
+        assert cold_client._collection_created is False
+        assert cold_client._blob_store.contains(key) is True
+        assert cold_client.keys() == set()
+        assert cold_client.get(key) is None
+        assert cold_store.lookup_prefix(hashes) == 0
+    finally:
+        cold_store.close()
+
+
+def test_blob_legacy_record_with_collection_row_survives_reopen(
+    lc, monkeypatch, tmp_path
+):
+    path = tmp_path / "legacy-row"
+    engine = _StubEngine(str(path))
+    monkeypatch.setattr(sys.modules["telys"], "Telys", lambda _: engine)
+    key = _chunk_key("chain")
+    metadata = {"vllm.model": "legacy-model", "vllm.engine_id": "legacy-engine"}
+    client = _make_blob_client(lc, monkeypatch, path)
+    client.close()
+    client._collection._rows[key] = {"__key": key, **metadata}
+    client._blob_store.records[key] = (b"legacy payload", dict(metadata))
+
+    reopened = _make_blob_client(lc, monkeypatch, path)
+    try:
+        record = reopened.get(key)
+
+        assert record is not None
+        assert record.value == b"legacy payload"
+        assert record.metadata == metadata
+        assert reopened._collection.search_calls == 1
+    finally:
+        reopened.close()
+
+
+def test_blob_first_time_legacy_migration_attaches_collection_row(
+    lc, monkeypatch, tmp_path
+):
+    path = tmp_path / "legacy-migration"
+    engine = _StubEngine(str(path))
+    monkeypatch.setattr(sys.modules["telys"], "Telys", lambda _: engine)
+    key = _chunk_key("chain")
+    metadata = {"vllm.model": "legacy-model", "vllm.engine_id": "legacy-engine"}
+    _StubBlobStore(f"{path}_blobs").put(key, b"legacy payload", metadata)
+
+    client = _make_blob_client(lc, monkeypatch, path)
+    try:
+        assert client._collection_created is True
+        assert key in client._legacy_migration_candidates
+        assert client.keys() == {key}
+        record = client.get(key)
+
+        assert record is not None
+        assert record.value == b"legacy payload"
+        assert record.metadata == metadata
+        assert key in client._collection._rows
+        assert key not in client._legacy_migration_candidates
+    finally:
+        client.close()
+
+    reopened = _make_blob_client(lc, monkeypatch, path)
+    try:
+        assert reopened._collection_created is False
+        assert reopened._legacy_migration_candidates == set()
+        record = reopened.get(key)
+        assert record is not None
+        assert record.value == b"legacy payload"
+        assert record.metadata == metadata
+    finally:
+        reopened.close()

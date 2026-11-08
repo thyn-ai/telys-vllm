@@ -207,8 +207,14 @@ class _ChunkContentValidator:
                 _validate_content_digest(key, cached.identity, expected)
                 self._entries.move_to_end(token)
                 return cached.identity
-            identity = _encoded_chunk_identity(payload)
-            _validate_content_digest(key, identity, expected)
+        identity = _encoded_chunk_identity(payload)
+        _validate_content_digest(key, identity, expected)
+        with self._lock:
+            cached = self._entries.get(token)
+            if cached is not None and self._matches(cached, payload):
+                _validate_content_digest(key, cached.identity, expected)
+                self._entries.move_to_end(token)
+                return cached.identity
             self._insert(token, identity, payload, slab_token is None)
             return identity
 

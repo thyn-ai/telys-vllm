@@ -5,13 +5,13 @@ import json
 from unittest.mock import patch
 
 import torch
+from vllm.distributed.kv_transfer.kv_connector.v1.base import KVConnectorRole
+
 from telys_vllm.connector import (
     TelysConnectorMetadata,
     TelysKVConnector,
     TelysSaveSpec,
 )
-from vllm.distributed.kv_transfer.kv_connector.v1.base import KVConnectorRole
-
 from tests.fakes import (
     FakeNewReq,
     FakeRequest,

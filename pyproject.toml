@@ -18,6 +18,9 @@ dev = ["pytest>=8", "ruff==0.17.3"]
 [tool.hatch.build.targets.wheel]
 packages = ["telys_vllm"]
 
+[tool.ruff]
+target-version = "py310"
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]

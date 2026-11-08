@@ -9,9 +9,9 @@ from unittest.mock import patch
 
 import pytest
 import torch
+
 from telys_vllm.gpu_ops import AsyncKVExtractionBatch
 from telys_vllm.telemetry import Telemetry
-
 from tests.test_gpu_ops_layout import (
     BLOCK_SIZE,
     LAYER,

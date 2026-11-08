@@ -618,35 +618,62 @@ def test_validation_cache_byte_bound_and_oversized_bypass():
     assert validator.retained_bytes == 2
 
 
-def test_concurrent_validation_of_one_immutable_payload_hashes_once():
+def test_concurrent_validation_hashes_outside_lock_and_shares_one_entry():
     validator = _ChunkContentValidator(max_entries=8, max_bytes=1024)
     payload = b"immutable encoded payload"
-    barrier = threading.Barrier(5)
+    start_barrier = threading.Barrier(5)
+    hash_barrier = threading.Barrier(4)
     identities = []
+    hash_lock_states = []
     errors = []
 
     def validate() -> None:
         try:
-            barrier.wait(timeout=5)
+            start_barrier.wait(timeout=5)
             identities.append(validator.validate("key", payload, {}, None))
         except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
             errors.append(exc)
 
+    def gated_identity(value):
+        hash_lock_states.append(validator._lock.locked())
+        hash_barrier.wait(timeout=5)
+        return _encoded_chunk_identity(value)
+
     with patch(
         "telys_vllm.connector._encoded_chunk_identity",
-        wraps=_encoded_chunk_identity,
+        side_effect=gated_identity,
     ) as identity_hash:
         threads = [threading.Thread(target=validate) for _ in range(4)]
         for thread in threads:
             thread.start()
-        barrier.wait(timeout=5)
+        start_barrier.wait(timeout=5)
         for thread in threads:
             thread.join(timeout=10)
 
     assert not errors
     assert all(not thread.is_alive() for thread in threads)
-    assert identity_hash.call_count == 1
+    assert identity_hash.call_count == 4
+    assert hash_lock_states == [False] * 4
     assert identities == [identities[0]] * 4
+    assert len(validator) == 1
+    assert validator._entries[("inline", id(payload))].payload is payload
+
+
+def test_validation_cache_distinguishes_equal_inline_payload_objects():
+    validator = _ChunkContentValidator(max_entries=8, max_bytes=1024)
+    first_payload = bytes(bytearray(b"equal immutable payloads"))
+    second_payload = bytes(bytearray(b"equal immutable payloads"))
+    assert first_payload is not second_payload
+
+    first = validator.validate("first", first_payload, {}, None)
+    second = validator.validate("second", second_payload, {}, None)
+
+    assert first == second
+    assert len(validator) == 2
+    assert validator._entries[("inline", id(first_payload))].payload is first_payload
+    assert validator._entries[("inline", id(second_payload))].payload is second_payload
+    assert validator.validate("first", first_payload, {}, None) == first
+    assert len(validator) == 2
 
 
 def test_reset_and_shutdown_clear_validation_state():

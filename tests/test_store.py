@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """TelysBlockStore + codec: chunk key mapping, round-trip, errors, async writes."""
 
+import threading
 from dataclasses import replace
 
 import pytest
@@ -529,3 +530,226 @@ def test_fast_load_rejects_empty_decoded_layers(tmp_path, monkeypatch):
 
     with pytest.raises(TelysStoreError, match="has no layers"):
         store.load_decoded_blocks_fast(hashes)
+
+
+def _race_hashes() -> tuple[list[bytes], list[bytes]]:
+    return [b"\x30" * 32, b"\x31" * 32], [b"\x40" * 32, b"\x41" * 32]
+
+
+def test_reset_then_concurrent_save_survives_complete_after_cold_reopen(
+    tmp_path, monkeypatch
+):
+    client = FakeTelysClient()
+    store = make_store(tmp_path, client, write_behind=False)
+    old_hashes, new_hashes = _race_hashes()
+    seed_chunk(store, old_hashes, b"old")
+    old_key = store.chunk_key(old_hashes[0], len(old_hashes), old_hashes[-1])
+    new_key = store.chunk_key(new_hashes[0], len(new_hashes), new_hashes[-1])
+    snapshot_ready = threading.Event()
+    release_reset = threading.Event()
+    save_done = threading.Event()
+    errors: list[Exception] = []
+
+    def paused_keys():
+        snapshot = client.__class__.keys(client)
+        snapshot_ready.set()
+        if not release_reset.wait(timeout=5):
+            raise TimeoutError("timed out waiting to release reset")
+        return snapshot
+
+    def run_reset():
+        try:
+            store.reset()
+        except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
+            errors.append(exc)
+
+    def run_save():
+        try:
+            store.save_chunk(
+                new_hashes[0], new_hashes, {LAYER: [b"new"] * len(new_hashes)}
+            )
+        except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
+            errors.append(exc)
+        finally:
+            save_done.set()
+
+    monkeypatch.setattr(client, "keys", paused_keys)
+    reset_thread = threading.Thread(target=run_reset)
+    save_thread = threading.Thread(target=run_save)
+    try:
+        reset_thread.start()
+        assert snapshot_ready.wait(timeout=5)
+        save_thread.start()
+        assert not save_done.wait(timeout=0.05)
+        release_reset.set()
+        reset_thread.join(timeout=5)
+        save_thread.join(timeout=5)
+        assert not reset_thread.is_alive()
+        assert not save_thread.is_alive()
+        assert not errors
+        assert client.get(old_key) is None
+        assert client.get(new_key) is not None
+        store.close()
+
+        cold = make_store(tmp_path, client, write_behind=False)
+        try:
+            assert cold.lookup_prefix(old_hashes) == 0
+            loaded = cold.load_blocks(new_hashes)
+            assert [decode_record_value(record) for record in loaded] == [
+                {LAYER: b"new"},
+                {LAYER: b"new"},
+            ]
+        finally:
+            cold.close()
+    finally:
+        release_reset.set()
+        reset_thread.join(timeout=5)
+        save_thread.join(timeout=5)
+        if not store._closed:
+            store.close()
+
+
+def test_save_then_concurrent_reset_deletes_complete_record_after_cold_reopen(
+    tmp_path, monkeypatch
+):
+    client = FakeTelysClient()
+    store = make_store(tmp_path, client, write_behind=False)
+    old_hashes, new_hashes = _race_hashes()
+    seed_chunk(store, old_hashes, b"old")
+    old_key = store.chunk_key(old_hashes[0], len(old_hashes), old_hashes[-1])
+    new_key = store.chunk_key(new_hashes[0], len(new_hashes), new_hashes[-1])
+    put_started = threading.Event()
+    release_put = threading.Event()
+    reset_done = threading.Event()
+    errors: list[Exception] = []
+    original_put = client.put
+
+    def paused_put(key, value, metadata):
+        if key == new_key:
+            put_started.set()
+            if not release_put.wait(timeout=5):
+                raise TimeoutError("timed out waiting to release put")
+        original_put(key, value, metadata)
+
+    def run_save():
+        try:
+            store.save_chunk(
+                new_hashes[0], new_hashes, {LAYER: [b"new"] * len(new_hashes)}
+            )
+        except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
+            errors.append(exc)
+
+    def run_reset():
+        try:
+            store.reset()
+        except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
+            errors.append(exc)
+        finally:
+            reset_done.set()
+
+    monkeypatch.setattr(client, "put", paused_put)
+    save_thread = threading.Thread(target=run_save)
+    reset_thread = threading.Thread(target=run_reset)
+    try:
+        save_thread.start()
+        assert put_started.wait(timeout=5)
+        reset_thread.start()
+        assert not reset_done.wait(timeout=0.05)
+        release_put.set()
+        save_thread.join(timeout=5)
+        reset_thread.join(timeout=5)
+        assert not save_thread.is_alive()
+        assert not reset_thread.is_alive()
+        assert not errors
+        assert client.get(old_key) is None
+        assert client.get(new_key) is None
+        store.close()
+
+        cold = make_store(tmp_path, client, write_behind=False)
+        try:
+            assert cold.lookup_prefix(old_hashes) == 0
+            assert cold.lookup_prefix(new_hashes) == 0
+            assert (tmp_path / "kv.slab").stat().st_size == 16
+        finally:
+            cold.close()
+    finally:
+        release_put.set()
+        save_thread.join(timeout=5)
+        reset_thread.join(timeout=5)
+        if not store._closed:
+            store.close()
+
+
+def test_reset_preserves_new_write_behind_pending_accounting(tmp_path, monkeypatch):
+    client = FakeTelysClient()
+    store = make_store(tmp_path, client, write_behind=True)
+    old_hashes, new_hashes = _race_hashes()
+    seed_chunk(store, old_hashes, b"old")
+    store.drain()
+    new_key = store.chunk_key(new_hashes[0], len(new_hashes), new_hashes[-1])
+    snapshot_ready = threading.Event()
+    release_reset = threading.Event()
+    put_started = threading.Event()
+    release_put = threading.Event()
+    errors: list[Exception] = []
+    original_keys = client.keys
+    original_put = client.put
+
+    def paused_keys():
+        snapshot = original_keys()
+        snapshot_ready.set()
+        if not release_reset.wait(timeout=5):
+            raise TimeoutError("timed out waiting to release reset")
+        return snapshot
+
+    def paused_put(key, value, metadata):
+        if key == new_key:
+            put_started.set()
+            if not release_put.wait(timeout=5):
+                raise TimeoutError("timed out waiting to release put")
+        original_put(key, value, metadata)
+
+    def run_reset():
+        try:
+            store.reset()
+        except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
+            errors.append(exc)
+
+    monkeypatch.setattr(client, "keys", paused_keys)
+    monkeypatch.setattr(client, "put", paused_put)
+    reset_thread = threading.Thread(target=run_reset)
+    try:
+        reset_thread.start()
+        assert snapshot_ready.wait(timeout=5)
+        store.save_chunk(
+            new_hashes[0], new_hashes, {LAYER: [b"new"] * len(new_hashes)}
+        )
+        assert store._pending_count == 1
+        release_reset.set()
+        reset_thread.join(timeout=5)
+        assert not reset_thread.is_alive()
+        assert put_started.wait(timeout=5)
+        assert store._pending_count == 1
+        assert new_key in store._pending_keys
+        release_put.set()
+        store.drain()
+        assert store._pending_count == 0
+        assert not errors
+        store.close()
+
+        cold = make_store(tmp_path, client, write_behind=False)
+        try:
+            loaded = cold.load_blocks(new_hashes)
+            assert [decode_record_value(record) for record in loaded] == [
+                {LAYER: b"new"},
+                {LAYER: b"new"},
+            ]
+            assert cold._pending_count == 0
+        finally:
+            cold.close()
+    finally:
+        release_reset.set()
+        release_put.set()
+        reset_thread.join(timeout=5)
+        if not store._closed:
+            store.close()
