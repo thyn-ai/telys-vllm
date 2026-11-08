@@ -250,7 +250,7 @@ Because only one C' cold run completed for persistence, warm-cache numbers for t
 - Investigate the EngineCore crash with vLLM-native prefix caching disabled and large working sets; it may require limiting in-flight sequences or changing KV-block allocation.
 - Consider a staged benchmark that pre-populates Telys and then measures only the lookup/inject phase, separated from the save phase.
 
-## Telemetry Autopsy — headline workload, batched injection fix
+## Telemetry analysis — headline workload, batched injection fix
 
 Run: 2026-10-25 ~15:30–16:03 UTC  
 Pod: Runpod A40 `6brrvv8awzdsac`, EU-SE-1  
@@ -258,7 +258,7 @@ Model: `Qwen/Qwen2.5-7B-Instruct`
 Harness: `bench/benchmark_prefix_caching_metrics.py` with `bench/run_autopsy_headline.sh`  
 Telemetry: `telys_vllm/telemetry.py` JSONL + `bench/summarize_telemetry.py`
 
-The Telys runtime auth blocker from the earlier autopsy attempt was resolved by refreshing `~/.telys/` credentials on the local Mac and reinstalling the runtime on the pod:
+The Telys runtime auth blocker from the earlier validation attempt was resolved by refreshing `~/.telys/` credentials on the local Mac and reinstalling the runtime on the pod:
 
 ```
 TELYS_TOKEN=$(cat /root/.telys/api_key) telys runtime install --license /root/.telys/login_license.jwt
@@ -383,10 +383,10 @@ The `inject` median is not directly comparable before vs after: before, each spa
 ### What's next
 
 - Replace `torch.save`/`torch.load` per block blob with a raw-byte tensor serialization to cut the remaining `tensor_from_blob` cost.
-- Re-run the autopsy after that change; re-populate Telys state because the blob format would change.
+- Re-run the benchmark after that change; re-populate Telys state because the blob format would change.
 - Investigate whether the headline C′ warm path can be brought under the ~49 s Arm A TTFT baseline, or whether the PCIe transfer + deserialization cost makes that impossible for a 4K-prefix/7B workload on this GPU class.
 
-## Autopsy v2 — BlobStore + raw-byte tensors
+## Benchmark v2 — BlobStore + raw-byte tensors
 
 Run: 2026-10-25 ~16:57–17:05 UTC  
 Pod: Runpod A40 `k6k6jcqazq9y9n`, EU-SE-1  
@@ -398,7 +398,7 @@ This run adopts the native Telys SDK `BlobStore` for payload bytes and replaces 
 
 ### Workload
 
-Same as the previous autopsy:
+Same as the previous benchmark:
 
 - `num_prompts=20`
 - `repeat_count=5`
@@ -519,7 +519,7 @@ The raw-byte path eliminates `torch.load`/`pickle` parsing; deserialization is n
 - Consider prefetching/warming the full prefix into GPU KV cache before the first request to hide the PCIe transfer + decode cost.
 - Re-run the small/persistence workloads to see whether the BlobStore path also improves stability under larger KV-cache pressure.
 
-## Autopsy v3 — headline re-measurement
+## Benchmark v3 — headline re-measurement
 
 Run: 2026-10-25 ~20:06–20:10 UTC  
 Pod: Runpod A40 `z9d81mgsl7hg7v`, EU-SE-1  
@@ -598,7 +598,7 @@ Source: `bench/autopsy-v3/results/warm_telemetry.jsonl` (≈273 MB, summarized o
 
 ### Focused per-phase table (warm-hit request)
 
-| phase | Autopsy v2 BlobStore (s) | Autopsy v3 (s) | notes |
+| phase | Benchmark v2 BlobStore (s) | Benchmark v3 (s) | notes |
 |-------|--------------------------|----------------|-------|
 | engine boot | 17.72 | 18.78 | vLLM init + KV cache + warmup |
 | connector init | 0.00042 | 0.00048 | `connector_store_init` span |
@@ -624,7 +624,7 @@ Cold and warm outputs are text/token-identical, confirming the connector does no
 
 1. **Telys hit path is still working.** The warm C′ run reports 99.0% external prefix-cache hits and connector lookups show `hit_blocks == max_block` for full-prefix requests.
 
-2. **Warm TTFT regressed from the v2 BlobStore result.** C′ warm TTFT p50 is 69.6 s in this re-measurement vs 58.4 s in Autopsy v2. The main telemetry shifts are a higher `store_read_chunk` median (0.327 s vs 0.139 s) and higher `start_load_kv` total (96.7 s vs 83.3 s). Without a code change between the two runs, the most likely explanation is pod-to-pod variance or a change in the Telys SDK/runtime version that affects BlobStore read latency.
+2. **Warm TTFT regressed from the v2 BlobStore result.** C′ warm TTFT p50 is 69.6 s in this re-measurement vs 58.4 s in Benchmark v2. The main telemetry shifts are a higher `store_read_chunk` median (0.327 s vs 0.139 s) and higher `start_load_kv` total (96.7 s vs 83.3 s). Without a code change between the two runs, the most likely explanation is pod-to-pod variance or a change in the Telys SDK/runtime version that affects BlobStore read latency.
 
 3. **Telys warm-cache is slower than recomputing on first-token latency.** Arm A TTFT p50 is 48.4 s; C′ warm is 69.6 s — **1.44× slower** than the recompute baseline. Total wall time is essentially a wash (106.14 s vs 106.33 s) because the warm cache avoids recomputing the 4096-token prefix; the first-token penalty remains.
 
@@ -632,7 +632,7 @@ Cold and warm outputs are text/token-identical, confirming the connector does no
 
 5. **The connector is functionally correct.** Block hashes are deterministic, Telys chunks persist across runs, warm lookups return full-prefix hits, and the output-verification test passed.
 
-## Autopsy v4 — fast-path stacked tensors
+## Benchmark v4 — fast-path stacked tensors
 
 Run: 2026-10-25 ~22:20–22:25 UTC  
 Pod: Runpod A40 `v1d3lajc49sxde`, EU-SE-1  
@@ -648,7 +648,7 @@ Two fixes landed immediately before this run:
 
 ### Workload
 
-Same as the previous autopsy:
+Same as the previous benchmark:
 
 - `num_prompts=20`
 - `repeat_count=5` (Arm A and C′ warm) / `1` (C′ cold)
@@ -690,9 +690,9 @@ The fast path removes per-block `torch.load`/`deserialize_kv_tensor` overhead an
 
 3. **Warm total throughput beats recompute.** C′ warm total time is 78.8 s vs Arm A 106.8 s, and throughput is 81.2 tok/s vs 60.0 tok/s. Avoiding recomputation of the 4096-token prefix pays off in overall throughput when the working set fits.
 
-4. **Warm TTFT p50 is still behind recompute.** Arm A TTFT p50 is 46.6 s; C′ warm is 50.1 s — **1.08× slower** on first-token latency. The fast path narrowed the gap from Autopsy v3 (69.6 s, 1.44×) but has not closed it completely. The remaining cost is the contiguous chunk H2D transfer + per-layer batched injection for the full prefix on every batch.
+4. **Warm TTFT p50 is still behind recompute.** Arm A TTFT p50 is 46.6 s; C′ warm is 50.1 s — **1.08× slower** on first-token latency. The fast path narrowed the gap from Benchmark v3 (69.6 s, 1.44×) but has not closed it completely. The remaining cost is the contiguous chunk H2D transfer + per-layer batched injection for the full prefix on every batch.
 
-5. **The connector is slab-backed in this run.** Because `telys.BlobStore` is unavailable in the installed runtime, all numbers are via `TelysLocalClient` + slab. They are comparable to v3's slab path, not to Autopsy v2's BlobStore path.
+5. **The connector is slab-backed in this run.** Because `telys.BlobStore` is unavailable in the installed runtime, all numbers are via `TelysLocalClient` + slab. They are comparable to v3's slab path, not to Benchmark v2's BlobStore path.
 
 ### Files touched
 
@@ -712,7 +712,7 @@ The fast path removes per-block `torch.load`/`deserialize_kv_tensor` overhead an
 - Profile whether prefetching/staging the next batch's prefix chunk while the current batch generates can hide the remaining H2D transfer cost.
 - Re-run the small/persistence workloads to check whether the fast path also improves stability under larger KV-cache pressure.
 
-## Autopsy v5 — fast path + BlobStore (telys 0.1.10)
+## Benchmark v5 — fast path + BlobStore (telys 0.1.10)
 
 Run: 2026-10-26 ~00:23–00:30 UTC  
 Pod: Runpod A40 `7vewld6266m2fm`, EU-SE-1  
@@ -724,7 +724,7 @@ This run keeps the v4 zero-decode fast path (stacked per-layer CPU tensors, asyn
 
 ### Workload
 
-Same as the previous autopsy:
+Same as the previous benchmark:
 
 - `num_prompts=20`
 - `repeat_count=5` (Arm A and C′ warm) / `1` (C′ cold)
@@ -819,7 +819,7 @@ The `store_read_chunk` median drops from 139 ms (slab file) to 0.59 ms (BlobStor
   - `_auto_client()` already selected `TelysBlobClient` when `telys.BlobStore` is available; this run is the first exercise of that path with the fast-format codec.
 - `bench/run_autopsy_headline.sh`
   - Added `PYTHONPATH=/root/bench/telys-vllm` because the package is used in-place on the pod (no editable install).
-  - Changed C′ cold to `repeat_count=1` (20 prompts) to match the previous autopsy cold-population pattern.
+  - Changed C′ cold to `repeat_count=1` (20 prompts) to match the previous benchmark cold-population pattern.
 
 ### Honest verdict
 
@@ -839,7 +839,7 @@ The `store_read_chunk` median drops from 139 ms (slab file) to 0.59 ms (BlobStor
 
 ---
 
-## Autopsy v6 — 16K-prefix stability retest (telys 0.1.10)
+## Benchmark v6 — 16K-prefix stability retest (telys 0.1.10)
 
 **Goal:** Re-run the workload shape that previously crashed the vLLM EngineCore during warm C′ runs (~64–68% completion, GPU KV cache ~88–97%) with the current batched-injection + BlobStore fast-path code. Test both 8K and 16K prefixes under load.
 
@@ -922,7 +922,7 @@ All six EngineCore processes shut down cleanly (SIGTERM after normal request pro
 
 ---
 
-## Autopsy v7 — two-replica shared-cache demo (telys 0.1.10)
+## Benchmark v7 — two-replica shared-cache demo (telys 0.1.10)
 
 **Goal:** Prove that one Telys store can be shared across two completely separate vLLM engine processes: engine A cold-populates the store and exits, engine B starts fresh (native prefix cache empty by construction) and warm-hits the shared store.
 

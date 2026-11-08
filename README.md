@@ -28,14 +28,14 @@ prefix caching **OFF** (`--no-enable-prefix-caching`), RunPod A40 (EU-SE-1),
 
 | Version | Arm | TTFT p50 | Total time | Throughput | Speedup vs recompute |
 |---|---|---:|---:|---:|---:|
-| Autopsy v5 | Recompute (no cache) | 49.3 s | 106.8 s | 60.0 tok/s | 1.0× |
-| Autopsy v5 | Telys warm hit | **27.8 s** | **78.8 s** | **81.2 tok/s** | **1.8× TTFT, 1.35× total** |
-| Autopsy v6 | Recompute, 8K prefix | 89.3 s | 189.1 s | 33.9 tok/s | 1.0× |
-| Autopsy v6 | Telys warm, 8K prefix | 25.1 s | 41.9 s | 152.7 tok/s | 3.6× TTFT, 4.5× total |
-| Autopsy v6 | Recompute, 16K prefix | 186.6 s | 383.3 s | 16.7 tok/s | 1.0× |
-| Autopsy v6 | Telys warm, 16K prefix | 48.6 s | 74.1 s | 86.4 tok/s | 3.8× TTFT, 5.2× total |
-| Autopsy v7 | Recompute (fresh process) | 49.7 s | 103.9 s | 61.6 tok/s | 1.0× |
-| Autopsy v7 | Telys warm, second replica | **16.8 s** | **29.0 s** | **220.9 tok/s** | **2.96× TTFT, 3.58× total** |
+| Benchmark v5 | Recompute (no cache) | 49.3 s | 106.8 s | 60.0 tok/s | 1.0× |
+| Benchmark v5 | Telys warm hit | **27.8 s** | **78.8 s** | **81.2 tok/s** | **1.8× TTFT, 1.35× total** |
+| Benchmark v6 | Recompute, 8K prefix | 89.3 s | 189.1 s | 33.9 tok/s | 1.0× |
+| Benchmark v6 | Telys warm, 8K prefix | 25.1 s | 41.9 s | 152.7 tok/s | 3.6× TTFT, 4.5× total |
+| Benchmark v6 | Recompute, 16K prefix | 186.6 s | 383.3 s | 16.7 tok/s | 1.0× |
+| Benchmark v6 | Telys warm, 16K prefix | 48.6 s | 74.1 s | 86.4 tok/s | 3.8× TTFT, 5.2× total |
+| Benchmark v7 | Recompute (fresh process) | 49.7 s | 103.9 s | 61.6 tok/s | 1.0× |
+| Benchmark v7 | Telys warm, second replica | **16.8 s** | **29.0 s** | **220.9 tok/s** | **2.96× TTFT, 3.58× total** |
 
 Key takeaways:
 
