@@ -25,6 +25,7 @@ requested logical coordinates.
 from __future__ import annotations
 
 from math import prod
+from unittest.mock import patch
 
 import pytest
 
@@ -33,7 +34,12 @@ try:
 except ImportError:  # pragma: no cover - CPU-only dev environments
     torch = None  # type: ignore[assignment]
 
-from telys_vllm.gpu_ops import extract_kv_blocks, inject_kv_blocks
+from telys_vllm.gpu_ops import (
+    deserialize_kv_tensor,
+    extract_kv_blocks,
+    inject_kv_blocks,
+    serialize_kv_tensor,
+)
 
 pytestmark = pytest.mark.skipif(torch is None, reason="torch required")
 
@@ -174,3 +180,31 @@ def test_extract_one_cpu_transfer_preserves_bf16_bytes_for_noncontiguous_input()
         assert block.dtype == torch.bfloat16
         assert block.shape == expected_block.shape
         assert _raw_bytes(block) == _raw_bytes(expected_block)
+
+
+def test_deserialize_immutable_bytes_preserves_zero_copy_fast_path():
+    tensor = torch.arange(8, dtype=torch.float32)
+    raw = serialize_kv_tensor(tensor)
+
+    with patch.object(torch, "frombuffer", wraps=torch.frombuffer) as frombuffer:
+        decoded = deserialize_kv_tensor(raw)
+
+    assert frombuffer.call_count == 1
+    assert frombuffer.call_args.args[0] is raw
+    assert torch.equal(decoded, tensor)
+
+
+@pytest.mark.parametrize(
+    "make_mutable",
+    [bytearray, lambda raw: memoryview(bytearray(raw))],
+    ids=["bytearray", "memoryview"],
+)
+def test_deserialize_mutable_input_is_isolated_from_later_mutation(make_mutable):
+    tensor = torch.ones(8, dtype=torch.float32)
+    mutable = make_mutable(serialize_kv_tensor(tensor))
+    decoded = deserialize_kv_tensor(mutable)
+    header_end = 3 + tensor.ndim * 2
+
+    mutable[header_end:] = b"\x00" * tensor.nbytes
+
+    assert torch.equal(decoded, tensor)

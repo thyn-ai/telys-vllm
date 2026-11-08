@@ -1100,6 +1100,9 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
 
         layer_blobs: dict[str, dict[bytes, bytes]] = {}
         block_ids = sorted(block_hash_to_id.values())
+        block_id_to_index: dict[int, int] = {}
+        for index, block_id in enumerate(block_ids):
+            block_id_to_index.setdefault(block_id, index)
         for layer_name, kv_cache in self._kv_caches.items():
             # Attention metadata is unavailable when torch.compile elides the
             # per-layer save_kv_layer decorator. Extraction only needs it for
@@ -1114,7 +1117,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
             )
             blobs = [serialize_kv_tensor(t) for t in tensors]
             layer_blobs[layer_name] = {
-                block_hash: blobs[block_ids.index(block_id)]
+                block_hash: blobs[block_id_to_index[block_id]]
                 for block_hash, block_id in block_hash_to_id.items()
             }
         return layer_blobs

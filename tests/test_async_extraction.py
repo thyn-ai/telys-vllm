@@ -49,10 +49,11 @@ class _PinnedTestTensor(torch.Tensor):
 
 
 class _FakeEvent:
-    def __init__(self) -> None:
+    def __init__(self, synchronize_error: Exception | None = None) -> None:
         self.record_calls = 0
         self.synchronize_calls = 0
         self.stream = None
+        self.synchronize_error = synchronize_error
 
     def record(self, stream) -> None:
         self.record_calls += 1
@@ -60,6 +61,8 @@ class _FakeEvent:
 
     def synchronize(self) -> None:
         self.synchronize_calls += 1
+        if self.synchronize_error is not None:
+            raise self.synchronize_error
 
 
 _REAL_EMPTY = torch.empty
@@ -221,4 +224,89 @@ def test_async_batch_rejects_stream_change_and_drains_pending_copy():
     assert _PinnedTestTensor.copy_calls == [True]
     assert _FakeCudaTensor.cpu_calls == 0
     assert event.record_calls == 1
+    assert event.synchronize_calls == 1
+
+
+def test_async_batch_preserves_copy_error_when_synchronization_also_fails():
+    layer = _fake_cuda_layers()[LAYER]
+    event = _FakeEvent(RuntimeError("injected event synchronization failure"))
+    stream = object()
+    _PinnedTestTensor.copy_calls = []
+    _PinnedTestTensor.fail_copy = True
+
+    try:
+        with pytest.raises(
+            RuntimeError, match="nonblocking pinned KV extraction failed"
+        ) as exc_info:
+            with (
+                patch.object(torch, "empty", side_effect=_pinned_empty),
+                patch.object(torch.cuda, "current_stream", return_value=stream),
+                patch.object(torch.cuda, "Event", return_value=event),
+                AsyncKVExtractionBatch() as batch,
+            ):
+                batch.extract(layer, [1, 2], BLOCK_SIZE, None)
+    finally:
+        _PinnedTestTensor.fail_copy = False
+
+    assert event.record_calls == 1
+    assert event.synchronize_calls == 1
+    assert batch._closed
+    assert any(
+        "async KV extraction synchronization failure" in note
+        and "injected event synchronization failure" in note
+        for note in exc_info.value.__notes__
+    )
+
+
+def test_async_batch_normal_exit_raises_synchronization_error_and_closes():
+    layer = _fake_cuda_layers()[LAYER]
+    event = _FakeEvent(RuntimeError("injected event synchronization failure"))
+    stream = object()
+    _PinnedTestTensor.fail_copy = False
+
+    with pytest.raises(
+        RuntimeError, match="failed to synchronize async KV extraction"
+    ) as exc_info:
+        with (
+            patch.object(torch, "empty", side_effect=_pinned_empty),
+            patch.object(torch.cuda, "current_stream", return_value=stream),
+            patch.object(torch.cuda, "Event", return_value=event),
+            AsyncKVExtractionBatch() as batch,
+        ):
+            batch.extract(layer, [1, 2], BLOCK_SIZE, None)
+
+    assert str(exc_info.value.__cause__) == "injected event synchronization failure"
+    assert event.synchronize_calls == 1
+    assert batch._closed
+    with pytest.raises(RuntimeError, match="async KV extraction batch is closed"):
+        with batch:
+            pass
+
+
+def test_async_batch_owns_pinned_storage_until_copy_drains():
+    import gc
+    import weakref
+
+    layer = _fake_cuda_layers()[LAYER]
+    stream = object()
+    pinned_refs = []
+
+    class LifetimeCheckingEvent(_FakeEvent):
+        def synchronize(self):
+            assert pinned_refs[0]() is not None
+            super().synchronize()
+
+    event = LifetimeCheckingEvent()
+    _PinnedTestTensor.fail_copy = False
+    with (
+        patch.object(torch, "empty", side_effect=_pinned_empty),
+        patch.object(torch.cuda, "current_stream", return_value=stream),
+        patch.object(torch.cuda, "Event", return_value=event),
+        AsyncKVExtractionBatch() as batch,
+    ):
+        pinned_refs.append(weakref.ref(batch.extract(layer, [1, 2], BLOCK_SIZE, None)))
+        gc.collect()
+
+    gc.collect()
+    assert pinned_refs[0]() is None
     assert event.synchronize_calls == 1

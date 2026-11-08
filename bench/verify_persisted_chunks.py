@@ -431,7 +431,7 @@ def _recompute_hashes(
 
 
 def _chunk_payload(record: TelysRecord, slab: KVSlab | None) -> bytes:
-    if record.value:
+    if record.value is not None:
         return bytes(record.value)
     metadata = record.metadata
     try:
@@ -594,13 +594,10 @@ def _verify_request(
         start_hash = hashes[index]
         start_key = f"{expectation.namespace}/chunk/{start_hash.hex()}"
         block_count = client.chunk_length(start_key)
-        if block_count == 0:
-            index += 1
-            continue
         if (
             isinstance(block_count, bool)
             or not isinstance(block_count, int)
-            or block_count < 1
+            or block_count < 0
         ):
             errors.append(
                 _error(
@@ -610,6 +607,9 @@ def _verify_request(
                 )
             )
             break
+        if block_count == 0:
+            index += 1
+            continue
         key = f"{start_key}/{block_count}"
         cache_key = (
             key,

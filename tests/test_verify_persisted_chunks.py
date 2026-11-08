@@ -366,6 +366,46 @@ def test_corrupt_payload_fails_decoding(persisted_case):
     )
 
 
+def test_empty_inline_payload_fails_in_chunk_decoder(persisted_case):
+    prefix_key = persisted_case.store.chunk_key(persisted_case.hashes[0], 2)
+    persisted_case.client._values[prefix_key] = b""
+    result = _verify(persisted_case, persisted_case.record())
+    assert result["status"] == "fail"
+    request = result["requests"][0]
+    chunk = request["chunks"][0]
+    assert chunk["payload_bytes"] == 0
+    assert chunk["payload_sha256"] == hashlib.sha256(b"").hexdigest()
+    expected_message = (
+        "truncated fast chunk header"
+        if persisted_case.chunk_format == "fast"
+        else "truncated chunk header"
+    )
+    assert request["errors"][0] == {
+        "code": "invalid_chunk",
+        "message": expected_message,
+        "details": {
+            "key": prefix_key,
+            "exception_type": "PayloadCodecError",
+        },
+    }
+
+
+def test_false_chunk_length_is_invalid(persisted_case, monkeypatch):
+    monkeypatch.setattr(persisted_case.client, "chunk_length", lambda _key: False)
+    get_count = persisted_case.client.get_count
+    result = _verify(persisted_case, persisted_case.record())
+    assert result["status"] == "fail"
+    request = result["requests"][0]
+    start_key = f"test-ns/chunk/{persisted_case.hashes[0].hex()}"
+    assert request["errors"][0] == {
+        "code": "invalid_chunk_length",
+        "message": "client returned an invalid chunk length",
+        "details": {"key": start_key},
+    }
+    assert request["missing_block_indices"] == [0, 1, 2]
+    assert persisted_case.client.get_count == get_count
+
+
 def test_wrong_expected_dtype_fails(persisted_case):
     context = _context(dtype="torch.float16")
     _write_manifest(

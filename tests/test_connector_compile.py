@@ -75,3 +75,48 @@ def test_wait_for_save_extracts_from_registered_kv_caches():
 
     # All blocks are one contiguous run -> one chunk.
     assert worker_client.put_count == 1
+
+
+class _ComparisonCountingInt(int):
+    comparisons = 0
+
+    def __eq__(self, other):
+        type(self).comparisons += 1
+        return int(self) == int(other)
+
+    __hash__ = int.__hash__
+
+
+def test_collect_layer_blobs_uses_linear_block_lookup_and_preserves_mapping():
+    worker = make_worker()
+    num_blocks = 32
+    hashes = make_hashes(num_blocks)
+    block_hash_to_id = {
+        block_hash: _ComparisonCountingInt(block_id)
+        for block_hash, block_id in zip(hashes, reversed(range(num_blocks)))
+    }
+    worker.register_kv_caches({"layer.0": "layer.0", "layer.1": "layer.1"})
+
+    def fake_extract(kv_layer, block_ids, block_size, attn_metadata):
+        return [f"{kv_layer}:{int(block_id)}".encode() for block_id in block_ids]
+
+    expected = {
+        layer_name: {
+            block_hash: f"{layer_name}:{int(block_id)}".encode()
+            for block_hash, block_id in block_hash_to_id.items()
+        }
+        for layer_name in worker._kv_caches
+    }
+    _ComparisonCountingInt.comparisons = 0
+
+    with (
+        patch("telys_vllm.connector.extract_kv_blocks", fake_extract),
+        patch(
+            "telys_vllm.connector.serialize_kv_tensor",
+            side_effect=lambda blob: blob,
+        ),
+    ):
+        actual = worker._collect_layer_blobs_from_kv_caches(block_hash_to_id)
+
+    assert actual == expected
+    assert _ComparisonCountingInt.comparisons == 0
