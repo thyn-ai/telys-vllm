@@ -99,9 +99,9 @@ and Ruff passed. Real Telys `0.1.14` / vLLM `0.32.0` A40 validation completed
 persistence, reopen, old-schema, overlap, and cross-process race coverage. The
 opt-in real output-correctness wrapper passed two tests with batch invariance
 set only in its verifier child. No connector real-runtime blocker remained;
-the documented raw SDK delete/reopen defect remains an upstream SDK issue and
-the connector fails closed. PR #4 remains under review, and these checks do
-not claim that it merged or that a stable artifact was published.
+the raw SDK delete/reopen defect was fixed in Telys `0.1.15`; the connector
+also fails closed on affected older stores. PR #4 merged after these checks.
+This validation does not claim stable connector artifact publication.
 
 ## Reproduction and evidence provenance
 

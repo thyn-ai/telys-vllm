@@ -103,7 +103,11 @@ separately labeled in
 Source commit `1a100ac26dff6a98b8ceafec5cdaebf0f5d49135` matched all 10 compared
 Python files in `rc9-source-verification.json`. The `v0.1.2` Git tag exists, but
 this evidence does not establish a stable GitHub Release, PyPI wheel, or signed
-stable GHCR image; rc9 must not be represented as one.
+stable GHCR image; rc9 must not be represented as one. The `v0.1.3` source tag
+also exists; its automated publication stopped when the GHCR image push was
+denied by the package's repository Actions grant. Downstream GitHub Release and
+PyPI jobs were skipped. No stable `0.1.3` GitHub Release, PyPI wheel, or signed
+GHCR image is claimed here.
 
 Cold worker `yutiyuykg0g2gc` completed in **7.042 s** and persisted **538 prompt
 blocks + 4 generated blocks = 542 blocks**. Fresh worker `tdi0xf9426iu21` returned
