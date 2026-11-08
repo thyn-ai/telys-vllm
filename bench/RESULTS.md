@@ -1,5 +1,12 @@
 # telys-vllm prefix-caching benchmark results
 
+> **Current concurrent comparison:** see
+> [`CONCURRENT.md`](CONCURRENT.md) for the three-repetition 8K/c1/c4/c8 and
+> 16K/c8 matrix, true fresh-process external-hit baselines, separate native-hot
+> results, exact source/runtime provenance, and batch-invariant correctness.
+> The v2-v7 tables below are sequential historical measurements; do not present
+> their no-native-cache recompute comparisons as native-hot wins.
+
 ## v2 — shared-engine / hot-cache connector fix
 
 Run: 2026-10-25 ~00:18–00:30 UTC  
