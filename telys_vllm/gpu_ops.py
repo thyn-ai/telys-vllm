@@ -101,7 +101,7 @@ class AsyncKVExtractionBatch:
         self._copy_started = False
         self._closed = False
 
-    def __enter__(self) -> AsyncKVExtractionBatch:
+    def __enter__(self):
         if self._closed:
             raise RuntimeError("async KV extraction batch is closed")
         return self

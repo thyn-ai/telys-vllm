@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
 from unittest.mock import patch
 
 import pytest
@@ -33,7 +34,7 @@ class _FakeCudaTensor(torch.Tensor):
 
 
 class _PinnedTestTensor(torch.Tensor):
-    copy_calls: list[bool] = []
+    copy_calls: ClassVar[list[bool]] = []
     fail_copy = False
 
     def is_pinned(self):
@@ -98,13 +99,13 @@ def test_async_batch_transfers_each_layer_once_and_synchronizes_once():
         patch.object(torch, "empty", side_effect=_pinned_empty),
         patch.object(torch.cuda, "current_stream", return_value=stream),
         patch.object(torch.cuda, "Event", return_value=event),
+        AsyncKVExtractionBatch() as batch,
     ):
-        with AsyncKVExtractionBatch() as batch:
-            extracted = [
-                batch.extract(layer, block_ids, BLOCK_SIZE, None) for layer in layers
-            ]
-            assert event.record_calls == 0
-            assert event.synchronize_calls == 0
+        extracted = [
+            batch.extract(layer, block_ids, BLOCK_SIZE, None) for layer in layers
+        ]
+        assert event.record_calls == 0
+        assert event.synchronize_calls == 0
 
     assert _PinnedTestTensor.copy_calls == [True, True]
     assert _FakeCudaTensor.cpu_calls == 0
@@ -138,11 +139,11 @@ def test_async_batch_falls_back_to_synchronous_cpu_without_pinned_memory():
             "Event",
             side_effect=AssertionError("CUDA event must not be created"),
         ),
+        AsyncKVExtractionBatch() as batch,
     ):
-        with AsyncKVExtractionBatch() as batch:
-            extracted = [
-                batch.extract(layer, block_ids, BLOCK_SIZE, None) for layer in layers
-            ]
+        extracted = [
+            batch.extract(layer, block_ids, BLOCK_SIZE, None) for layer in layers
+        ]
 
     assert _FakeCudaTensor.cpu_calls == NUM_LAYERS
     assert _PinnedTestTensor.copy_calls == []
@@ -163,10 +164,10 @@ def test_async_batch_does_not_hide_unrelated_pinned_allocation_errors():
             "Event",
             side_effect=AssertionError("no copy should be synchronized"),
         ),
+        pytest.raises(RuntimeError, match="CUDA out of memory"),
+        AsyncKVExtractionBatch() as batch,
     ):
-        with pytest.raises(RuntimeError, match="CUDA out of memory"):
-            with AsyncKVExtractionBatch() as batch:
-                batch.extract(layer, [1, 2], BLOCK_SIZE, None)
+        batch.extract(layer, [1, 2], BLOCK_SIZE, None)
 
     assert _FakeCudaTensor.cpu_calls == 0
 
@@ -184,12 +185,12 @@ def test_async_batch_fails_fast_on_nonblocking_copy_error_and_still_drains():
             patch.object(torch, "empty", side_effect=_pinned_empty),
             patch.object(torch.cuda, "current_stream", return_value=stream),
             patch.object(torch.cuda, "Event", return_value=event),
-        ):
-            with pytest.raises(
+            pytest.raises(
                 RuntimeError, match="nonblocking pinned KV extraction failed"
-            ):
-                with AsyncKVExtractionBatch() as batch:
-                    batch.extract(layer, [1, 2], BLOCK_SIZE, None)
+            ),
+            AsyncKVExtractionBatch() as batch,
+        ):
+            batch.extract(layer, [1, 2], BLOCK_SIZE, None)
     finally:
         _PinnedTestTensor.fail_copy = False
 
@@ -211,11 +212,11 @@ def test_async_batch_rejects_stream_change_and_drains_pending_copy():
         patch.object(torch, "empty", side_effect=_pinned_empty),
         patch.object(torch.cuda, "current_stream", side_effect=streams),
         patch.object(torch.cuda, "Event", return_value=event),
+        pytest.raises(RuntimeError, match="one CUDA stream per save batch"),
+        AsyncKVExtractionBatch() as batch,
     ):
-        with pytest.raises(RuntimeError, match="one CUDA stream per save batch"):
-            with AsyncKVExtractionBatch() as batch:
-                batch.extract(layers[0], [1, 2], BLOCK_SIZE, None)
-                batch.extract(layers[1], [1, 2], BLOCK_SIZE, None)
+        batch.extract(layers[0], [1, 2], BLOCK_SIZE, None)
+        batch.extract(layers[1], [1, 2], BLOCK_SIZE, None)
 
     assert _PinnedTestTensor.copy_calls == [True]
     assert _FakeCudaTensor.cpu_calls == 0
