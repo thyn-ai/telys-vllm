@@ -353,3 +353,65 @@ jobs:
           path: ${{ steps.release.outputs.evidence-file }}
           if-no-files-found: error
           retention-days: 90
+
+  release:
+    name: Create GitHub Release
+    needs: [publish-pypi, publish-ghcr]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download wheel
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: dist
+          path: dist
+
+      - name: Download signed image evidence
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: ghcr-image-${{ github.ref_name }}
+          path: release-image
+
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' -print)
+          if [[ "${#wheels[@]}" -ne 1 ]]; then
+            echo "::error::Expected exactly one release wheel, found ${#wheels[@]}."
+            exit 1
+          fi
+          image_file=$(find release-image -maxdepth 1 -type f -name '*.json' -print -quit)
+          if [[ -z "$image_file" ]]; then
+            echo "::error::Signed GHCR evidence is missing."
+            exit 1
+          fi
+          image_ref=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["image"])' "$image_file")
+          if [[ "$image_ref" != ghcr.io/thyn-ai/telys-worker-vllm@sha256:* ]]; then
+            echo "::error::Unexpected image reference: $image_ref"
+            exit 1
+          fi
+          cat > release-notes.md <<EOF
+          ## telys-vllm ${GITHUB_REF_NAME}
+
+          - Wheel: \`${wheels[0]##*/}\`
+          - Image: \`${image_ref}\`
+          - Source: \`${GITHUB_SHA}\`
+          - Sigstore signature and SLSA provenance verified before publication.
+          - Async KV loading remains disabled in this revision.
+          EOF
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" \
+              --title "telys-vllm ${GITHUB_REF_NAME}" \
+              --notes-file release-notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "telys-vllm ${GITHUB_REF_NAME}" \
+              --notes-file release-notes.md
+          fi
+          gh release upload "$GITHUB_REF_NAME" --clobber \
+            "${wheels[0]}" "$image_file"
