@@ -1175,7 +1175,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         use_async_extraction = all(
             isinstance(kv_cache, torch.Tensor) for kv_cache in self._kv_caches.values()
         )
-        with AsyncKVExtractionBatch() as extraction_batch:
+        with AsyncKVExtractionBatch(telemetry=self._telemetry) as extraction_batch:
             for layer_name, kv_cache in self._kv_caches.items():
                 layer_attn = (
                     attn_metadata.get(layer_name)
@@ -1266,24 +1266,32 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                 # blocks are already saved; the saveable suffix is aligned with
                 # block_ids at the end of block_hashes.
                 pending_runs: list[tuple[bytes, list[bytes]]] = []
+                pending_block_refs: list[tuple[bytes, int]] = []
                 seen_keys: set[str] = set()
-                block_hash_to_id: dict[bytes, int] = {}
                 for spec in specs:
                     num_ids = len(spec.block_ids)
                     if num_ids == 0:
                         continue
                     save_hashes = spec.block_hashes[-num_ids:]
+                    save_hash_to_id: dict[bytes, int] = {}
                     for block_hash, block_id in zip(save_hashes, spec.block_ids):
-                        block_hash_to_id.setdefault(bytes(block_hash), block_id)
+                        save_hash_to_id.setdefault(bytes(block_hash), block_id)
                     for run in self._split_into_runs(save_hashes):
                         key = self._store.chunk_key(run[0], len(run), run[-1])
                         if key in seen_keys or self._store.contains(key):
                             continue
                         seen_keys.add(key)
                         pending_runs.append((run[0], run))
+                        pending_block_refs.extend(
+                            (bytes(block_hash), save_hash_to_id[bytes(block_hash)])
+                            for block_hash in run
+                        )
                 if not pending_runs:
                     return
 
+                block_hash_to_id: dict[bytes, int] = {}
+                for block_hash, block_id in pending_block_refs:
+                    block_hash_to_id.setdefault(block_hash, block_id)
                 outer_ctx["pending_chunks"] = len(pending_runs)
                 outer_ctx["unique_blocks"] = len(block_hash_to_id)
 
@@ -1321,12 +1329,15 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                         if use_fast_path:
                             if not all(h in hash_to_idx for h in run):
                                 continue
-                            run_tensors = {
-                                layer: layer_tensors[layer][
-                                    [hash_to_idx[h] for h in run]
-                                ]
-                                for layer in required_layers
-                            }
+                            with self._telemetry.span("save_run_tensors") as run_ctx:
+                                run_ctx["block_count"] = len(run)
+                                run_ctx["layer_count"] = len(required_layers)
+                                run_tensors = {
+                                    layer: layer_tensors[layer][
+                                        [hash_to_idx[h] for h in run]
+                                    ]
+                                    for layer in required_layers
+                                }
                             with self._telemetry.span("save_encode_chunk") as enc_ctx:
                                 enc_ctx["block_count"] = len(run)
                                 enc_ctx["layer_count"] = len(required_layers)
