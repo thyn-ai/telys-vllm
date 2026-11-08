@@ -9,6 +9,7 @@ pure core (:class:`~telys_vllm.store.TelysBlockStore`).
 """
 
 import hashlib
+import hmac
 import importlib
 import threading
 from collections import OrderedDict
@@ -41,7 +42,7 @@ from telys_vllm.gpu_ops import (
     inject_kv_blocks_contiguous,
     serialize_kv_tensor,
 )
-from telys_vllm.store import TelysBlockStore
+from telys_vllm.store import FastDecodedChunk, TelysBlockStore, TelysStoreError
 from telys_vllm.telemetry import Telemetry, get_telemetry
 
 
@@ -88,6 +89,236 @@ class TelysConnectorError(RuntimeError):
 
 _PINNED_STAGING_MAX_ENTRIES = 256
 _PINNED_STAGING_MAX_BYTES = 1024**3
+_CONTENT_VALIDATION_MAX_ENTRIES = 256
+_CONTENT_VALIDATION_MAX_BYTES = 1024**3
+_CHUNK_CONTENT_SHA256_KEY = "vllm.content_sha256"
+_ENCODED_CONTENT_DOMAIN = b"telys-vllm/encoded-chunk/v1"
+_DECODED_CONTENT_DOMAIN = b"telys-vllm/decoded-chunk/v1"
+_PINNED_STAGING_DOMAIN = b"telys-vllm/pinned-staging/v2"
+
+
+@dataclass(frozen=True)
+class _ChunkContentIdentity:
+    domain: bytes
+    digest: bytes
+
+    def __post_init__(self) -> None:
+        if type(self.domain) is not bytes or not self.domain:
+            raise ValueError("chunk content identity requires a domain")
+        if type(self.digest) is not bytes or len(self.digest) != 32:
+            raise ValueError("chunk content identity requires a SHA-256 digest")
+
+
+def _encoded_chunk_identity(payload: bytes) -> _ChunkContentIdentity:
+    return _ChunkContentIdentity(
+        domain=_ENCODED_CONTENT_DOMAIN, digest=hashlib.sha256(payload).digest()
+    )
+
+
+def _persisted_content_digest(
+    key: str, metadata: Mapping[str, str]
+) -> bytes | None:
+    raw = metadata.get(_CHUNK_CONTENT_SHA256_KEY)
+    if raw is None:
+        return None
+    if not isinstance(raw, str) or len(raw) != 64:
+        raise TelysStoreError(f"chunk {key!r} has a malformed content digest")
+    try:
+        digest = bytes.fromhex(raw)
+    except ValueError as exc:
+        raise TelysStoreError(
+            f"chunk {key!r} has a malformed content digest"
+        ) from exc
+    if raw != digest.hex():
+        raise TelysStoreError(f"chunk {key!r} has a malformed content digest")
+    return digest
+
+
+def _validate_content_digest(
+    key: str, identity: _ChunkContentIdentity, expected: bytes | None
+) -> None:
+    if expected is not None and not hmac.compare_digest(identity.digest, expected):
+        raise TelysStoreError(f"chunk {key!r} content digest mismatch")
+
+
+class _ContentDigestClient:
+    """Add a digest of the final encoded payload on the persistence thread."""
+
+    def __init__(self, delegate: TelysClient) -> None:
+        self._delegate = delegate
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._delegate, name)
+
+    def put(self, key: str, value: bytes, metadata: Mapping[str, str]) -> None:
+        expected = _persisted_content_digest(key, metadata)
+        identity = _encoded_chunk_identity(value)
+        _validate_content_digest(key, identity, expected)
+        authenticated_metadata = dict(metadata)
+        authenticated_metadata[_CHUNK_CONTENT_SHA256_KEY] = identity.digest.hex()
+        self._delegate.put(key, value, authenticated_metadata)
+
+
+@dataclass
+class _ValidatedPayload:
+    identity: _ChunkContentIdentity
+    payload: bytes | None
+
+
+class _ChunkContentValidator:
+    """Validate each immutable storage version once, with bounded retention."""
+
+    def __init__(self, max_entries: int, max_bytes: int) -> None:
+        if max_entries <= 0 or max_bytes <= 0:
+            raise ValueError("content validation cache bounds must be positive")
+        self._max_entries = max_entries
+        self._max_bytes = max_bytes
+        self._entries: OrderedDict[tuple[Any, ...], _ValidatedPayload] = OrderedDict()
+        self._retained_bytes = 0
+        self._lock = threading.Lock()
+
+    def __len__(self) -> int:
+        with self._lock:
+            return len(self._entries)
+
+    @property
+    def retained_bytes(self) -> int:
+        with self._lock:
+            return self._retained_bytes
+
+    def validate(
+        self,
+        key: str,
+        payload: bytes,
+        metadata: Mapping[str, str],
+        slab_token: tuple[int, int, int] | None,
+    ) -> _ChunkContentIdentity:
+        if type(payload) is not bytes:
+            raise TelysStoreError(f"chunk {key!r} payload is not immutable bytes")
+        expected = _persisted_content_digest(key, metadata)
+        token = (
+            ("inline", id(payload))
+            if slab_token is None
+            else ("slab", *slab_token)
+        )
+        with self._lock:
+            cached = self._entries.get(token)
+            if cached is not None and self._matches(cached, payload):
+                _validate_content_digest(key, cached.identity, expected)
+                self._entries.move_to_end(token)
+                return cached.identity
+            identity = _encoded_chunk_identity(payload)
+            _validate_content_digest(key, identity, expected)
+            self._insert(token, identity, payload, slab_token is None)
+            return identity
+
+    @staticmethod
+    def _matches(cached: _ValidatedPayload, payload: bytes) -> bool:
+        return cached.payload is None or cached.payload is payload
+
+    def _insert(
+        self,
+        token: tuple[Any, ...],
+        identity: _ChunkContentIdentity,
+        payload: bytes,
+        retain_payload: bool,
+    ) -> None:
+        retained = payload if retain_payload else None
+        retained_nbytes = len(retained) if retained is not None else 0
+        if retained_nbytes > self._max_bytes:
+            return
+        while self._entries and (
+            len(self._entries) >= self._max_entries
+            or self._retained_bytes + retained_nbytes > self._max_bytes
+        ):
+            _, oldest = self._entries.popitem(last=False)
+            if oldest.payload is not None:
+                self._retained_bytes -= len(oldest.payload)
+        self._entries[token] = _ValidatedPayload(identity, retained)
+        self._retained_bytes += retained_nbytes
+
+    def clear(self) -> None:
+        with self._lock:
+            self._entries.clear()
+            self._retained_bytes = 0
+
+
+@dataclass(frozen=True)
+class _AuthenticatedFastDecodedChunk(FastDecodedChunk):
+    content_identity: _ChunkContentIdentity
+
+
+class _ConnectorBlockStore(TelysBlockStore):
+    """Authenticate encoded chunks and propagate their typed identity."""
+
+    def __init__(
+        self,
+        client: TelysClient,
+        config: TelysConnectorConfig,
+        **kwargs: Any,
+    ) -> None:
+        self._content_validator = _ChunkContentValidator(
+            _CONTENT_VALIDATION_MAX_ENTRIES, _CONTENT_VALIDATION_MAX_BYTES
+        )
+        self._capture_local = threading.local()
+        super().__init__(_ContentDigestClient(client), config, **kwargs)
+
+    def _identity_captures(self) -> list[list[_ChunkContentIdentity]]:
+        captures = getattr(self._capture_local, "captures", None)
+        if captures is None:
+            captures = []
+            self._capture_local.captures = captures
+        return captures
+
+    def _read_chunk_bytes(
+        self, key: str, record: TelysRecord
+    ) -> tuple[bytes, Mapping[str, str]]:
+        payload, metadata = super()._read_chunk_bytes(key, record)
+        captures = self._identity_captures()
+        if not captures:
+            return payload, metadata
+        slab_token = None
+        if not record.value:
+            slab_token = (
+                id(self._slab),
+                int(record.metadata[self._SLAB_OFFSET_KEY]),
+                int(record.metadata[self._SLAB_LENGTH_KEY]),
+            )
+        identity = self._content_validator.validate(
+            key, payload, record.metadata, slab_token
+        )
+        captures[-1].append(identity)
+        return payload, metadata
+
+    def load_decoded_blocks_fast(
+        self, block_hashes: Sequence[bytes]
+    ) -> list[FastDecodedChunk]:
+        captures = self._identity_captures()
+        captures.append([])
+        try:
+            chunks = super().load_decoded_blocks_fast(block_hashes)
+        finally:
+            identities = captures.pop()
+        if len(identities) != len(chunks):
+            raise TelysStoreError("chunk content identity capture mismatch")
+        return [
+            _AuthenticatedFastDecodedChunk(
+                provenance=chunk.provenance,
+                metadata=chunk.metadata,
+                block_hashes=chunk.block_hashes,
+                layer_tensors=chunk.layer_tensors,
+                content_identity=identity,
+            )
+            for chunk, identity in zip(chunks, identities, strict=True)
+        ]
+
+    def reset(self) -> None:
+        self._content_validator.clear()
+        super().reset()
+
+    def close(self) -> None:
+        self._content_validator.clear()
+        super().close()
 
 
 @dataclass
@@ -159,22 +390,47 @@ class _PinnedStagingCache:
         self._total_bytes = 0
 
 
-def _pinned_staging_key(
-    block_hashes: Sequence[bytes], layer_name: str, tensor: "torch.Tensor"
-) -> bytes:
-    """Identify the exact decoded layer contents staged in pinned memory."""
+def _decoded_chunk_identity(
+    layer_tensors: Mapping[str, "torch.Tensor"],
+) -> _ChunkContentIdentity:
+    """Hash opaque decoded chunks in full; structural identity is insufficient."""
     import torch
 
     digest = hashlib.sha256()
-    fields = [*block_hashes, layer_name.encode("utf-8"), str(tensor.dtype).encode()]
+    for layer_name in sorted(layer_tensors):
+        tensor = layer_tensors[layer_name].detach().contiguous()
+        fields = (
+            layer_name.encode("utf-8"),
+            str(tensor.dtype).encode("utf-8"),
+        )
+        for field_value in fields:
+            digest.update(len(field_value).to_bytes(8, "big"))
+            digest.update(field_value)
+        digest.update(tensor.ndim.to_bytes(8, "big"))
+        for dim in tensor.shape:
+            digest.update(int(dim).to_bytes(8, "big"))
+        digest.update(tensor.view(torch.uint8).numpy())
+    return _ChunkContentIdentity(_DECODED_CONTENT_DOMAIN, digest.digest())
+
+
+def _pinned_staging_key(
+    identity: _ChunkContentIdentity, layer_name: str, tensor: "torch.Tensor"
+) -> bytes:
+    """Key pinned bytes by authenticated content and the exact layer layout."""
+    digest = hashlib.sha256()
+    fields = (
+        _PINNED_STAGING_DOMAIN,
+        identity.domain,
+        identity.digest,
+        layer_name.encode("utf-8"),
+        str(tensor.dtype).encode("utf-8"),
+    )
     for field_value in fields:
         digest.update(len(field_value).to_bytes(8, "big"))
         digest.update(field_value)
     digest.update(tensor.ndim.to_bytes(8, "big"))
     for dim in tensor.shape:
         digest.update(int(dim).to_bytes(8, "big"))
-    raw = tensor.detach().contiguous().view(torch.uint8).numpy()
-    digest.update(raw)
     return digest.digest()
 
 
@@ -275,7 +531,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         with self._telemetry.span("connector_store_init") as ctx:
             ctx["model_id"] = str(vllm_config.model_config.model)
             ctx["engine_id"] = str(self._kv_transfer_config.engine_id or "")
-            self._store = TelysBlockStore(
+            self._store = _ConnectorBlockStore(
                 client,
                 self._config,
                 model_id=str(vllm_config.model_config.model),
@@ -772,14 +1028,14 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
 
     def _stage_pinned_tensor(
         self,
-        block_hashes: Sequence[bytes],
+        identity: _ChunkContentIdentity,
         layer_name: str,
         source: "torch.Tensor",
     ) -> tuple["torch.Tensor", _PinnedStagingEntry | None]:
         """Return cached pinned contents, copying only on a content-key miss."""
         import torch
 
-        key = _pinned_staging_key(block_hashes, layer_name, source)
+        key = _pinned_staging_key(identity, layer_name, source)
         entry = self._pinned_staging_cache.get(key)
         if entry is not None:
             return entry.tensor, entry
@@ -819,6 +1075,11 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
             chunk_block_ids = [
                 next(block_id_iter) for _ in range(len(chunk.block_hashes))
             ]
+            identity = getattr(chunk, "content_identity", None)
+            identity_source = "encoded"
+            if not isinstance(identity, _ChunkContentIdentity):
+                identity = _decoded_chunk_identity(chunk.layer_tensors)
+                identity_source = "decoded-full-hash"
             for layer_name in layer_names:
                 layer = no_compile_layers.get(layer_name)
                 if layer is None:
@@ -839,6 +1100,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                     block_ctx["layer_name"] = layer_name
                     block_ctx["block_count"] = len(chunk.block_hashes)
                     block_ctx["fast_path"] = True
+                    block_ctx["identity_source"] = identity_source
 
                     stacked_cpu = chunk.layer_tensors[layer_name][
                         : len(chunk_block_ids)
@@ -846,7 +1108,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                     device = kv_cache_layer.device
                     if torch.cuda.is_available():
                         pinned, cache_entry = self._stage_pinned_tensor(
-                            chunk.block_hashes, layer_name, stacked_cpu
+                            identity, layer_name, stacked_cpu
                         )
                         pinned_staged.append(pinned)
                         if stream is not None:
