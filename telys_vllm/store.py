@@ -836,7 +836,12 @@ class TelysBlockStore:
         return self._client.compact()
 
     def reset(self) -> None:
-        """Delete every persisted connector key, clear the slab, then compact."""
+        """Delete persisted keys and clear the slab, then compact outside the lock.
+
+        Reset linearizes with writes at the end of the deletion and slab-clearing
+        critical section. A save during the subsequent compaction is therefore
+        ordered after reset and survives it.
+        """
         self.drain()
         with self._persistence_lock:
             for key in sorted(self._client.keys()):
@@ -845,7 +850,7 @@ class TelysBlockStore:
                 self._known_keys.clear()
             if self._slab is not None:
                 self._slab.clear()
-            self.compact()
+        self.compact()
 
     def close(self) -> None:
         """Drain pending writes, stop the worker, and close the slab."""

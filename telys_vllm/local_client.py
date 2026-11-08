@@ -1033,7 +1033,12 @@ class TelysBlobClient(TelysClient):
         self._check_open()
         with self._lock:
             record = self._record_cache.get(key)
-        if record is not None and self._has_collection_membership(key):
+            if record is not None and (
+                key not in self._key_set or key in self._legacy_migration_candidates
+            ):
+                self._record_cache.pop(key, None)
+                record = None
+        if record is not None:
             self._cache_record_for_overlapping_clients(key, record)
             return record
 

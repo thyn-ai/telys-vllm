@@ -609,6 +609,86 @@ def test_reset_then_concurrent_save_survives_complete_after_cold_reopen(
             store.close()
 
 
+def test_save_during_reset_compaction_survives_cold_reopen(tmp_path, monkeypatch):
+    client = FakeTelysClient()
+    store = make_store(tmp_path, client, write_behind=False)
+    old_hashes, new_hashes = _race_hashes()
+    seed_chunk(store, old_hashes, b"old")
+    old_key = store.chunk_key(old_hashes[0], len(old_hashes), old_hashes[-1])
+    new_key = store.chunk_key(new_hashes[0], len(new_hashes), new_hashes[-1])
+    compaction_started = threading.Event()
+    release_compaction = threading.Event()
+    save_done = threading.Event()
+    errors: list[Exception] = []
+    original_compact = client.compact
+
+    def paused_compact():
+        compaction_started.set()
+        if not release_compaction.wait(timeout=5):
+            raise TimeoutError("timed out waiting to release compaction")
+        return original_compact()
+
+    def run_reset():
+        try:
+            store.reset()
+        except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
+            errors.append(exc)
+
+    def run_save():
+        try:
+            store.save_chunk(
+                new_hashes[0], new_hashes, {LAYER: [b"new"] * len(new_hashes)}
+            )
+        except Exception as exc:  # noqa: BLE001 - collect thread failures for diagnostics
+            errors.append(exc)
+        finally:
+            save_done.set()
+
+    monkeypatch.setattr(client, "compact", paused_compact)
+    reset_thread = threading.Thread(target=run_reset)
+    save_thread = threading.Thread(target=run_save)
+    try:
+        reset_thread.start()
+        assert compaction_started.wait(timeout=5)
+        save_thread.start()
+        assert save_done.wait(timeout=2), "save blocked behind reset compaction"
+
+        record = client.get(new_key)
+        assert record is not None
+        assert record.metadata["vllm.slab_offset"] == "16"
+        offset = int(record.metadata["vllm.slab_offset"])
+        length = int(record.metadata["vllm.slab_length"])
+        assert store._slab.read(offset, length) == TelysChunkCodec().encode_chunk(
+            {LAYER: [b"new"] * len(new_hashes)}
+        )
+
+        release_compaction.set()
+        reset_thread.join(timeout=5)
+        save_thread.join(timeout=5)
+        assert not reset_thread.is_alive()
+        assert not save_thread.is_alive()
+        assert not errors
+        assert client.get(old_key) is None
+        store.close()
+
+        cold = make_store(tmp_path, client, write_behind=False)
+        try:
+            assert cold.lookup_prefix(old_hashes) == 0
+            loaded = cold.load_blocks(new_hashes)
+            assert [decode_record_value(record) for record in loaded] == [
+                {LAYER: b"new"},
+                {LAYER: b"new"},
+            ]
+        finally:
+            cold.close()
+    finally:
+        release_compaction.set()
+        reset_thread.join(timeout=5)
+        save_thread.join(timeout=5)
+        if not store._closed:
+            store.close()
+
+
 def test_save_then_concurrent_reset_deletes_complete_record_after_cold_reopen(
     tmp_path, monkeypatch
 ):

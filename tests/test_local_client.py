@@ -1524,3 +1524,51 @@ def test_blob_first_time_legacy_migration_attaches_collection_row(
         assert record.metadata == metadata
     finally:
         reopened.close()
+
+
+def test_blob_legacy_migration_evicts_stale_cache_before_io_then_hits_cache(
+    lc, monkeypatch, tmp_path
+):
+    path = tmp_path / "legacy-migration-stale-cache"
+    engine = _StubEngine(str(path))
+    monkeypatch.setattr(sys.modules["telys"], "Telys", lambda _: engine)
+    key = _chunk_key("chain")
+    metadata = {"vllm.model": "legacy-model", "vllm.engine_id": "legacy-engine"}
+    _StubBlobStore(f"{path}_blobs").put(key, b"legacy payload", metadata)
+
+    client = _make_blob_client(lc, monkeypatch, path)
+    stale_record = TelysRecord(
+        key=key,
+        value=b"stale payload",
+        provenance=lc._derived_provenance(key),
+        metadata={"vllm.model": "stale-model"},
+    )
+    client._record_cache[key] = stale_record
+    original_blob_get = client._blob_store.get
+
+    def get_after_cache_eviction(requested_key):
+        assert requested_key not in client._record_cache
+        return original_blob_get(requested_key)
+
+    monkeypatch.setattr(client._blob_store, "get", get_after_cache_eviction)
+    try:
+        assert key in client._legacy_migration_candidates
+        first = client.get(key)
+
+        assert first is not None
+        assert first.value == b"legacy payload"
+        assert first.metadata == metadata
+        assert client._record_cache[key].value == b"legacy payload"
+        assert key not in client._legacy_migration_candidates
+        assert client._blob_store.get_calls == 1
+        assert client._collection.search_calls == 1
+
+        for _ in range(2):
+            cached = client.get(key)
+            assert cached is not None
+            assert cached.value == b"legacy payload"
+            assert cached.metadata == metadata
+        assert client._blob_store.get_calls == 1
+        assert client._collection.search_calls == 1
+    finally:
+        client.close()
