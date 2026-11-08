@@ -83,6 +83,7 @@ class RequestExpectation:
     kv_dtype: str
     expected_shape: tuple[int, ...] | None
     expected_layer_count: int
+    shape_unresolved_reason: str | None
 
 
 def _sha256_file(path: Path) -> str:
@@ -321,6 +322,11 @@ def _validate_manifest(path: Path, manifest: Mapping[str, Any]) -> RequestExpect
     kv_dtype = kv.get("dtype")
     if not isinstance(kv_dtype, str) or not kv_dtype.startswith("torch."):
         raise EvidenceError("kv.dtype must be a torch dtype string")
+    shape_unresolved_reason = kv.get("shape_unresolved_reason")
+    if shape_unresolved_reason is not None and (
+        not isinstance(shape_unresolved_reason, str) or not shape_unresolved_reason
+    ):
+        raise EvidenceError("kv.shape_unresolved_reason must be null or non-empty")
     storage = _required_mapping(manifest, "storage")
     namespace = storage.get("namespace")
     if not isinstance(namespace, str) or not namespace.strip():
@@ -342,6 +348,7 @@ def _validate_manifest(path: Path, manifest: Mapping[str, Any]) -> RequestExpect
         kv_dtype=kv_dtype,
         expected_shape=_validated_shape(kv),
         expected_layer_count=_required_int(kv, "expected_layer_count", minimum=1),
+        shape_unresolved_reason=shape_unresolved_reason,
     )
 
 
@@ -663,10 +670,16 @@ def _verify_request(
     inconclusive_reasons: list[dict[str, Any]] = []
     if expectation.expected_shape is None and not errors:
         status = INCONCLUSIVE
+        details = (
+            {}
+            if expectation.shape_unresolved_reason is None
+            else {"reason": expectation.shape_unresolved_reason}
+        )
         inconclusive_reasons.append(
             _error(
                 "unresolved_expected_shape",
                 "manifest does not contain an exact full-attention KV block shape",
+                **details,
             )
         )
     return {

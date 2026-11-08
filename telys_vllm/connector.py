@@ -439,6 +439,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                 local_boundary = min(
                     cached.num_computed_tokens[i] // self._block_size,
                     (request.num_tokens - 1) // self._block_size,
+                    (request.num_prompt_tokens - 1) // self._block_size,
                 )
                 if local_boundary:
                     self._save_cursors[req_id] = max(

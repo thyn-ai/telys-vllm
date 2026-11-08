@@ -71,6 +71,89 @@ def _load_metrics(monkeypatch: pytest.MonkeyPatch):
     return metrics
 
 
+def _install_attention_spec_support(monkeypatch: pytest.MonkeyPatch):
+    interface = ModuleType("vllm.v1.kv_cache_interface")
+
+    class AttentionSpec:
+        pass
+
+    class FullAttentionSpec(AttentionSpec):
+        pass
+
+    class MLAAttentionSpec(FullAttentionSpec):
+        pass
+
+    interface.AttentionSpec = AttentionSpec
+    interface.FullAttentionSpec = FullAttentionSpec
+    interface.MLAAttentionSpec = MLAAttentionSpec
+    torch_utils = ModuleType("vllm.utils.torch_utils")
+    torch_utils.get_dtype_size = lambda dtype: torch.empty(
+        (), dtype=dtype
+    ).element_size()
+    torch_utils.get_kv_cache_torch_dtype = lambda _cache_dtype, model_dtype: model_dtype
+    hash_utils = ModuleType("vllm.v1.core.kv_cache_utils")
+    hash_utils.get_none_hash_seed = lambda: "seed"
+    v1 = ModuleType("vllm.v1")
+    v1.__path__ = []
+    core = ModuleType("vllm.v1.core")
+    core.__path__ = []
+    modules = {
+        "vllm.v1": v1,
+        "vllm.v1.core": core,
+        "vllm.v1.core.kv_cache_utils": hash_utils,
+        "vllm.v1.kv_cache_interface": interface,
+        "vllm.utils.torch_utils": torch_utils,
+    }
+    for name, module in modules.items():
+        monkeypatch.setitem(sys.modules, name, module)
+    return SimpleNamespace(
+        attention=AttentionSpec,
+        full_attention=FullAttentionSpec,
+        mla_attention=MLAAttentionSpec,
+    )
+
+
+def _attention_spec(spec_type, **overrides):
+    spec = spec_type()
+    values = {
+        "block_size": 16,
+        "num_states": 16,
+        "num_heads": 4,
+        "state_content_size_bytes": 512,
+        "dtype": torch.bfloat16,
+        **overrides,
+    }
+    for name, value in values.items():
+        setattr(spec, name, value)
+    return spec
+
+
+def _manifest_vllm_config():
+    return SimpleNamespace(
+        model_config=SimpleNamespace(
+            model="model",
+            dtype=torch.bfloat16,
+            get_num_layers=lambda _parallel: 28,
+        ),
+        parallel_config=SimpleNamespace(),
+        cache_config=SimpleNamespace(
+            block_size=16,
+            hash_block_size=16,
+            prefix_caching_hash_algo="sha256",
+            cache_dtype="auto",
+        ),
+    )
+
+
+def _manifest_args():
+    return SimpleNamespace(
+        manifest_arm="C",
+        manifest_phase="cold",
+        manifest_namespace="test-ns",
+        manifest_max_chunk_blocks=0,
+    )
+
+
 def _context(*, block_size: int = 4, dtype: str = "torch.bfloat16") -> dict:
     return {
         "schema_version": 1,
@@ -303,6 +386,127 @@ def test_manifest_writer_records_actual_response_tokens_and_identity(
     assert "headers" not in files[0].read_text().lower()
 
 
+def test_manifest_context_resolves_packed_attention_spec_shape(monkeypatch):
+    metrics = _load_metrics(monkeypatch)
+    spec_types = _install_attention_spec_support(monkeypatch)
+    attention_spec = _attention_spec(spec_types.full_attention)
+    rpc_methods = []
+
+    def collective_rpc(method):
+        rpc_methods.append(method)
+        return [{"layer.0": attention_spec}, {"layer.0": attention_spec}]
+
+    llm = SimpleNamespace(
+        llm_engine=SimpleNamespace(vllm_config=_manifest_vllm_config()),
+        collective_rpc=collective_rpc,
+    )
+    context = metrics.build_manifest_context(llm, _manifest_args())
+
+    assert rpc_methods == ["get_kv_cache_spec"]
+    assert context["kv"]["expected_block_shape"] == [16, 4, 256]
+    assert context["kv"]["expected_layer_count"] == 28
+    assert context["kv"]["shape_kind"] == "full_attention"
+    assert context["kv"]["shape_unresolved_reason"] is None
+
+
+def test_attention_shape_uses_state_bytes_and_dtype_without_fixed_width(monkeypatch):
+    metrics = _load_metrics(monkeypatch)
+    spec_types = _install_attention_spec_support(monkeypatch)
+    attention_spec = _attention_spec(
+        spec_types.full_attention,
+        state_content_size_bytes=384,
+        dtype=torch.float32,
+    )
+
+    shape, reason = metrics._resolve_kv_block_shape(
+        [{"layer.0": attention_spec}], 16, torch.float32
+    )
+
+    assert shape == [16, 4, 96]
+    assert reason is None
+
+
+def test_unsupported_or_divergent_attention_specs_are_unresolved(monkeypatch):
+    metrics = _load_metrics(monkeypatch)
+    spec_types = _install_attention_spec_support(monkeypatch)
+    mla_spec = _attention_spec(spec_types.mla_attention)
+    full_spec = _attention_spec(spec_types.full_attention)
+    divergent_spec = _attention_spec(spec_types.full_attention, num_heads=8)
+
+    mla_shape, mla_reason = metrics._resolve_kv_block_shape(
+        [{"layer.0": mla_spec}], 16, torch.bfloat16
+    )
+    divergent_shape, divergent_reason = metrics._resolve_kv_block_shape(
+        [{"first": full_spec}, {"second": divergent_spec}], 16, torch.bfloat16
+    )
+    empty_shape, empty_reason = metrics._resolve_kv_block_shape([], 16, torch.bfloat16)
+
+    assert mla_shape is None
+    assert "unsupported" in mla_reason
+    assert divergent_shape is None
+    assert "different" in divergent_reason
+    assert empty_shape is None
+    assert "no worker" in empty_reason
+
+
+def test_exact_multiple_prompt_retains_prompt_and_generated_coverage(
+    tmp_path, monkeypatch
+):
+    metrics = _load_metrics(monkeypatch)
+    output = SimpleNamespace(
+        request_id="aligned-request",
+        prompt_token_ids=list(range(16)),
+        outputs=[
+            SimpleNamespace(
+                index=0,
+                token_ids=list(range(100, 116)),
+                text="actual response",
+                finish_reason="length",
+                stop_reason=None,
+            )
+        ],
+    )
+    manifest = metrics._request_manifest(output, 0, _context())
+    manifest_path = tmp_path / "aligned.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    expectation = verifier._validate_manifest(manifest_path, manifest)
+
+    assert manifest["expected"]["full_block_count"] == 8
+    assert expectation.prefix_count == 4
+    assert expectation.persisted_count == 7
+    assert expectation.manifest["expected"]["suffix_block_count"] == 3
+
+    hashes = verifier._recompute_hashes(expectation, _backend())
+    client = FakeBlobStoreClient()
+    config = TelysConnectorConfig(
+        namespace="test-ns",
+        slab_path=None,
+        blobstore_no_slab=True,
+        write_behind=False,
+    )
+    store = TelysBlockStore(
+        client,
+        config,
+        model_id="model",
+        engine_id="engine",
+        block_size=4,
+    )
+    try:
+        _save_run(store, hashes[: expectation.prefix_count], "fast")
+        result = verifier._verify_request(expectation, client, None, _backend(), {})
+    finally:
+        store.close()
+
+    assert result["status"] == "fail"
+    assert result["verified"]["blocks"] == 4
+    assert result["missing_block_indices"] == [4, 5, 6]
+    assert result["expected"] == {
+        "prefix_blocks": 4,
+        "suffix_blocks": 3,
+        "total_blocks": 7,
+    }
+
+
 def test_verifier_recomputes_dynamic_prefix_and_suffix_coverage(persisted_case):
     result = _verify(persisted_case, persisted_case.record())
     assert result["status"] == "pass"
@@ -437,6 +641,7 @@ def test_unresolved_model_shape_is_inconclusive_not_a_pass(persisted_case):
     context = _context()
     context["kv"]["expected_block_shape"] = None
     context["kv"]["shape_kind"] = "unresolved"
+    context["kv"]["shape_unresolved_reason"] = "unsupported KV cache spec"
     _write_manifest(
         persisted_case.manifest_path,
         prompt_ids=list(range(8)),
@@ -446,9 +651,9 @@ def test_unresolved_model_shape_is_inconclusive_not_a_pass(persisted_case):
     result = _verify(persisted_case, persisted_case.record())
     assert result["status"] == "inconclusive"
     assert result["passed"] is False
-    assert result["requests"][0]["inconclusive_reasons"][0]["code"] == (
-        "unresolved_expected_shape"
-    )
+    reason = result["requests"][0]["inconclusive_reasons"][0]
+    assert reason["code"] == "unresolved_expected_shape"
+    assert reason["details"]["reason"] == "unsupported KV cache spec"
 
 
 def test_changed_generated_tokens_require_a_new_suffix_chunk(persisted_case):

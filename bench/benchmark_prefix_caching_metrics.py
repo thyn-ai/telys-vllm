@@ -16,6 +16,7 @@ import os
 import random
 import tempfile
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -132,7 +133,66 @@ def _actual_token_ids(raw_ids: Any, *, field_name: str) -> list[int]:
     return token_ids
 
 
-def _kv_manifest_context(vllm_config: Any, block_size: int) -> dict[str, Any]:
+def _positive_dimension(value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        raise ValueError(f"expected a positive integer dimension, got {value!r}")
+    return value
+
+
+def _attention_block_shape(
+    spec: Any, block_size: int, kv_dtype: Any
+) -> tuple[list[int] | None, str | None]:
+    from vllm.utils.torch_utils import get_dtype_size
+    from vllm.v1.kv_cache_interface import AttentionSpec, FullAttentionSpec
+
+    if type(spec) not in (AttentionSpec, FullAttentionSpec):
+        return None, f"unsupported KV cache spec {type(spec).__name__}"
+    try:
+        spec_block_size = _positive_dimension(spec.block_size)
+        num_states = _positive_dimension(spec.num_states)
+        num_heads = _positive_dimension(spec.num_heads)
+        content_bytes = _positive_dimension(spec.state_content_size_bytes)
+        dtype_size = _positive_dimension(get_dtype_size(spec.dtype))
+    except (AttributeError, TypeError, ValueError, NotImplementedError) as exc:
+        return None, f"unresolved AttentionSpec layout: {exc}"
+    if spec.dtype != kv_dtype:
+        return None, "AttentionSpec dtype differs from the resolved KV dtype"
+    if spec_block_size != block_size or num_states != block_size:
+        return None, "AttentionSpec does not have one stored state per block token"
+    if content_bytes % dtype_size:
+        return None, "AttentionSpec state bytes are not whole dtype elements"
+    return [block_size, num_heads, content_bytes // dtype_size], None
+
+
+def _resolve_kv_block_shape(
+    worker_specs: Any, block_size: int, kv_dtype: Any
+) -> tuple[list[int] | None, str | None]:
+    if not isinstance(worker_specs, Sequence) or isinstance(
+        worker_specs, (str, bytes, bytearray)
+    ):
+        return None, "worker KV cache specs are not a sequence"
+    specs = []
+    for worker_spec in worker_specs:
+        if not isinstance(worker_spec, Mapping):
+            return None, "worker KV cache spec result is not a mapping"
+        specs.extend(worker_spec.values())
+    if not specs:
+        return None, "no worker KV cache specs were returned"
+    shapes: set[tuple[int, ...]] = set()
+    for spec in specs:
+        shape, reason = _attention_block_shape(spec, block_size, kv_dtype)
+        if reason is not None:
+            return None, reason
+        assert shape is not None
+        shapes.add(tuple(shape))
+    if len(shapes) != 1:
+        return None, "worker KV cache specs resolve to different block shapes"
+    return list(next(iter(shapes))), None
+
+
+def _kv_manifest_context(
+    vllm_config: Any, block_size: int, worker_specs: Any
+) -> dict[str, Any]:
     from vllm.utils.torch_utils import get_kv_cache_torch_dtype
 
     model_config = vllm_config.model_config
@@ -140,22 +200,15 @@ def _kv_manifest_context(vllm_config: Any, block_size: int) -> dict[str, Any]:
     kv_dtype = get_kv_cache_torch_dtype(
         vllm_config.cache_config.cache_dtype, model_config.dtype
     )
-    is_full_attention = not bool(
-        getattr(model_config, "use_mla", False)
-        or getattr(model_config, "is_hybrid", False)
+    expected_shape, unresolved_reason = _resolve_kv_block_shape(
+        worker_specs, block_size, kv_dtype
     )
-    expected_shape = None
-    if is_full_attention:
-        expected_shape = [
-            block_size,
-            int(model_config.get_num_kv_heads(parallel_config)),
-            int(model_config.get_head_size()),
-        ]
     return {
         "dtype": str(kv_dtype),
         "expected_block_shape": expected_shape,
         "expected_layer_count": int(model_config.get_num_layers(parallel_config)),
-        "shape_kind": "full_attention" if is_full_attention else "unresolved",
+        "shape_kind": "full_attention" if expected_shape is not None else "unresolved",
+        "shape_unresolved_reason": unresolved_reason,
     }
 
 
@@ -188,7 +241,11 @@ def build_manifest_context(llm: Any, args: Any) -> dict[str, Any]:
             "hash_block_size": hash_block_size,
             "extra_keys_per_block": None,
         },
-        "kv": _kv_manifest_context(vllm_config, block_size),
+        "kv": _kv_manifest_context(
+            vllm_config,
+            block_size,
+            llm.collective_rpc("get_kv_cache_spec"),
+        ),
         "storage": {
             "namespace": args.manifest_namespace,
             "max_chunk_blocks": args.manifest_max_chunk_blocks,

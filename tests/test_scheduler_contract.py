@@ -258,3 +258,74 @@ def test_cached_zero_external_allocation_updates_are_idempotent():
     scheduler.update_state_after_alloc(request, None, 0)
     second_meta = _build_cached_request_meta(scheduler, request, local_tokens)
     assert second_meta.saves == []
+
+
+def _cached_decode_meta(scheduler, request, computed, scheduled, block_ids):
+    scheduler_output = FakeSchedulerOutput(
+        scheduled_cached_reqs=FakeCachedReqs(
+            req_ids=[request.request_id],
+            num_computed_tokens=[computed],
+        ),
+        num_scheduled_tokens={request.request_id: scheduled},
+    )
+    scheduler_output.kv_connector_block_state = SimpleNamespace(
+        get_block_ids=lambda _req_id: (block_ids,)
+    )
+    return scheduler.build_connector_meta(scheduler_output)
+
+
+def test_exact_aligned_prompt_block_is_saved_on_first_decode():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    request = FakeRequest("req-aligned-decode", 4 * BLOCK_SIZE)
+    block_ids = list(range(20))
+    scheduler.on_new_request(request)
+
+    prefill = scheduler.build_connector_meta(
+        FakeSchedulerOutput(
+            scheduled_new_reqs=[FakeNewReq(request.request_id, (block_ids,))],
+            num_scheduled_tokens={request.request_id: request.num_prompt_tokens},
+        )
+    )
+    assert len(prefill.saves) == 1
+    assert len(prefill.saves[0].block_hashes) == 3
+    assert prefill.saves[0].block_hashes == request.block_hashes[:3]
+
+    request.append_output_token_ids([100])
+    decode = _cached_decode_meta(scheduler, request, 4 * BLOCK_SIZE, 1, block_ids)
+
+    assert len(decode.saves) == 1
+    assert decode.saves[0].block_hashes == [request.block_hashes[3]]
+    assert decode.saves[0].block_ids == [block_ids[3]]
+
+
+def test_decode_completion_saves_prompt_boundary_and_generated_blocks():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    prompt_tokens = 3 * BLOCK_SIZE + 12
+    request = FakeRequest("req-generated-decode", prompt_tokens)
+    block_ids = list(range(20))
+    scheduler.on_new_request(request)
+
+    prefill = scheduler.build_connector_meta(
+        FakeSchedulerOutput(
+            scheduled_new_reqs=[FakeNewReq(request.request_id, (block_ids,))],
+            num_scheduled_tokens={request.request_id: prompt_tokens},
+        )
+    )
+    assert len(prefill.saves) == 1
+    assert len(prefill.saves[0].block_hashes) == 3
+
+    request.append_output_token_ids(list(range(5)))
+    boundary = _cached_decode_meta(scheduler, request, prompt_tokens + 4, 1, block_ids)
+    assert len(boundary.saves) == 1
+    assert boundary.saves[0].block_hashes == [request.block_hashes[3]]
+    assert boundary.saves[0].block_ids == [block_ids[3]]
+
+    request.append_output_token_ids(list(range(5, 69)))
+    generated = _cached_decode_meta(
+        scheduler, request, prompt_tokens + 68, 1, block_ids
+    )
+    assert len(generated.saves) == 1
+    assert generated.saves[0].block_hashes == request.block_hashes[4:8]
+    assert generated.saves[0].block_ids == block_ids[4:8]
+    assert len(request.block_hashes) == 8
+    assert len(generated.saves[0].block_hashes) == 4

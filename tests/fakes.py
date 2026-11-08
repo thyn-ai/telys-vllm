@@ -198,6 +198,7 @@ class FakeRequest:
     ) -> None:
         self.request_id = request_id
         self._num_tokens = num_tokens
+        self.num_prompt_tokens = num_tokens
         self.prompt_token_ids = list(range(num_tokens))
         full_blocks = num_tokens // BLOCK_SIZE
         self.block_hashes: list[bytes] = (
@@ -209,6 +210,11 @@ class FakeRequest:
     @property
     def num_tokens(self) -> int:
         return self._num_tokens
+
+    def append_output_token_ids(self, token_ids: list[int]) -> None:
+        """Mirror vLLM extending token count and full-block hashes on decode."""
+        self._num_tokens += len(token_ids)
+        self.block_hashes = make_hashes(self._num_tokens // BLOCK_SIZE)
 
 
 #: Temporary directories created when callers don't supply a pytest tmp_path.
