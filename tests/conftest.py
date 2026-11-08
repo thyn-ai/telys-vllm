@@ -21,12 +21,13 @@ import enum
 import importlib
 import inspect
 import logging
-import pytest
 import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from types import ModuleType
 from typing import Any, ClassVar
+
+import pytest
 
 
 def _install(name: str, module: ModuleType) -> ModuleType:

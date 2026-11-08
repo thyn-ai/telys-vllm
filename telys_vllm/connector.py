@@ -36,6 +36,7 @@ from telys_vllm.config import (
     TelysConnectorConfig,
 )
 from telys_vllm.gpu_ops import (
+    AsyncKVExtractionBatch,
     extract_kv_blocks,
     inject_kv_blocks_contiguous,
     serialize_kv_tensor,
@@ -875,19 +876,29 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         ordered_hashes = list(block_hash_to_id.keys())
         block_ids = [block_hash_to_id[h] for h in ordered_hashes]
         layer_stacked: dict[str, torch.Tensor] = {}
-        for layer_name, kv_cache in self._kv_caches.items():
-            layer_attn = (
-                attn_metadata.get(layer_name)
-                if isinstance(attn_metadata, dict)
-                else attn_metadata
-            )
-            tensors = extract_kv_blocks(
-                kv_cache, block_ids, self._block_size, layer_attn
-            )
-            if not tensors or not isinstance(tensors[0], torch.Tensor):
-                return None
-            stacked = torch.stack(tensors)  # [N, block_size, *]
-            layer_stacked[layer_name] = stacked
+        use_async_extraction = all(
+            isinstance(kv_cache, torch.Tensor) for kv_cache in self._kv_caches.values()
+        )
+        with AsyncKVExtractionBatch() as extraction_batch:
+            for layer_name, kv_cache in self._kv_caches.items():
+                layer_attn = (
+                    attn_metadata.get(layer_name)
+                    if isinstance(attn_metadata, dict)
+                    else attn_metadata
+                )
+                if use_async_extraction:
+                    stacked = extraction_batch.extract(
+                        kv_cache, block_ids, self._block_size, layer_attn
+                    )
+                else:
+                    # Preserve test-double and legacy fallback behavior.
+                    tensors = extract_kv_blocks(
+                        kv_cache, block_ids, self._block_size, layer_attn
+                    )
+                    if not tensors or not isinstance(tensors[0], torch.Tensor):
+                        return None
+                    stacked = torch.stack(tensors)
+                layer_stacked[layer_name] = stacked
         return ordered_hashes, layer_stacked
 
     def wait_for_layer_load(self, layer_name: str) -> None:

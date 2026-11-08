@@ -216,7 +216,7 @@ def test_concurrent_loads_reuse_one_buffer_only_after_h2d_completion():
         try:
             barrier.wait(timeout=5)
             worker.start_load_kv(forward_context)
-        except Exception as exc:  # surface thread failures in the assertion
+        except Exception as exc:  # noqa: BLE001 - collect worker thread failures for diagnostics
             errors.append(exc)
 
     try:
