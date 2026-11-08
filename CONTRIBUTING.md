@@ -62,6 +62,23 @@ All required checks must pass, including on forked-repository pull requests —
 CI runs with no secrets and no elevated permissions, so it's safe to run
 automatically on every PR.
 
+### Stable release tagging
+
+Maintainers propose a stable `pyproject.toml` version increase through the
+normal PR process. After that PR merges, `.github/workflows/tag-release.yml`
+verifies the merged PR, successful `guard` runs, the completed Codna check, and
+main-lineage/tag-immutability guards before creating the matching `vX.Y.Z` tag.
+The tag triggers `.github/workflows/publish.yml`, which remains the only
+PyPI/GHCR/GitHub Release publisher. The tagging workflow does not bump versions,
+push to `main`, merge PRs, move existing tags, or publish artifacts directly.
+A failed or superseded release requires a new version-bump PR, never a re-tag.
+
+The tag-creation step uses the same GitHub App as `thyn-ai/telys`, scoped to
+this repository with contents-write permission. An organization administrator
+must make `TELYS_RELEASE_APP_ID` and `TELYS_RELEASE_APP_PRIVATE_KEY` available
+to this repository in Actions secrets. Missing credentials fail closed; no
+credential or personal access token belongs in source.
+
 ## Recognizing contributors
 
 This project follows the [all-contributors](https://allcontributors.org)
