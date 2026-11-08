@@ -491,6 +491,62 @@ def test_blob_clients_share_store_across_overlapping_lifetimes(
     assert shared_store.sync_calls == 1
 
 
+def test_blob_delete_invalidates_overlapping_client_caches(lc, monkeypatch, tmp_path):
+    first = _make_blob_client(lc, monkeypatch, tmp_path / "overlap-delete")
+    second = _make_blob_client(lc, monkeypatch, tmp_path / "overlap-delete")
+    key = "test-ns/chunk/overlap/2"
+
+    try:
+        first.put(key, b"payload", {"meta": "first"})
+        assert first.get(key) is not None
+        assert first.contains(key) is True
+
+        assert second.delete(key) is True
+
+        assert first.get(key) is None
+        assert first.contains(key) is False
+        assert key not in first._key_set
+        assert key not in first._record_cache
+        assert first.chunk_length("test-ns/chunk/overlap") == 0
+    finally:
+        first.close()
+        second.close()
+
+
+@pytest.mark.parametrize("blob_store_enabled", [True, False])
+def test_blob_get_decodes_v2_meta_blob(lc, monkeypatch, tmp_path, blob_store_enabled):
+    if blob_store_enabled:
+        client = _make_blob_client(lc, monkeypatch, tmp_path / "v2")
+    else:
+        monkeypatch.setenv("TELYS_ADDRESS", "/tmp/v2-no-blob-store.sock")
+        monkeypatch.delenv("TELYS_PATH", raising=False)
+        sys.modules["telys"].BlobStore = _StubBlobStore
+        client = lc.TelysBlobClient(TelysConnectorConfig(namespace="test-ns"))
+    key = "test-ns/chunk/v2/1"
+    metadata = {"vllm.chunk_format": "legacy", "meta": "v2"}
+    raw = json.dumps(
+        {
+            "payload": base64.b64encode(b"v2 payload").decode("ascii"),
+            "metadata": metadata,
+        }
+    )
+    client._collection._rows[key] = {
+        "__key": key,
+        "vllm.meta_blob": raw,
+    }
+
+    try:
+        if client._blob_store is not None:
+            assert client._blob_store.contains(key) is False
+        record = client.get(key)
+
+        assert record is not None
+        assert record.value == b"v2 payload"
+        assert record.metadata == metadata
+    finally:
+        client.close()
+
+
 def test_blob_delete_removes_metadata_blob_and_cached_keys(lc, monkeypatch, tmp_path):
     client = _make_blob_client(lc, monkeypatch, tmp_path / "delete")
     key = "test-ns/chunk/delete/1"

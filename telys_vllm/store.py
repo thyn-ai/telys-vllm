@@ -416,17 +416,17 @@ class TelysBlockStore:
         )
         try:
             decoded = intended_decode(payload)
-        except PayloadCodecError as intended_error:
+        except (PayloadCodecError, UnicodeError) as intended_error:
             try:
                 decoded = other_decode(payload)
-            except PayloadCodecError:
+            except (PayloadCodecError, UnicodeError):
                 raise intended_error
             return not prefer_fast, decoded
 
         if self._CHUNK_FORMAT_KEY not in metadata:
             try:
                 other_decode(payload)
-            except PayloadCodecError:
+            except (PayloadCodecError, UnicodeError):
                 pass
             else:
                 raise PayloadCodecError(

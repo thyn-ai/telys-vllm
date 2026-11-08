@@ -191,12 +191,19 @@ def _assert_fast_chunks_equal(loaded, tensors):
         assert torch.equal(loaded[0].layer_tensors[name], expected)
 
 
+def _unicode_fallback_tensors():
+    return {"layer.0": torch.arange(2 * 256, dtype=torch.float32).reshape(2, 256)}
+
+
 def test_two_block_metadata_free_legacy_chunk_loads_as_fast_tensors(tmp_path):
     client = FakeBlobStoreClient()
     store = _make_fast_store(tmp_path, client, write_behind=False)
     hashes = make_hashes(2)
-    tensors = _layer_tensors()
-    _put_metadata_free_chunk(store, client, hashes, _legacy_payload(tensors))
+    tensors = _unicode_fallback_tensors()
+    payload = _legacy_payload(tensors)
+    with pytest.raises(UnicodeDecodeError):
+        TelysFastChunkCodec().decode_chunk(payload)
+    _put_metadata_free_chunk(store, client, hashes, payload)
 
     loaded = store.load_decoded_blocks_fast(hashes)
 
@@ -207,7 +214,7 @@ def test_metadata_free_fast_chunk_loads_in_both_directions(tmp_path):
     client = FakeBlobStoreClient()
     store = _make_fast_store(tmp_path, client, write_behind=False)
     hashes = make_hashes(2)
-    tensors = _layer_tensors()
+    tensors = _unicode_fallback_tensors()
     payload = TelysFastChunkCodec().encode_chunk(tensors)
     _put_metadata_free_chunk(store, client, hashes, payload)
 
