@@ -1,0 +1,55 @@
+{
+  "all_passed": false,
+  "chain_keys": {
+    "fast": "telys-vllm/chunk/a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e/16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4/2",
+    "legacy": "telys-vllm/chunk/02811e4a991a586c7538db3f3e087c2d25b3a503cdb755f29e550114af13731b/c2f225c53e902e19125a5881958950fb9469c5b15006d20049c4f2bde2b112e3/2"
+  },
+  "checks": {
+    "blob_only_delete": true,
+    "blob_only_get_missing": false,
+    "blob_only_not_contains": false,
+    "chain_bound_key_exact": true,
+    "divergent_second_block_load_rejected": true,
+    "divergent_second_block_lookup": true,
+    "fast_decode_shape": true,
+    "fast_to_legacy_decode": true,
+    "legacy_chain_bound_key_exact": true,
+    "legacy_decode": false,
+    "legacy_to_fast_decode": false,
+    "original_lookup": true,
+    "overlap_chunk_length": false,
+    "overlap_metadata": true,
+    "overlap_payload_first": true,
+    "overlap_payload_second": true,
+    "v2_meta_blob_metadata": false,
+    "v2_meta_blob_payload": false
+  },
+  "divergent_hash": "79c94025edc82d91913a32e74b0b526de2832e241c7075a7a5aeaae8a7e8aee8",
+  "legacy_decode_error": {
+    "exception_type": "UnicodeDecodeError",
+    "message": "'utf-8' codec can't decode byte 0x80 in position 30: invalid start byte"
+  },
+  "legacy_to_fast_error": {
+    "exception_type": "UnicodeDecodeError",
+    "message": "'utf-8' codec can't decode byte 0x80 in position 30: invalid start byte"
+  },
+  "overlap_metadata": {
+    "vllm.block_count": "2",
+    "vllm.block_size": "16",
+    "vllm.block_start_hash": "6501d23dba70e9c3753ef2161cfda4ac3a83d1e2629274d32cd0bb58cc3d299f",
+    "vllm.chunk_format": "fast",
+    "vllm.engine_id": "overlap",
+    "vllm.model": "Qwen/Qwen2.5-7B-Instruct"
+  },
+  "v2_metadata": {
+    "__key": "telys-vllm/chunk/v2/1",
+    "vllm.block_count": null,
+    "vllm.block_size": null,
+    "vllm.block_start_hash": null,
+    "vllm.chunk_format": null,
+    "vllm.engine_id": null,
+    "vllm.model": null,
+    "vllm.slab_length": null,
+    "vllm.slab_offset": null
+  }
+}

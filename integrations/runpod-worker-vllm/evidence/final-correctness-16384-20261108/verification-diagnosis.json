@@ -1,0 +1,80 @@
+{
+  "all_passed": true,
+  "checks": {
+    "all_expected_blocks_verified": true,
+    "cold_and_warm_verification_pass": true,
+    "no_errors": true,
+    "no_inconclusive_reasons": true,
+    "packed_shape_singular": true,
+    "save_collect_matches_expected_new_blocks": true,
+    "zero_missing_blocks": true
+  },
+  "phases": {
+    "cold": {
+      "aligned_prompt_requests": [],
+      "expected_new_blocks_including_generated": 1081,
+      "lookup_count": 1,
+      "lookup_hit_block_sum": 0,
+      "lookup_max_block_sum": 1077,
+      "lookup_prompt_new_block_sum": 1077,
+      "manifest_generated_block_sum": 4,
+      "manifest_prompt_block_sum": 1077,
+      "resolved_shapes": [
+        [
+          16,
+          4,
+          256
+        ]
+      ],
+      "save_collect_block_sum": 1081,
+      "telemetry_pending_chunks": 7,
+      "telemetry_saved_chunks": 7,
+      "verification_errors": [],
+      "verification_expected_blocks": 1081,
+      "verification_inconclusive_reasons": [],
+      "verification_missing_blocks": 0,
+      "verification_status": "pass",
+      "verification_verified_blocks": 1081
+    },
+    "warm": {
+      "aligned_prompt_requests": [
+        {
+          "lookup_max_block": 1100,
+          "manifest_prefix_blocks": 1101,
+          "prompt_tokens": 17616,
+          "request_index": 15
+        }
+      ],
+      "expected_new_blocks_including_generated": 2793,
+      "lookup_count": 20,
+      "lookup_hit_block_sum": 21540,
+      "lookup_max_block_sum": 24253,
+      "lookup_prompt_new_block_sum": 2713,
+      "manifest_generated_block_sum": 79,
+      "manifest_prompt_block_sum": 24254,
+      "resolved_shapes": [
+        [
+          16,
+          4,
+          256
+        ]
+      ],
+      "save_collect_block_sum": 2793,
+      "telemetry_pending_chunks": 105,
+      "telemetry_saved_chunks": 105,
+      "verification_errors": [],
+      "verification_expected_blocks": 24333,
+      "verification_inconclusive_reasons": [],
+      "verification_missing_blocks": 0,
+      "verification_status": "pass",
+      "verification_verified_blocks": 24333
+    }
+  },
+  "resolved_shapes": [
+    [
+      16,
+      4,
+      256
+    ]
+  ]
+}

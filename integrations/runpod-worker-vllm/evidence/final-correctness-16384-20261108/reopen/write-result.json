@@ -1,0 +1,34 @@
+{
+  "payload_bytes": 1836126,
+  "payload_sha256": "8f57da36ddbcd4fb8452aabc223f8af812b9970fddbd7deeecd07f21ca8e798d",
+  "records": [
+    {
+      "end_hash": "021c58b36d9413a04ec86f43fc46dc8529b97389eab6d6cc603b9c9ba2983b7a",
+      "key": "telys-vllm/chunk/52d9909bced64e0c4a9a14f96b3b6bc600021b309e3efba9f7735dfbc521350d/021c58b36d9413a04ec86f43fc46dc8529b97389eab6d6cc603b9c9ba2983b7a/2",
+      "metadata": {
+        "vllm.block_count": "2",
+        "vllm.block_size": "16",
+        "vllm.block_start_hash": "52d9909bced64e0c4a9a14f96b3b6bc600021b309e3efba9f7735dfbc521350d",
+        "vllm.chunk_format": "fast",
+        "vllm.engine_id": "correctness-reopen",
+        "vllm.model": "Qwen/Qwen2.5-7B-Instruct"
+      },
+      "name": "no_collection_rows",
+      "start_hash": "52d9909bced64e0c4a9a14f96b3b6bc600021b309e3efba9f7735dfbc521350d"
+    },
+    {
+      "end_hash": "61f41444d1a480555e86c7b998a0dfb6029bc0cce1d75437cd4e952b2a99f4c8",
+      "key": "telys-vllm/chunk/06099c6bb634d977f5996f5886e037a01199a9cdc1d1412f8c7ae442c1d4143b/61f41444d1a480555e86c7b998a0dfb6029bc0cce1d75437cd4e952b2a99f4c8/2",
+      "metadata": {
+        "vllm.block_count": "2",
+        "vllm.block_size": "16",
+        "vllm.block_start_hash": "06099c6bb634d977f5996f5886e037a01199a9cdc1d1412f8c7ae442c1d4143b",
+        "vllm.chunk_format": "fast",
+        "vllm.engine_id": "correctness-reopen",
+        "vllm.model": "Qwen/Qwen2.5-7B-Instruct"
+      },
+      "name": "durable_put",
+      "start_hash": "06099c6bb634d977f5996f5886e037a01199a9cdc1d1412f8c7ae442c1d4143b"
+    }
+  ]
+}

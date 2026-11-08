@@ -1,0 +1,138 @@
+{
+  "correctness": [
+    {
+      "arm": "A",
+      "fresh_warm_matches_reference": null,
+      "label": "no cache",
+      "status": "pass"
+    },
+    {
+      "arm": "B",
+      "fresh_warm_matches_reference": true,
+      "label": "filesystem",
+      "status": "pass"
+    },
+    {
+      "arm": "C",
+      "fresh_warm_matches_reference": true,
+      "label": "Telys",
+      "status": "pass"
+    }
+  ],
+  "runs": [
+    {
+      "arm": "A",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "no cache",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": 1,
+      "phase": "cold",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 13.641207306920215,
+      "total_output_tokens": 64,
+      "total_time_s": 4.691666841506958,
+      "ttft_mean_s": 2.8121895790100098,
+      "ttft_p50_s": 2.8121895790100098,
+      "ttft_p95_s": 2.8121895790100098
+    },
+    {
+      "arm": "A",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": 4.952854633331299,
+      "label": "no cache",
+      "later_warm_ttft_p50_s": 36.50407958030701,
+      "num_prompts": 20,
+      "phase": "warm",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 17.68192285510739,
+      "total_output_tokens": 1280,
+      "total_time_s": 72.3903169631958,
+      "ttft_mean_s": 35.659237670898435,
+      "ttft_p50_s": 35.09770095348358,
+      "ttft_p95_s": 64.3941461443901
+    },
+    {
+      "arm": "B",
+      "external_hit_evidence": "vLLM external hit rate=0.0%",
+      "external_hit_rate_pct": 0.0,
+      "first_warm_ttft_s": null,
+      "label": "filesystem",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": 1,
+      "phase": "cold",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 13.492319415914018,
+      "total_output_tokens": 64,
+      "total_time_s": 4.743439435958862,
+      "ttft_mean_s": 2.8664238452911377,
+      "ttft_p50_s": 2.8664238452911377,
+      "ttft_p95_s": 2.8664238452911377
+    },
+    {
+      "arm": "B",
+      "external_hit_evidence": "vLLM external hit rate=88.8%",
+      "external_hit_rate_pct": 88.8,
+      "first_warm_ttft_s": 14.51709794998169,
+      "label": "filesystem",
+      "later_warm_ttft_p50_s": 17.543039798736572,
+      "num_prompts": 20,
+      "phase": "warm",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 48.52604584785665,
+      "total_output_tokens": 1280,
+      "total_time_s": 26.37758708000183,
+      "ttft_mean_s": 17.93592050075531,
+      "ttft_p50_s": 17.506097674369812,
+      "ttft_p95_s": 20.797282409667968
+    },
+    {
+      "arm": "C",
+      "external_hit_evidence": "vLLM external hit rate=0.0%; Telys last lookup hit_blocks=0,hit_tokens=0",
+      "external_hit_rate_pct": 0.0,
+      "first_warm_ttft_s": null,
+      "label": "Telys",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": 1,
+      "phase": "cold",
+      "result_present": true,
+      "telys_last_lookup": {
+        "hit_blocks": 0,
+        "hit_tokens": 0
+      },
+      "throughput_tokens_per_s": 8.629134610510164,
+      "total_output_tokens": 64,
+      "total_time_s": 7.416734457015991,
+      "ttft_mean_s": 4.711503744125366,
+      "ttft_p50_s": 4.711503744125366,
+      "ttft_p95_s": 4.711503744125366
+    },
+    {
+      "arm": "C",
+      "external_hit_evidence": "vLLM external hit rate=88.8%; Telys last lookup hit_blocks=1077,hit_tokens=17232",
+      "external_hit_rate_pct": 88.8,
+      "first_warm_ttft_s": 16.6482892036438,
+      "label": "Telys",
+      "later_warm_ttft_p50_s": 30.60295343399048,
+      "num_prompts": 20,
+      "phase": "warm",
+      "result_present": true,
+      "telys_last_lookup": {
+        "hit_blocks": 1077,
+        "hit_tokens": 17232
+      },
+      "throughput_tokens_per_s": 30.298152627360395,
+      "total_output_tokens": 1280,
+      "total_time_s": 42.24680018424988,
+      "ttft_mean_s": 28.95509613752365,
+      "ttft_p50_s": 30.58447778224945,
+      "ttft_p95_s": 36.81059247255325
+    }
+  ]
+}

@@ -1,0 +1,4244 @@
+{
+  "errors": [],
+  "evidence_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/arm_C_warm.lifecycle.json",
+  "inconclusive_reasons": [],
+  "kind": "telys_vllm_persisted_chunk_verification",
+  "lifecycle": {
+    "exit_kind": "completed",
+    "exit_status": 0,
+    "pending_chunks_observed": 105,
+    "pending_write_spans": 52,
+    "persisted_chunk_spans": 105
+  },
+  "passed": true,
+  "requests": [
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 132,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/ac5bee026c20b0afe1fa4f43ffca18ead117045e1397528ef789fafd01e1d9ca/a25857995c82553a68368f5120fe4cf1231dc5bc09cff68bdb296347fc773ffa/132",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 121111646,
+          "payload_sha256": "619060a01194d979ba0db2f3027d6f0bedc85ad237980644bedaa23eebfba4e7",
+          "start_block": 1077,
+          "token_end_exclusive": 19344,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/e2f7f6d56884e0b849475606c01b619019bbf4aae85e2ad70d72d51c23f40fbb/e2f7f6d56884e0b849475606c01b619019bbf4aae85e2ad70d72d51c23f40fbb/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "82c7050f738aa60d5d9825712a182542d93d955234a4e16d9656b392de715cbf",
+          "start_block": 1209,
+          "token_end_exclusive": 19360,
+          "token_start": 19344
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/d23f9265cfa4b6cf5920f4cb263638563c809ea94b9b47b52e88a76353d01369/d23f9265cfa4b6cf5920f4cb263638563c809ea94b9b47b52e88a76353d01369/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "1a95aa2fc567fbb3501720ed5fe8a645b74290f2988b8c32b2aa826e8d47a8e4",
+          "start_block": 1210,
+          "token_end_exclusive": 19376,
+          "token_start": 19360
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/2b02884d4191b36f828ee6a5862535e72858dfabb95b6534f4f60c1fd83082bd/2b02884d4191b36f828ee6a5862535e72858dfabb95b6534f4f60c1fd83082bd/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "48e05ae722abe302c128637cc17ffcda29f2e4068eb4ddc07ca1cad442d90e51",
+          "start_block": 1211,
+          "token_end_exclusive": 19392,
+          "token_start": 19376
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/6a7eb846ca246ba452196c145881edfe634863bfdf622e720d422b0da2e878e9/6a7eb846ca246ba452196c145881edfe634863bfdf622e720d422b0da2e878e9/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "3fa929814437af7eedc8195eaccf0803cfc674e2910c2612981b14bf5421f60d",
+          "start_block": 1212,
+          "token_end_exclusive": 19408,
+          "token_start": 19392
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1209,
+        "suffix_blocks": 4,
+        "total_blocks": 1213
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000000-5feceb66ffc86f38.json",
+      "missing_block_indices": [],
+      "request_id": "0",
+      "status": "pass",
+      "verified": {
+        "blocks": 1213,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 142,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/d61e18a15258e76634322d6aac9445ec1ecc7b503d0c5a79cbe762fa7140c3d3/17ec995493fc464b2e990aca5bfd57a9e11661d8a37a04a0133ba8c0ef0e6b72/142",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 130286686,
+          "payload_sha256": "7081220aabb0cf614a803200a8dcf33df10eb6f6474bea4ac823b6f8e5f809e9",
+          "start_block": 1077,
+          "token_end_exclusive": 19504,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/f0b3480083d668b213f5b3cf22a8c6b1f59662bcbd16f79745c16efd8c1245d3/f0b3480083d668b213f5b3cf22a8c6b1f59662bcbd16f79745c16efd8c1245d3/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "b528e30de8953296c7ccef81d86eee5a25bc551f66dd50a1e3093ca2b74f0123",
+          "start_block": 1219,
+          "token_end_exclusive": 19520,
+          "token_start": 19504
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/12da1330b0f159414af80ef88c5d8f31b0837738c478946f83888703ce910239/12da1330b0f159414af80ef88c5d8f31b0837738c478946f83888703ce910239/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "b9481f0906e988564f9d65ab1ca63106f6a44650f95e4b96c1721bf39afde128",
+          "start_block": 1220,
+          "token_end_exclusive": 19536,
+          "token_start": 19520
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3d81c25b0769bb16862cdaa538be283d342d28935b008a1c318e0019031dbd22/3d81c25b0769bb16862cdaa538be283d342d28935b008a1c318e0019031dbd22/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "b151e168ba88cd475c425b4ef17236c476738cafdc95d998466a444a19eb96d2",
+          "start_block": 1221,
+          "token_end_exclusive": 19552,
+          "token_start": 19536
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/30c55d6957e517208df31eb0dd5abfe210e4080a7a16605f0154e70334c5b461/30c55d6957e517208df31eb0dd5abfe210e4080a7a16605f0154e70334c5b461/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "51881a9910b7b587732ae26eeb9486250f5f7b785dee4ec6bb795a37cdc319fe",
+          "start_block": 1222,
+          "token_end_exclusive": 19568,
+          "token_start": 19552
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1219,
+        "suffix_blocks": 4,
+        "total_blocks": 1223
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000001-6b86b273ff34fce1.json",
+      "missing_block_indices": [],
+      "request_id": "1",
+      "status": "pass",
+      "verified": {
+        "blocks": 1223,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 104,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/91bc57a6773a2ace17d5408079a634aa978b504d2a9bc86e75bb1827da67cd74/2257464d365439b49e2a3bce33ce4c005bb2b7ac445d51761b905be6c31bdfee/104",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 95421534,
+          "payload_sha256": "3c291547936010b9c84ac92c908aa073f78c472b36d61a8dce8430d60073115e",
+          "start_block": 1077,
+          "token_end_exclusive": 18896,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/982e7ca6e17d0f56ed098364d99dc6cf9eb643f38ae012288d6574b8442bf9e6/982e7ca6e17d0f56ed098364d99dc6cf9eb643f38ae012288d6574b8442bf9e6/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "8e6338a698d06dd02d902480e1072b1297ba2aa4a30eda7c84882cf7f04121ec",
+          "start_block": 1181,
+          "token_end_exclusive": 18912,
+          "token_start": 18896
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/56a456dc05a3ebbe48f46af9e38ddf2e8bc8525a86f1bfabc30e36f29d8301b3/56a456dc05a3ebbe48f46af9e38ddf2e8bc8525a86f1bfabc30e36f29d8301b3/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "33883e8916ab004b2e6828e0140b84bf23e885a99b101ab74a613a157d3c8a36",
+          "start_block": 1182,
+          "token_end_exclusive": 18928,
+          "token_start": 18912
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/29e8e6b58cdf0d196a87a78cbd0be4cad802c02368a94bf6ffea7ea368691b82/29e8e6b58cdf0d196a87a78cbd0be4cad802c02368a94bf6ffea7ea368691b82/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "8e93a1ab891dbf79c17b25bc0f59c9f2a99b384a7dba30d0d88c8be7d487b213",
+          "start_block": 1183,
+          "token_end_exclusive": 18944,
+          "token_start": 18928
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3ae7b7596c7051ca6dc728234c92769e19c1b9c7f869d3f5a33c110fbe181dbc/3ae7b7596c7051ca6dc728234c92769e19c1b9c7f869d3f5a33c110fbe181dbc/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "ffa5ad12d288f0ab8aceb98583914331adc5afc640a7a490aa44e60d299363ef",
+          "start_block": 1184,
+          "token_end_exclusive": 18960,
+          "token_start": 18944
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1181,
+        "suffix_blocks": 4,
+        "total_blocks": 1185
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000002-d4735e3a265e16ee.json",
+      "missing_block_indices": [],
+      "request_id": "2",
+      "status": "pass",
+      "verified": {
+        "blocks": 1185,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 132,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/6d657f7e007732f18476fe99d32391a99eb697e39c7495c287006e28120babb2/c97814770ae703d4287a5f8c46dfcd322585badbe6b75a3c6be24719db3730b3/132",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 121111646,
+          "payload_sha256": "8036d29ec8f5d6f6a0946b3981526b789e24217f41887904552af7782ade347b",
+          "start_block": 1077,
+          "token_end_exclusive": 19344,
+          "token_start": 17232
+        },
+        {
+          "block_count": 14,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a98daf715ab800601fb3f212d22d337f3daba72e70feea6e2a676ccf6b25638e/9aff6b576a3f672cf65cdb65b3b2932da8dc66589fe83ab5b38c67a611b3d4c9/14",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 12846174,
+          "payload_sha256": "c22f1f7655e5889c22c6d0b4bb8794a7f844b0aa1c164bb4262a9c7321ea242d",
+          "start_block": 1209,
+          "token_end_exclusive": 19568,
+          "token_start": 19344
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/c8b573ad9af8de8ec6b7ca98f88d2430931130a9aab7733addf9e8c12a3149bc/c8b573ad9af8de8ec6b7ca98f88d2430931130a9aab7733addf9e8c12a3149bc/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "0cf80dad15cdad80cfe2aa5bf79f4252e7c278c537a729a45353ab5d68aa1e3c",
+          "start_block": 1223,
+          "token_end_exclusive": 19584,
+          "token_start": 19568
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/c247ae7c9bf5c212b10c1d2ea75abd70f4b84cf4072715e54e2f9ec3085b2dff/c247ae7c9bf5c212b10c1d2ea75abd70f4b84cf4072715e54e2f9ec3085b2dff/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "3d0084056517cf4e2c9e1c9cb5d7a46771bd9d7ce6c30aed3b1e840ce22e9639",
+          "start_block": 1224,
+          "token_end_exclusive": 19600,
+          "token_start": 19584
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/6b0446b872cc82804e01d608cf8ffb7e2df9b5c90a2352ccd8dba4a6d8070b0c/6b0446b872cc82804e01d608cf8ffb7e2df9b5c90a2352ccd8dba4a6d8070b0c/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "50bfee6cc0145b280c0208444623d7f251b0a3bfe564b8acc494910b28dad955",
+          "start_block": 1225,
+          "token_end_exclusive": 19616,
+          "token_start": 19600
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/1bfece49aa9fa17fc3ee186ca760722bbb63e9fc27c0cfc4a35869256ca89af9/1bfece49aa9fa17fc3ee186ca760722bbb63e9fc27c0cfc4a35869256ca89af9/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "4a665cd1b162a2a1b3ecc3fe174d4c0413fe3913b86ee63474067bf7c704a9f8",
+          "start_block": 1226,
+          "token_end_exclusive": 19632,
+          "token_start": 19616
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1223,
+        "suffix_blocks": 4,
+        "total_blocks": 1227
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000003-4e07408562bedb8b.json",
+      "missing_block_indices": [],
+      "request_id": "3",
+      "status": "pass",
+      "verified": {
+        "blocks": 1227,
+        "boundary_chunks": 0,
+        "prefix_chunks": 5,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 131,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/fa879376cd0fe45bf1875b1547dfb6e16b350ee8b5cbf757695ef443a9e5aad0/edf3993dcfaf3ac214e65600f1ed74aace3569d900c100d79f1fcbd67f3b1fcb/131",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 120194142,
+          "payload_sha256": "2f6223ca1493d1462db932ee02a0b7a68cd551d17a29569e5873c6aff38f294f",
+          "start_block": 1077,
+          "token_end_exclusive": 19328,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/ef0c83521b59843c1b6ec185e725588d624a84fbabcb848789c0c3c3fcf44efd/ef0c83521b59843c1b6ec185e725588d624a84fbabcb848789c0c3c3fcf44efd/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "5aff6ee46c215f9f4997a27aa255fb261ce97d6845329064c423c5bada667c81",
+          "start_block": 1208,
+          "token_end_exclusive": 19344,
+          "token_start": 19328
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/6e70613ea184a1a38e74cf8058161e686ee292ab290461e7cf6d82b27b0f2cbb/6e70613ea184a1a38e74cf8058161e686ee292ab290461e7cf6d82b27b0f2cbb/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "31c625af93862be22ac9208c186c417cce25783e3b8a6ac17bc5d6aa96e71bb5",
+          "start_block": 1209,
+          "token_end_exclusive": 19360,
+          "token_start": 19344
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/b8d0c7c69f4e69e9fb4fe2694cad952c40215903ecac0d1fb7c9c35c5ccf2873/b8d0c7c69f4e69e9fb4fe2694cad952c40215903ecac0d1fb7c9c35c5ccf2873/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "1de7921e841b747fe5c3086af0fc0843b12b608ff367c9ec42fa0135d753090e",
+          "start_block": 1210,
+          "token_end_exclusive": 19376,
+          "token_start": 19360
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/11b06c138296d5517e463e0410901184da2a24f0c509721e41cb49bfb5c04729/11b06c138296d5517e463e0410901184da2a24f0c509721e41cb49bfb5c04729/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "91876dd24c35d7dc186f64eee2d507f00e9071291280423b7bc9f69052712fd1",
+          "start_block": 1211,
+          "token_end_exclusive": 19392,
+          "token_start": 19376
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1208,
+        "suffix_blocks": 4,
+        "total_blocks": 1212
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000004-4b227777d4dd1fc6.json",
+      "missing_block_indices": [],
+      "request_id": "4",
+      "status": "pass",
+      "verified": {
+        "blocks": 1212,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 264,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/f9fe37b5e6a3ec6f1d6c9ee3fed722ad55326fc4e8873e1839787c7141abb9b4/d215c98eac4a0f197e12563735a92cd7a22a62b09d358080a473bd28edeefbd9/264",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 242222174,
+          "payload_sha256": "f30aec14da0f6f114a3d2ccebcfd7542f4d3ed0ab1479d5832552f29a9a23e94",
+          "start_block": 1077,
+          "token_end_exclusive": 21456,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/c203307a74b0ccf5967241442813d8626e1e5013d020907d57c0c056954f0f50/c203307a74b0ccf5967241442813d8626e1e5013d020907d57c0c056954f0f50/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "f85d765a87655975b5b96e55ff2bc82d1355b74a864a31c47969e5f71eaa84ef",
+          "start_block": 1341,
+          "token_end_exclusive": 21472,
+          "token_start": 21456
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/aa8d92f81df7dc4944fd994748e07997642ef3f913eefeca5d0285c867d7e6a7/aa8d92f81df7dc4944fd994748e07997642ef3f913eefeca5d0285c867d7e6a7/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "0ab68700321fcedc07649305a87fd759798eb83137e70ae59bd58af3026472af",
+          "start_block": 1342,
+          "token_end_exclusive": 21488,
+          "token_start": 21472
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/8133551cb3e7a6e3f26b7842145dfd3a0babfc302afd4f60dbed6a726e5d2136/8133551cb3e7a6e3f26b7842145dfd3a0babfc302afd4f60dbed6a726e5d2136/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "25faeff19f8dfeb8679f970beaa1c6c01fd09cca1dddaa578785fdad51d4f9ab",
+          "start_block": 1343,
+          "token_end_exclusive": 21504,
+          "token_start": 21488
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/2eddf82dacce44bcabbdff3baae242fea7cfd6e81b461aa8cab19ed92ca5db54/2eddf82dacce44bcabbdff3baae242fea7cfd6e81b461aa8cab19ed92ca5db54/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "53cc80cc33ec4952dc9d377b510408f24850d512eeb303d468a58e5642c126ad",
+          "start_block": 1344,
+          "token_end_exclusive": 21520,
+          "token_start": 21504
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1341,
+        "suffix_blocks": 4,
+        "total_blocks": 1345
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000005-ef2d127de37b942b.json",
+      "missing_block_indices": [],
+      "request_id": "5",
+      "status": "pass",
+      "verified": {
+        "blocks": 1345,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 30,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/c4193cdc61addd749b4ea1a9bb641018c6f44be4d123eadf05a7134d81f96a64/3a40eff051698fa5577915b032170e2a9c06cff9c628df4f3b57a27fe35b33f8/30",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 27526238,
+          "payload_sha256": "28797d9c0d0b2d624899a878afcff655f05de980eb3113ec5c6e3f51d5fde3f8",
+          "start_block": 1077,
+          "token_end_exclusive": 17712,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a7ff611bb2ac845a9becdad499f608a028f89b0b40499782a2d68b55efae5d73/a7ff611bb2ac845a9becdad499f608a028f89b0b40499782a2d68b55efae5d73/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "28723fa3ffd1feedaffdc64edbc1218193175ad3f1a1f14561cdd42a87362236",
+          "start_block": 1107,
+          "token_end_exclusive": 17728,
+          "token_start": 17712
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/5da5c323043c55724786b4f3e89d1841aba1cc8e8ab0ad33445f32cece50df11/5da5c323043c55724786b4f3e89d1841aba1cc8e8ab0ad33445f32cece50df11/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "48f8abba9e9410a302a9e8efd744a160f3b022831d6b808be51c1bae7f1d6dc0",
+          "start_block": 1108,
+          "token_end_exclusive": 17744,
+          "token_start": 17728
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/6721ac48ff8c2a30768e526dcb2b6ab6837cba936d4e9ced8b956db919344e5f/6721ac48ff8c2a30768e526dcb2b6ab6837cba936d4e9ced8b956db919344e5f/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "fcc5fd2a968611fbe21d1558cc09a7e57e53eeba63b061247767e3f5b6f8011b",
+          "start_block": 1109,
+          "token_end_exclusive": 17760,
+          "token_start": 17744
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/845b53886c9961753bfcca42fb90f9e4304c6bfcb9eb2d48a1704a586c5f33aa/845b53886c9961753bfcca42fb90f9e4304c6bfcb9eb2d48a1704a586c5f33aa/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "70231c837b7c26ba497c9c5eecebed3fa9a10fed5d6f04087fbcc5c79b87711e",
+          "start_block": 1110,
+          "token_end_exclusive": 17776,
+          "token_start": 17760
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1107,
+        "suffix_blocks": 4,
+        "total_blocks": 1111
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000006-e7f6c011776e8db7.json",
+      "missing_block_indices": [],
+      "request_id": "6",
+      "status": "pass",
+      "verified": {
+        "blocks": 1111,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 29,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/f8c5642d9e67864747175ed9a86352b6a095393e41a156db1f8ce0300c02d46e/a8674b11b6de8a48f2bb9b238361a7f6207c85ed7de08663c545413299b7941e/29",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 26608734,
+          "payload_sha256": "6ae0c8898207dff687b3d6ea2f438694dfd89c138ea608baaa2e4d01e670974e",
+          "start_block": 1077,
+          "token_end_exclusive": 17696,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/8850a1ccb236718a13fcf8933186109e6f410524e613536b71aaaa18171e082f/8850a1ccb236718a13fcf8933186109e6f410524e613536b71aaaa18171e082f/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "1918b84378c3d93f7f634e6534ecff63cff68c78351e2ab482c7a5ed5354d793",
+          "start_block": 1106,
+          "token_end_exclusive": 17712,
+          "token_start": 17696
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a6c2c929c5ca67b32f702aa212e6227517bdb53d74d954775cf8b2cb112a8f65/a6c2c929c5ca67b32f702aa212e6227517bdb53d74d954775cf8b2cb112a8f65/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "c2643082da3b3825fef4b212050e80a713ea6896664c81b404db26bc2ab747d2",
+          "start_block": 1107,
+          "token_end_exclusive": 17728,
+          "token_start": 17712
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/47687335853ba0a03b62f2d40d33ccef037f15440f8ac9fbeb63c678badcf496/47687335853ba0a03b62f2d40d33ccef037f15440f8ac9fbeb63c678badcf496/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "61abc887be24b8572e6e3b427ae7ed14a2a500dab04d23f59ce3278ec09f8788",
+          "start_block": 1108,
+          "token_end_exclusive": 17744,
+          "token_start": 17728
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/cd099da7ef048b978e77c8daa44dbe54e13a4da36e82c7eaa24e3499f19d5b46/cd099da7ef048b978e77c8daa44dbe54e13a4da36e82c7eaa24e3499f19d5b46/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "ae345131cf10ed4517dd398d06970beefefede03823d540d6e77de8533c8d3c2",
+          "start_block": 1109,
+          "token_end_exclusive": 17760,
+          "token_start": 17744
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1106,
+        "suffix_blocks": 4,
+        "total_blocks": 1110
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000007-7902699be42c8a8e.json",
+      "missing_block_indices": [],
+      "request_id": "7",
+      "status": "pass",
+      "verified": {
+        "blocks": 1110,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 42,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a7a7a9879d9a653a1ffa85e1dee2b0f1934b5793e220099e59b3c57114aca31c/8ba7d32bb1cf0b4dde4015dd586839358f02c2015f6b19cb30f36e68599d4fe7/42",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 38536286,
+          "payload_sha256": "cb57d0bace9c99a66d5b4ea702ae0b32584c4989153362cbe591fc1f37948377",
+          "start_block": 1077,
+          "token_end_exclusive": 17904,
+          "token_start": 17232
+        },
+        {
+          "block_count": 26,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/7a29ceabc4a403fc4e099bd06fb33d86016301661ccba05d7f3a6bf6d5658517/02852cfbe6660919ffb16a2e42c7e5d255b10c27700a71ffe7387a1452011af7/26",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 23856222,
+          "payload_sha256": "9617695fe60697e8e31ef759486f58ff9705e32d0294a8c4eceeb5c5321557e7",
+          "start_block": 1119,
+          "token_end_exclusive": 18320,
+          "token_start": 17904
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/bee2ab78b4305321f06f99112598ec7bc660ac099f625a80fb69c85433d6afe6/bee2ab78b4305321f06f99112598ec7bc660ac099f625a80fb69c85433d6afe6/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "ee0d219017a60b49b157ef125ada78e153e596730ba306a1f7119c2c8fa3f216",
+          "start_block": 1145,
+          "token_end_exclusive": 18336,
+          "token_start": 18320
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/e26aa2eab798e7645cc1dc54991efb40b1e60e73d1284c7480651d4b92a2e6c4/e26aa2eab798e7645cc1dc54991efb40b1e60e73d1284c7480651d4b92a2e6c4/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "542167d9e20e97b5bf06d1a259832f456c4647eea9ae1fc92a3908572f725f97",
+          "start_block": 1146,
+          "token_end_exclusive": 18352,
+          "token_start": 18336
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/76d67fcc79df03df1fca44ba43fbea5e8678a9f307c54dd0e4f9e55fbfa74dd1/76d67fcc79df03df1fca44ba43fbea5e8678a9f307c54dd0e4f9e55fbfa74dd1/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "c59ac87ed58cfa5931da7168bc91f9baa29a88bd4dc82ca36c85f1a8851c680a",
+          "start_block": 1147,
+          "token_end_exclusive": 18368,
+          "token_start": 18352
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/7eece153807d9288fdc47ac5c2043da5040e76c7f60aeae49e861f83fa8bbcce/7eece153807d9288fdc47ac5c2043da5040e76c7f60aeae49e861f83fa8bbcce/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "a2909600919cd28a737e78772b8eae4efc55a34aa7a3894a6cb0cbddec528872",
+          "start_block": 1148,
+          "token_end_exclusive": 18384,
+          "token_start": 18368
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1145,
+        "suffix_blocks": 4,
+        "total_blocks": 1149
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000008-2c624232cdd22177.json",
+      "missing_block_indices": [],
+      "request_id": "8",
+      "status": "pass",
+      "verified": {
+        "blocks": 1149,
+        "boundary_chunks": 0,
+        "prefix_chunks": 5,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 164,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/7f9bdc59de5f5525958796b31e350ba694c65ef59b318c91c24d519dbfa50639/20ef24d66babc5c9104a77b21242d1818d4b1c23cfa571cb31ea0040303befbc/164",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 150471774,
+          "payload_sha256": "9b85535679d8badacbe8f0073f87a78b32b21c9cce8d313a3f843aba3908d161",
+          "start_block": 1077,
+          "token_end_exclusive": 19856,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/67a3df71cab0db148352b1c1e04a875fab354d9b33d9fc55cbde60bb7cbc8cb9/67a3df71cab0db148352b1c1e04a875fab354d9b33d9fc55cbde60bb7cbc8cb9/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "4bfcd3f5284dc4f65d481d294c771e526fce42dcd2c4f196926f40199da56691",
+          "start_block": 1241,
+          "token_end_exclusive": 19872,
+          "token_start": 19856
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/88aac4bfb4e2affd657f92069ee060c2d84259ffeac378f2bc692f16ac4091a9/88aac4bfb4e2affd657f92069ee060c2d84259ffeac378f2bc692f16ac4091a9/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "7f1080906c4942c99bf318935dfebd6538130ff7b08a69395d2525aa9eb9bdfb",
+          "start_block": 1242,
+          "token_end_exclusive": 19888,
+          "token_start": 19872
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/f7cf99a3cf9533d0eb89d905515030712b180e48665ea61ba5466d0bdf66a883/f7cf99a3cf9533d0eb89d905515030712b180e48665ea61ba5466d0bdf66a883/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "26e8832b857562d7f31058ff22de4a3105fb8b280f2ee7da08358629c5b5e8f3",
+          "start_block": 1243,
+          "token_end_exclusive": 19904,
+          "token_start": 19888
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a8ec5173204853639fb465332d2e194b4ec2f8c4064b2edfdf287c7b14389d10/a8ec5173204853639fb465332d2e194b4ec2f8c4064b2edfdf287c7b14389d10/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "25468d9a2611889a61a4ac5f52ecf5ce1e0e7cf437f97857f94c2de4c0409f4c",
+          "start_block": 1244,
+          "token_end_exclusive": 19920,
+          "token_start": 19904
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1241,
+        "suffix_blocks": 4,
+        "total_blocks": 1245
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000009-19581e27de7ced00.json",
+      "missing_block_indices": [],
+      "request_id": "9",
+      "status": "pass",
+      "verified": {
+        "blocks": 1245,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 63,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/5ccfdc7508be503e52842026b04d15b489d78fbaa22148b2276836f1d4bac7ec/9611292b27fc3669ab031f916d09987f6bf23cdbf9526a3fd08066e69339e902/63",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 57803870,
+          "payload_sha256": "9c5e10582c39a558762ceafc008bf40c16212ff3ea6c14c30f76dfce8d0a3bfd",
+          "start_block": 1077,
+          "token_end_exclusive": 18240,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/849b97497fcbc15a1dd84f9632da84c9cba174c8fd5f846ead833a3f10272003/849b97497fcbc15a1dd84f9632da84c9cba174c8fd5f846ead833a3f10272003/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "a76a7f0c39f456b74ba0154567128a1e3217319238e1f5f73aac376108d1309b",
+          "start_block": 1140,
+          "token_end_exclusive": 18256,
+          "token_start": 18240
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/ce80333481cff231aaeac20f4cd131f4c500b1f19141e7009b826a84d201ba8e/ce80333481cff231aaeac20f4cd131f4c500b1f19141e7009b826a84d201ba8e/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "7301f0056de1deb092b9340e4e41bc22888dff4122671a59f14affaf1187bf32",
+          "start_block": 1141,
+          "token_end_exclusive": 18272,
+          "token_start": 18256
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/1e714def842bb06628e431e773e1c220db77ee9fd15d726fff8251233fb7ef2e/1e714def842bb06628e431e773e1c220db77ee9fd15d726fff8251233fb7ef2e/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "d20c625c9c367d55cd33e7c527eae4d72bcc436c52c633fb0afa6644feee2936",
+          "start_block": 1142,
+          "token_end_exclusive": 18288,
+          "token_start": 18272
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/042837b6206396be3484d4c5ee5c68bda7238e160b522e7ccbbe159933cd3ced/042837b6206396be3484d4c5ee5c68bda7238e160b522e7ccbbe159933cd3ced/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "eb46d8374b28edbe07cb498ff01eb93568f12d47c68a11010497bf1f74b984fd",
+          "start_block": 1143,
+          "token_end_exclusive": 18304,
+          "token_start": 18288
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1140,
+        "suffix_blocks": 4,
+        "total_blocks": 1144
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000010-4a44dc15364204a8.json",
+      "missing_block_indices": [],
+      "request_id": "10",
+      "status": "pass",
+      "verified": {
+        "blocks": 1144,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 256,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/78b5c91314457637fd60703c1522e27247573f90d70aaacd3e31bdae9d05d9ca/e8dd287ead55bed76f2e79cacbea6a1bf54af2658cf0892b157e39257b2e5ee6/256",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 234882142,
+          "payload_sha256": "719b8df3b3f615ea4989dc699440c93c755324ab103a48a954ca879c2572244c",
+          "start_block": 1077,
+          "token_end_exclusive": 21328,
+          "token_start": 17232
+        },
+        {
+          "block_count": 4,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/90cd990343133fecee3e18fb2945a4eeed011d44126abb9eb2f2561a0a85d315/21760a4a7515b2194c9ae19db58be8a97093caf5f78b651c5597f1b6b5b09528/4",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 3671134,
+          "payload_sha256": "8e5a4634f1830d9999b8ffda8798c08f95cf3160b7e477519e08dca8a5714bea",
+          "start_block": 1333,
+          "token_end_exclusive": 21392,
+          "token_start": 21328
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/fcd33e3618dff496f8682f8b347215b70176e4ee994fc58c689e483bd756864e/fcd33e3618dff496f8682f8b347215b70176e4ee994fc58c689e483bd756864e/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "c600fe139dc2ed0141b988d12eafe5c88a9692acdcb3c40deaa6cc20f3e753de",
+          "start_block": 1337,
+          "token_end_exclusive": 21408,
+          "token_start": 21392
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/7307045300a85f6362b3888a8877c5112da2fc2ed122c4a2c1bcf22cc43a58f2/7307045300a85f6362b3888a8877c5112da2fc2ed122c4a2c1bcf22cc43a58f2/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "63bdb06b0fa14ddb5215882d1cdd340d128819b0def08bbfe4fed524524998a6",
+          "start_block": 1338,
+          "token_end_exclusive": 21424,
+          "token_start": 21408
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9785624b1a1debae04a531b8e47aff332657f40f55d56281c23ba0f45772ef49/9785624b1a1debae04a531b8e47aff332657f40f55d56281c23ba0f45772ef49/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "c52322b302ed27b6707504a11a89331af6b912ffee7c876dfdfd9d6ce7122d2a",
+          "start_block": 1339,
+          "token_end_exclusive": 21440,
+          "token_start": 21424
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/2708d263b6d50ba01c15e0838bbd2e3cb859e34f11b09ca141bba39065c7ee15/2708d263b6d50ba01c15e0838bbd2e3cb859e34f11b09ca141bba39065c7ee15/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "30f8b5151cfcaa2e0b2ce5cefec14f28d4d321a98061befd0906e434c418dbaf",
+          "start_block": 1340,
+          "token_end_exclusive": 21456,
+          "token_start": 21440
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1337,
+        "suffix_blocks": 4,
+        "total_blocks": 1341
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000011-4fc82b26aecb47d2.json",
+      "missing_block_indices": [],
+      "request_id": "11",
+      "status": "pass",
+      "verified": {
+        "blocks": 1341,
+        "boundary_chunks": 0,
+        "prefix_chunks": 5,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 16,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/fe8365710e20729b30918fa689919501ad14bc216f98b17e07e2eb4313fb4f0f/0c56a9b03e0216978067c701cb0570740666fdcf15ffaf5c16278e654141fe3d/16",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 14681182,
+          "payload_sha256": "32e2bd5cf646f63d75a0e9eea0a5eba147bc5ab536be9b8db60d4e74fbe79404",
+          "start_block": 1077,
+          "token_end_exclusive": 17488,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/267f014ae00e79d85f030f24b9374186ec1cd553b32b7ee273c02172defd4348/267f014ae00e79d85f030f24b9374186ec1cd553b32b7ee273c02172defd4348/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "0d4770b05e393ffebad99f70616481306eeeb42df6b31a2e58e60def3c24efc2",
+          "start_block": 1093,
+          "token_end_exclusive": 17504,
+          "token_start": 17488
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/14fb9ae0484a4eb5a765b4c4e1cc19a364e504063617d3b28256633572de1652/14fb9ae0484a4eb5a765b4c4e1cc19a364e504063617d3b28256633572de1652/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "384b92c1302c80d6098e3951d3d39f83b46dd472b205e3bff77b6f07589feb90",
+          "start_block": 1094,
+          "token_end_exclusive": 17520,
+          "token_start": 17504
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/c486753064378c5c7199d6ca56fffd5ccade0e0c228f67a8a3763be1b1289329/c486753064378c5c7199d6ca56fffd5ccade0e0c228f67a8a3763be1b1289329/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "ac2d45504ca546eee5a611cea4037071bc841cf1f08e22b0f8620c800ded0745",
+          "start_block": 1095,
+          "token_end_exclusive": 17536,
+          "token_start": 17520
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/44c7f5e1a2cc1b936a1037d37cb4147abd22771612ca4eead99a45b8f9e8d338/44c7f5e1a2cc1b936a1037d37cb4147abd22771612ca4eead99a45b8f9e8d338/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "a6f6eada13c8acb7b80c07158f8f0a1f0dda4ce9284fa5134f4272d04b7f13cb",
+          "start_block": 1096,
+          "token_end_exclusive": 17552,
+          "token_start": 17536
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1093,
+        "suffix_blocks": 4,
+        "total_blocks": 1097
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000012-6b51d431df5d7f14.json",
+      "missing_block_indices": [],
+      "request_id": "12",
+      "status": "pass",
+      "verified": {
+        "blocks": 1097,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 76,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/93721d5c003d896a612b45e44b7e962bb938a28215c6c7b585c5774d6d1ce644/58067087311f0424aa73ff865df4032d1e529ac7c024db1d526d851d444339e7/76",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 69731422,
+          "payload_sha256": "7c126945c33bfe8f17d3d046b0bd72a194815d6446065a464b5aaee863729157",
+          "start_block": 1077,
+          "token_end_exclusive": 18448,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/adbe8e2228d9fdb87eeaabfb1aa30898fd68cf21ce366c1d0aedfe267ddaa2ba/adbe8e2228d9fdb87eeaabfb1aa30898fd68cf21ce366c1d0aedfe267ddaa2ba/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "9f9fce13c8f9467eb898caf2f2239801430c4311f8fdf989ecf30cb5973773af",
+          "start_block": 1153,
+          "token_end_exclusive": 18464,
+          "token_start": 18448
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/0282eadddc526083e63287b2b65c38df714d0d769bb091c1476ba9856db7c478/0282eadddc526083e63287b2b65c38df714d0d769bb091c1476ba9856db7c478/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "6058a08e30250e1b2b553a7f20902f8bc694cee690890de310f2cfb85734a21b",
+          "start_block": 1154,
+          "token_end_exclusive": 18480,
+          "token_start": 18464
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/ff7057d6fb72c3e3aa7cd1eb851debc46e422985459778f40189ea18da59f64f/ff7057d6fb72c3e3aa7cd1eb851debc46e422985459778f40189ea18da59f64f/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "213ea4e80e3dd1597a9bdc73023e10b8cb2f43cf7e1b868a88843bf0d57b0d6b",
+          "start_block": 1155,
+          "token_end_exclusive": 18496,
+          "token_start": 18480
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/cfc299ee8ec134b27e78af89f9f176274cdc561ed40aadef954521a4134ffe44/cfc299ee8ec134b27e78af89f9f176274cdc561ed40aadef954521a4134ffe44/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "46c9a7284309abe967d39195ce2a156172b2e2f1670f72c9a73b7c6e0d22c5f7",
+          "start_block": 1156,
+          "token_end_exclusive": 18512,
+          "token_start": 18496
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1153,
+        "suffix_blocks": 4,
+        "total_blocks": 1157
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000013-3fdba35f04dc8c46.json",
+      "missing_block_indices": [],
+      "request_id": "13",
+      "status": "pass",
+      "verified": {
+        "blocks": 1157,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 251,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9c9032abe14601a160b5d882edef1443bca5cbddd2f6f37137394a479d158820/1e378534801e7e2a86f2b92006f04a45ab4767a06d59fdf0bdc94cb14290fb08/251",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 230294622,
+          "payload_sha256": "2d758466203226143ff59658426e954ed290cb64e57696177e323eb64ccc6a14",
+          "start_block": 1077,
+          "token_end_exclusive": 21248,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/e9c515e6eae2cca92984654a63a4da20e0c17f0d8f858614ab728c68debb8cc6/e9c515e6eae2cca92984654a63a4da20e0c17f0d8f858614ab728c68debb8cc6/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "31f0f55982e47f4b56f78407dc24fdcd5f17c5898fa08fcf02d57ddd558c6fb7",
+          "start_block": 1328,
+          "token_end_exclusive": 21264,
+          "token_start": 21248
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/29066ff83aa93ded68586ecebb92417ce1691347a6f8cbe466a7cfc85e2bb74f/29066ff83aa93ded68586ecebb92417ce1691347a6f8cbe466a7cfc85e2bb74f/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "052c852ebe1c282a8daed7a809a4d1641a66b4a0381f3ca715b07aa433bded57",
+          "start_block": 1329,
+          "token_end_exclusive": 21280,
+          "token_start": 21264
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/cb897b815b13ebe7e2f91cdccf09cffc57b948a034873b73149fb97b1f002558/cb897b815b13ebe7e2f91cdccf09cffc57b948a034873b73149fb97b1f002558/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "8442dca4fd26f3d87716062f9b350ed234b412d45a16ba69851a24fc62f92dac",
+          "start_block": 1330,
+          "token_end_exclusive": 21296,
+          "token_start": 21280
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/e1e90bbed1a046c96f79c9c3a3106706d9b71ea9ad1f7d0236cce35897e08b21/e1e90bbed1a046c96f79c9c3a3106706d9b71ea9ad1f7d0236cce35897e08b21/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "9321131d4f4bc5ee02abb19827be34c7d537c54435b1253cd7ff534881e70e01",
+          "start_block": 1331,
+          "token_end_exclusive": 21312,
+          "token_start": 21296
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1328,
+        "suffix_blocks": 4,
+        "total_blocks": 1332
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000014-8527a891e2241369.json",
+      "missing_block_indices": [],
+      "request_id": "14",
+      "status": "pass",
+      "verified": {
+        "blocks": 1332,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 23,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/f9621c80f3b0a474035b782a0b88ee36de4ef72a19eb1087cfcbfffae44cae9a/d5fab93738d569f005b7df2d26edbb8e6cc4e199c81c20ee09d70fb44754c1ef/23",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 21103710,
+          "payload_sha256": "853047a7c5e04a3faaa2f3a86e038213543202dc3a30d70d78a8cebd68090b73",
+          "start_block": 1077,
+          "token_end_exclusive": 17600,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/eae3a09cc7485fd6156b4c6b28f3332c660f8f0dc12e595fe5094a8ebb749304/eae3a09cc7485fd6156b4c6b28f3332c660f8f0dc12e595fe5094a8ebb749304/1",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 918622,
+          "payload_sha256": "1de9b512df3ebe5a030c77ee7e7f94629a46f896d0b3e31cfc0da1d0f630981a",
+          "start_block": 1100,
+          "token_end_exclusive": 17616,
+          "token_start": 17600
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/49148ac4a779264c38f8bb119536a91afcfbfe7011de33d396c098ed8738086e/49148ac4a779264c38f8bb119536a91afcfbfe7011de33d396c098ed8738086e/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "35b3dbda0ff2417f87e479d237de9eef426972f16b6eb79a14e4fcca38ff0bf2",
+          "start_block": 1101,
+          "token_end_exclusive": 17632,
+          "token_start": 17616
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/035c7b41d48f943fe9810d84f813a4dad0bbf1bcc6afae8f1691f354d3dc2028/035c7b41d48f943fe9810d84f813a4dad0bbf1bcc6afae8f1691f354d3dc2028/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "fb8169e4c2f59aa5d71ae7f76520874bf8e815c0e2554af9d78f745e5fc99a23",
+          "start_block": 1102,
+          "token_end_exclusive": 17648,
+          "token_start": 17632
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/446f8b6cb75ea1b0c0282d374b1ff9174d7db2f04cd1664d0c33762e37c2be68/446f8b6cb75ea1b0c0282d374b1ff9174d7db2f04cd1664d0c33762e37c2be68/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "67e9eda1cace1a2558b8201d8b359bd5425810bcfa5801fa362cac0878e315f9",
+          "start_block": 1103,
+          "token_end_exclusive": 17664,
+          "token_start": 17648
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1101,
+        "suffix_blocks": 3,
+        "total_blocks": 1104
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000015-e629fa6598d73276.json",
+      "missing_block_indices": [],
+      "request_id": "15",
+      "status": "pass",
+      "verified": {
+        "blocks": 1104,
+        "boundary_chunks": 0,
+        "prefix_chunks": 5,
+        "suffix_chunks": 3
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 139,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a93689915a6edf12cad2e5675c471b038c4c472bd0ab6a2a949297312337601e/3d348291a27d6bd439024605c9fd066d441c01fb4a1dc9b4a19b1a411e990d0a/139",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 127534174,
+          "payload_sha256": "7b0d3fe63d92f9f9cc008199ed52b405a9ca74498852039f57163911f2bd9ecf",
+          "start_block": 1077,
+          "token_end_exclusive": 19456,
+          "token_start": 17232
+        },
+        {
+          "block_count": 88,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/06b4f4bef942d2e491399579847c9b6eee1aaea9f4d4aae3751fe1443eabdffa/d21b22cc0642b72f0904f22b13666ccde59c98c2000e31dd45c1d95d59c8bfb6/88",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 80741470,
+          "payload_sha256": "eeda6dd010f19f3f5b5d4f7caea3cdab8404ae84485ce00d5b705122a779261c",
+          "start_block": 1216,
+          "token_end_exclusive": 20864,
+          "token_start": 19456
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/5929e946df036aa2aac10b3d1fd5f5bb5bcc6ae3bf2ae895d76f1cca90c18ec4/5929e946df036aa2aac10b3d1fd5f5bb5bcc6ae3bf2ae895d76f1cca90c18ec4/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "3cdfe24fb2a8b87bb93cb513fb3e38266ba5faaf364d9f44b19fc2cde40e9f6e",
+          "start_block": 1304,
+          "token_end_exclusive": 20880,
+          "token_start": 20864
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/846ca8ca2f631c0c8b3431346ab42e6e7ddd0cfbadfcfe89eebaf8ffa59d8ce7/846ca8ca2f631c0c8b3431346ab42e6e7ddd0cfbadfcfe89eebaf8ffa59d8ce7/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "fbe083b554e0c170ca4f2953890eaa8f12a8edd0a4e433bb665dc206929874fd",
+          "start_block": 1305,
+          "token_end_exclusive": 20896,
+          "token_start": 20880
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/db5924a03db25e083325bd6965b1c7a7029af007a512890ca593f950dbbfb27d/db5924a03db25e083325bd6965b1c7a7029af007a512890ca593f950dbbfb27d/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "cc06e19a46589ac37d45465f1cc131ac4202449bf5b607f3400cee4772d53752",
+          "start_block": 1306,
+          "token_end_exclusive": 20912,
+          "token_start": 20896
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a94be5dadaf1b29d43e4cf0544735e2c07c0bc5fa5460c117b857a8679ac0d2d/a94be5dadaf1b29d43e4cf0544735e2c07c0bc5fa5460c117b857a8679ac0d2d/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "d12c4a2b3d104b91daf61997911b0a8481f124bd4e52745a808e449118b5ef81",
+          "start_block": 1307,
+          "token_end_exclusive": 20928,
+          "token_start": 20912
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1304,
+        "suffix_blocks": 4,
+        "total_blocks": 1308
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000016-b17ef6d19c7a5b1e.json",
+      "missing_block_indices": [],
+      "request_id": "16",
+      "status": "pass",
+      "verified": {
+        "blocks": 1308,
+        "boundary_chunks": 0,
+        "prefix_chunks": 5,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 140,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/59940824faa81d1fdfcc4ba4356f61da177a2105ae6e798a9f36468fb77e9585/5a70698fd28502316bcff5453135c8817da3984614816627ec73ec6f98cba810/140",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 128451678,
+          "payload_sha256": "a8de866ffb3c3f62cf55539219df3c1df4fe365db0a265ffd78a2bf9192868eb",
+          "start_block": 1077,
+          "token_end_exclusive": 19472,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/852ae942cbf9413647ec65a1fac2c04a594d1cf2bb65ba20434fc6d3dd3d9d53/852ae942cbf9413647ec65a1fac2c04a594d1cf2bb65ba20434fc6d3dd3d9d53/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "bbcc5c1fa5e60ca9a6caa197ce1a259fa9e59e7008e6257c47fe7e66938d0bdb",
+          "start_block": 1217,
+          "token_end_exclusive": 19488,
+          "token_start": 19472
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/e31d7f2f382d3f8e142d1256101ea40e57b86ab84927e2c5b18d2bdf0b98c4f3/e31d7f2f382d3f8e142d1256101ea40e57b86ab84927e2c5b18d2bdf0b98c4f3/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "7dc7bd8fa2059fbd695ac00e50389bc5120f75de20c8cc9aebd2e287dec8cf22",
+          "start_block": 1218,
+          "token_end_exclusive": 19504,
+          "token_start": 19488
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/6d6f61ccc69ab98024ee62bfcf0d5e7392b0378313a42995fdd1445ef6b45ecc/6d6f61ccc69ab98024ee62bfcf0d5e7392b0378313a42995fdd1445ef6b45ecc/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "fb9892a63eddeb9963f2920f8c22570445f323ee03ff18f097d6a0be098f6408",
+          "start_block": 1219,
+          "token_end_exclusive": 19520,
+          "token_start": 19504
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/5e38755b1d04e9742093101d21682592a75ff4422701f638cb122fcc147e7e44/5e38755b1d04e9742093101d21682592a75ff4422701f638cb122fcc147e7e44/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "34e489bf02d29f4685a57e53271f77932a88e374ed81520cd35195958bb8d595",
+          "start_block": 1220,
+          "token_end_exclusive": 19536,
+          "token_start": 19520
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1217,
+        "suffix_blocks": 4,
+        "total_blocks": 1221
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000017-4523540f1504cd17.json",
+      "missing_block_indices": [],
+      "request_id": "17",
+      "status": "pass",
+      "verified": {
+        "blocks": 1221,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 216,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/c13b74d581f45e19d879e26a158a9e197bea672fae041471f1a6648b50cb0e2a/a08372185eb9baa4b4eea92d287c5a38e2757837d08fe499889a0717460cf270/216",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 198181982,
+          "payload_sha256": "4db05a87ca3e6cef1964684ad73e350efdae79daccc66c41acd0f7a505567225",
+          "start_block": 1077,
+          "token_end_exclusive": 20688,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9b2e853c623122121ba9d3a0417215d98093879237564bdcccd5f2049e1e4535/9b2e853c623122121ba9d3a0417215d98093879237564bdcccd5f2049e1e4535/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "154c01a71b0646461b8a311048f0f78da788d478862b87763f4ae907427eb07e",
+          "start_block": 1293,
+          "token_end_exclusive": 20704,
+          "token_start": 20688
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/76aaa742fb86269f59a77039a776360209de3ce66d1af9e9740fe42af6f67770/76aaa742fb86269f59a77039a776360209de3ce66d1af9e9740fe42af6f67770/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "c971ffed9b03b176543eb5f2f45f256e337d4634ed4f1a12973afe54a87b7ba8",
+          "start_block": 1294,
+          "token_end_exclusive": 20720,
+          "token_start": 20704
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/980cfc9c49b774002dee25673c3c983877da8668443a6b82dd22481f0f5a58b7/980cfc9c49b774002dee25673c3c983877da8668443a6b82dd22481f0f5a58b7/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "5fbf3ea0c7bfe188a27d29f8077a64be69c1e1195cfcc4913f657df1c8a42c80",
+          "start_block": 1295,
+          "token_end_exclusive": 20736,
+          "token_start": 20720
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/612a52effe58ea2e4759d36445cceb471032e06aae5e3bdab3a968484bb9d5fe/612a52effe58ea2e4759d36445cceb471032e06aae5e3bdab3a968484bb9d5fe/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "2db7a911a1d2d60654c87a91fb3215865b2e3da0adda43800fde4ec024059c8a",
+          "start_block": 1296,
+          "token_end_exclusive": 20752,
+          "token_start": 20736
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1293,
+        "suffix_blocks": 4,
+        "total_blocks": 1297
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000018-4ec9599fc203d176.json",
+      "missing_block_indices": [],
+      "request_id": "18",
+      "status": "pass",
+      "verified": {
+        "blocks": 1297,
+        "boundary_chunks": 0,
+        "prefix_chunks": 4,
+        "suffix_chunks": 4
+      }
+    },
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 65,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/8716708096b528233f84c257503f38aee7190f3a9bdd5f1c8f0a83b4da493072/c0d0a6be2a538508c77023d54f20c7f25e57395d4076748638fbf71760bb1f5e/65",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 59638878,
+          "payload_sha256": "6f5b9b4d8d930ef4f55bac13f86b05994d2001492afd495ff55e0c265e3075db",
+          "start_block": 1077,
+          "token_end_exclusive": 18272,
+          "token_start": 17232
+        },
+        {
+          "block_count": 166,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/4ad9e3c973e763ceb85650c9fb93f96d7e0401933eea0710c3e4615eed7e2152/edd654a14da15ae397f023ceb94daf88e7f793be29e7aa96b9a8aea6d429b802/166",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 152306782,
+          "payload_sha256": "38d2f06324f521eda8158f03415fa38e1721af7aba72c6bc99622de58d3331ff",
+          "start_block": 1142,
+          "token_end_exclusive": 20928,
+          "token_start": 18272
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/553f00faa90d519260daa02c9042332a2074ca144088cc3802feccd7ca946c56/553f00faa90d519260daa02c9042332a2074ca144088cc3802feccd7ca946c56/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "2bf0633cf7c2abb6e54223f37bb1b9871a937580cfad91d3535c8e14a7c8d3e1",
+          "start_block": 1308,
+          "token_end_exclusive": 20944,
+          "token_start": 20928
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/ae1492ec8abf71a1200beedb3cfb46e2037e8d3b6af9a9be68fc8bd32c28ddb5/ae1492ec8abf71a1200beedb3cfb46e2037e8d3b6af9a9be68fc8bd32c28ddb5/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "bd3124e78051bc0b9a259f7f812e8d4302b3ae882ea146d79e61abc5fce194b1",
+          "start_block": 1309,
+          "token_end_exclusive": 20960,
+          "token_start": 20944
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/a1605f1236798572c91ff21c4b9ff3edba62b03840d6a53afdeed54563f6d461/a1605f1236798572c91ff21c4b9ff3edba62b03840d6a53afdeed54563f6d461/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "63ceaa374eacde12b2a00e35d6dda8215c279df1b13fd5e25996a78b6034b030",
+          "start_block": 1310,
+          "token_end_exclusive": 20976,
+          "token_start": 20960
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/0302b4aa514f8c1bb5d1da3c9ef908908e4eda2e2d438672112f2563c8aca298/0302b4aa514f8c1bb5d1da3c9ef908908e4eda2e2d438672112f2563c8aca298/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "c3a023dfc7f8f12402f8a382d2ec8a874795b10e683373ec28742aa8b77cf09e",
+          "start_block": 1311,
+          "token_end_exclusive": 20992,
+          "token_start": 20976
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1308,
+        "suffix_blocks": 4,
+        "total_blocks": 1312
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_warm/000019-9400f1b21cb527d7.json",
+      "missing_block_indices": [],
+      "request_id": "19",
+      "status": "pass",
+      "verified": {
+        "blocks": 1312,
+        "boundary_chunks": 0,
+        "prefix_chunks": 5,
+        "suffix_chunks": 4
+      }
+    }
+  ],
+  "schema_version": 1,
+  "status": "pass",
+  "summary": {
+    "expected_blocks": 24333,
+    "expected_prefix_blocks": 24254,
+    "expected_suffix_blocks": 79,
+    "missing_blocks": 0,
+    "prefix_chunks": 86,
+    "requests": 20,
+    "suffix_chunks": 79,
+    "verified_blocks": 24333
+  },
+  "vllm_version": "0.32.0"
+}

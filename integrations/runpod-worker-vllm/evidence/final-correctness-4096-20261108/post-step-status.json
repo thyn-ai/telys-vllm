@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "steps": [
+    {
+      "exit_status": 0,
+      "step": "copy_results"
+    },
+    {
+      "exit_status": 0,
+      "step": "copy_commands"
+    },
+    {
+      "exit_status": 0,
+      "step": "summary_json"
+    },
+    {
+      "exit_status": 0,
+      "step": "summary_markdown"
+    },
+    {
+      "exit_status": 0,
+      "step": "ordinary_summary_and_output_equality"
+    },
+    {
+      "exit_status": 0,
+      "step": "decode_store"
+    },
+    {
+      "exit_status": 0,
+      "step": "dynamic_persistence"
+    },
+    {
+      "exit_status": 0,
+      "step": "compact_store_manifest"
+    }
+  ]
+}

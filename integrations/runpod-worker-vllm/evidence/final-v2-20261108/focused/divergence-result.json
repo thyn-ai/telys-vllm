@@ -1,0 +1,9 @@
+{
+  "chain_keys": {
+    "fast": "telys-vllm/chunk/a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e/16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4/2",
+    "legacy": "telys-vllm/chunk/02811e4a991a586c7538db3f3e087c2d25b3a503cdb755f29e550114af13731b/c2f225c53e902e19125a5881958950fb9469c5b15006d20049c4f2bde2b112e3/2"
+  },
+  "divergent_load_rejected": true,
+  "divergent_lookup_blocks": 0,
+  "original_lookup_blocks": 2
+}

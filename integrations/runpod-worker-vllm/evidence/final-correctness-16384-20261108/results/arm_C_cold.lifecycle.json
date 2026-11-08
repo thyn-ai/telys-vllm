@@ -1,0 +1,123 @@
+{
+  "kind": "telys_vllm_lifecycle_evidence",
+  "manifests": {
+    "directory": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_cold",
+    "files": [
+      {
+        "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_cold/000000-5feceb66ffc86f38.json",
+        "sha256": "9118734155664217b426d99fc1368ad85b50552111c4866a2b78c5e514b5d1a3"
+      }
+    ]
+  },
+  "process": {
+    "exit_kind": "completed",
+    "exit_status": 0
+  },
+  "require_pending_writes": true,
+  "run": {
+    "arm": "C",
+    "phase": "cold"
+  },
+  "schema_version": 1,
+  "telemetry": {
+    "malformed_lines": [],
+    "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/arm_C_cold.telemetry.jsonl",
+    "pending_write_spans": [
+      {
+        "line": 10,
+        "pending_chunks": 1,
+        "pid": 63662,
+        "saved_chunks": 1
+      },
+      {
+        "line": 15,
+        "pending_chunks": 1,
+        "pid": 63662,
+        "saved_chunks": 1
+      },
+      {
+        "line": 19,
+        "pending_chunks": 1,
+        "pid": 63662,
+        "saved_chunks": 1
+      },
+      {
+        "line": 31,
+        "pending_chunks": 1,
+        "pid": 63662,
+        "saved_chunks": 1
+      },
+      {
+        "line": 52,
+        "pending_chunks": 1,
+        "pid": 63662,
+        "saved_chunks": 1
+      },
+      {
+        "line": 72,
+        "pending_chunks": 1,
+        "pid": 63662,
+        "saved_chunks": 1
+      },
+      {
+        "line": 92,
+        "pending_chunks": 1,
+        "pid": 63662,
+        "saved_chunks": 1
+      }
+    ],
+    "persisted_chunk_spans": [
+      {
+        "block_count": 512,
+        "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+        "line": 11,
+        "payload_bytes": 469763166,
+        "pid": 63662
+      },
+      {
+        "block_count": 512,
+        "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+        "line": 27,
+        "payload_bytes": 469763166,
+        "pid": 63662
+      },
+      {
+        "block_count": 53,
+        "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+        "line": 37,
+        "payload_bytes": 48628830,
+        "pid": 63662
+      },
+      {
+        "block_count": 1,
+        "key": "telys-vllm/chunk/96d139f803053d8ee0e115bcb04c09948a275d32cf3c6d3c2ae2616637d100a5/96d139f803053d8ee0e115bcb04c09948a275d32cf3c6d3c2ae2616637d100a5/1",
+        "line": 38,
+        "payload_bytes": 918622,
+        "pid": 63662
+      },
+      {
+        "block_count": 1,
+        "key": "telys-vllm/chunk/cd2add0d7388fa9ca72f8f049448725bf482af3873981141121ecdb9a70ae239/cd2add0d7388fa9ca72f8f049448725bf482af3873981141121ecdb9a70ae239/1",
+        "line": 54,
+        "payload_bytes": 918622,
+        "pid": 63662
+      },
+      {
+        "block_count": 1,
+        "key": "telys-vllm/chunk/987a955e10c3c18e5cc34d8e8f0b080d39f9c04a5f3d96eea974bbfbe3036240/987a955e10c3c18e5cc34d8e8f0b080d39f9c04a5f3d96eea974bbfbe3036240/1",
+        "line": 74,
+        "payload_bytes": 918622,
+        "pid": 63662
+      },
+      {
+        "block_count": 1,
+        "key": "telys-vllm/chunk/6228e6167e257785b53b69cdf1c4d16780f18a4307f9214dc408e301d3c2f7e5/6228e6167e257785b53b69cdf1c4d16780f18a4307f9214dc408e301d3c2f7e5/1",
+        "line": 94,
+        "payload_bytes": 918622,
+        "pid": 63662
+      }
+    ],
+    "present": true,
+    "sha256": "45c6ca34fac51596b7052d7955e108adc5c43e66c708c07a39ffaadb3c237f03"
+  }
+}

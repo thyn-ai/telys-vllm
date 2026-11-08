@@ -1,0 +1,14 @@
+{
+  "all_passed": true,
+  "checks": {
+    "aligned_17616_complete": true,
+    "aligned_17616_decode_saves_observed": true,
+    "aligned_17616_finish_drops_state": true,
+    "aligned_17616_ids_sufficient": true,
+    "cold_17241_complete": true,
+    "cold_17241_decode_saves_observed": true,
+    "cold_17241_finish_drops_state": true,
+    "cold_17241_ids_sufficient": true
+  },
+  "source_head": "6cbfe82af264f87bc78da067b8ad7a5254a8a6e1"
+}

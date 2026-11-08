@@ -1,0 +1,5 @@
+{
+  "all_chain_bound_keys_exact": true,
+  "chunks_checked": 172,
+  "key_format": "{namespace}/chunk/{start_hash}/{end_hash}/{block_count}"
+}

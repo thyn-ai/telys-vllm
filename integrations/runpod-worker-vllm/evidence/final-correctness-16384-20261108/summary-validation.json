@@ -1,0 +1,116 @@
+{
+  "ordinary_correctness_passed": true,
+  "ordinary_correctness_statuses": {
+    "A": "pass",
+    "B": "pass",
+    "C": "pass"
+  },
+  "output_comparisons": [
+    {
+      "arm": "A",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_A_run1.json",
+      "phase": "cold",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "A",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_A_run1.json",
+      "phase": "warm",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "B",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_B_run1.json",
+      "phase": "cold",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "B",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_B_run1.json",
+      "phase": "warm",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "B",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_B_run2.json",
+      "phase": "cold",
+      "run": "run2",
+      "verifier_passed": true
+    },
+    {
+      "arm": "B",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_B_run2.json",
+      "phase": "warm",
+      "run": "run2",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_C_run1.json",
+      "phase": "cold",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_C_run1.json",
+      "phase": "warm",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_C_run2.json",
+      "phase": "cold",
+      "run": "run2",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "match_text": true,
+      "match_tokens": true,
+      "output_token_count": 64,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/correctness_arm_C_run2.json",
+      "phase": "warm",
+      "run": "run2",
+      "verifier_passed": true
+    }
+  ],
+  "output_equality_passed": true,
+  "passed": true,
+  "schema_version": 1,
+  "summary_path": "/tmp/telys-final-correctness-validation/p16384/summary.json",
+  "worker_identity_passed": true,
+  "workers_path": "/tmp/telys-final-correctness-validation/p16384/workers.json"
+}

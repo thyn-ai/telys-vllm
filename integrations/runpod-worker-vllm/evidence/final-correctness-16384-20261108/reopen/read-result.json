@@ -1,0 +1,47 @@
+{
+  "all_passed": true,
+  "checks": {
+    "before_reset_lookup": true,
+    "durable_collection_row_present": true,
+    "durable_put_chunk_length": true,
+    "durable_put_metadata": true,
+    "durable_put_payload": true,
+    "no_collection_rows_absent": true,
+    "no_collection_rows_chunk_length": true,
+    "no_collection_rows_metadata": true,
+    "no_collection_rows_payload": true,
+    "reopened_reset_get_missing": true,
+    "reopened_reset_lookup": true,
+    "reset_chain_key_exact": true,
+    "reset_save_and_load": true
+  },
+  "records": [
+    {
+      "chunk_length": 2,
+      "collection_row_present": false,
+      "metadata": {
+        "vllm.block_count": "2",
+        "vllm.block_size": "16",
+        "vllm.block_start_hash": "52d9909bced64e0c4a9a14f96b3b6bc600021b309e3efba9f7735dfbc521350d",
+        "vllm.chunk_format": "fast",
+        "vllm.engine_id": "correctness-reopen",
+        "vllm.model": "Qwen/Qwen2.5-7B-Instruct"
+      },
+      "name": "no_collection_rows"
+    },
+    {
+      "chunk_length": 2,
+      "collection_row_present": true,
+      "metadata": {
+        "vllm.block_count": "2",
+        "vllm.block_size": "16",
+        "vllm.block_start_hash": "06099c6bb634d977f5996f5886e037a01199a9cdc1d1412f8c7ae442c1d4143b",
+        "vllm.chunk_format": "fast",
+        "vllm.engine_id": "correctness-reopen",
+        "vllm.model": "Qwen/Qwen2.5-7B-Instruct"
+      },
+      "name": "durable_put"
+    }
+  ],
+  "reset_chain_key": "telys-vllm/chunk/52d9909bced64e0c4a9a14f96b3b6bc600021b309e3efba9f7735dfbc521350d/021c58b36d9413a04ec86f43fc46dc8529b97389eab6d6cc603b9c9ba2983b7a/2"
+}

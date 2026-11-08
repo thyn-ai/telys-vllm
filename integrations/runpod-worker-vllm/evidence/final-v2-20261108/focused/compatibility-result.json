@@ -1,0 +1,66 @@
+{
+  "after_delete": {
+    "first_contains": false,
+    "first_get_present": false,
+    "second_contains": false,
+    "second_get_present": false
+  },
+  "all_passed": true,
+  "chain_keys": {
+    "fast": "telys-vllm/chunk/a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e/16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4/2",
+    "legacy": "telys-vllm/chunk/02811e4a991a586c7538db3f3e087c2d25b3a503cdb755f29e550114af13731b/c2f225c53e902e19125a5881958950fb9469c5b15006d20049c4f2bde2b112e3/2"
+  },
+  "checks": {
+    "chain_bound_key_exact": true,
+    "divergent_load_rejected": true,
+    "divergent_lookup": true,
+    "fast_to_fast": true,
+    "fast_to_legacy": true,
+    "legacy_chain_bound_key_exact": true,
+    "legacy_to_fast": true,
+    "legacy_to_legacy": true,
+    "metadata_free_fast_to_fast": true,
+    "metadata_free_fast_to_legacy": true,
+    "original_lookup": true,
+    "overlap_chunk_length": true,
+    "overlap_chunk_length_invalidated": true,
+    "overlap_delete_return": true,
+    "overlap_first_contains_invalidated": true,
+    "overlap_first_get_invalidated": true,
+    "overlap_metadata": true,
+    "overlap_put_first": true,
+    "overlap_put_second": true,
+    "overlap_second_contains_invalidated": true,
+    "overlap_second_get_invalidated": true,
+    "v2_metadata": true,
+    "v2_payload": true
+  },
+  "v2_raw_search": {
+    "ids": [
+      "telys-vllm/chunk/v2-final/1"
+    ],
+    "metadata": [
+      {
+        "__key": "telys-vllm/chunk/v2-final/1",
+        "vllm.block_count": null,
+        "vllm.block_size": null,
+        "vllm.block_start_hash": null,
+        "vllm.chunk_format": null,
+        "vllm.engine_id": null,
+        "vllm.meta_blob": "{\"payload\": \"djIgcGF5bG9hZA==\", \"metadata\": {\"vllm.chunk_format\": \"legacy\", \"meta\": \"v2\"}}",
+        "vllm.model": null,
+        "vllm.payload": null
+      }
+    ],
+    "scores": [
+      0.0
+    ]
+  },
+  "v2_record": {
+    "metadata": {
+      "meta": "v2",
+      "vllm.chunk_format": "legacy"
+    },
+    "value": "v2 payload"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "8192_executed": false,
+  "8192_reason": "16384 exercised the new manifest path; no additional size-specific validation was required",
+  "async_kv_loading": false,
+  "endpoint_created": false,
+  "git_head": "6cbfe82af264f87bc78da067b8ad7a5254a8a6e1",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "profile": 4096,
+  "run_id": "final-correctness-20261108-01",
+  "run_root": "/runpod-volume/telys-vllm-benchmark/p4096-seed42-final-correctness-20261108-01",
+  "scale_to_zero_executed": false,
+  "source_sha256": {
+    "bench/benchmark_prefix_caching_metrics.py": "68fda96f3386e0e498a5d824bf3bcff451acbee476bd11a4d4ee6e618f9ddc59",
+    "bench/verify_persisted_chunks.py": "d8dd1fba9d04a180e0298ea466220bd91dee8766fbaed3b76ae17867dec2b016",
+    "integrations/runpod-worker-vllm/benchmark.sh": "1b92b291673d6ac2e3f8033abbadceb8e7f364a35141035b0d03eca74bd60f75",
+    "integrations/runpod-worker-vllm/summarize_results.py": "6bdacc569a41765c047d7c4650019f21f0c1172911196baa3c826e14083e1ffa"
+  },
+  "telys": "0.1.14",
+  "telys_home": "/runpod-volume/telys-home",
+  "vllm": "0.32.0"
+}

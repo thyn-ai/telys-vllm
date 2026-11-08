@@ -1,0 +1,38 @@
+{
+  "after_delete": {
+    "first_contains": true,
+    "first_get_present": true,
+    "first_value": "overlap-payload-2",
+    "second_contains": false,
+    "second_get_present": false,
+    "second_value": null
+  },
+  "all_passed": false,
+  "checks": {
+    "blob_only_delete_return": true,
+    "blob_only_first_get_missing": false,
+    "blob_only_first_not_contains": false,
+    "blob_only_second_get_missing": true,
+    "blob_only_second_not_contains": true,
+    "overlap_chunk_length": true,
+    "overlap_metadata": true,
+    "overlap_payload_first": true,
+    "overlap_payload_second": true,
+    "v2_meta_blob_metadata": false,
+    "v2_meta_blob_payload": false
+  },
+  "v2_record": {
+    "metadata": {
+      "__key": "telys-vllm/chunk/v2-2/1",
+      "vllm.block_count": null,
+      "vllm.block_size": null,
+      "vllm.block_start_hash": null,
+      "vllm.chunk_format": null,
+      "vllm.engine_id": null,
+      "vllm.model": null,
+      "vllm.slab_length": null,
+      "vllm.slab_offset": null
+    },
+    "value": ""
+  }
+}
