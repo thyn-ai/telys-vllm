@@ -120,11 +120,11 @@ def test_stable_version_change_and_rejections():
 
 def test_build_plan_reads_exact_before_and_head(tmp_path):
     def git(*arguments):
-        return subprocess.check_output(  # noqa: S603
+        return subprocess.check_output(  # noqa: S603, RUF100
             [GIT_EXECUTABLE, "-C", str(tmp_path), *arguments], text=True
         ).strip()
 
-    subprocess.run(  # noqa: S603
+    subprocess.run(  # noqa: S603, RUF100
         [GIT_EXECUTABLE, "-C", str(tmp_path), "init", "-q"], check=True
     )
     git("config", "user.name", "Release Test")

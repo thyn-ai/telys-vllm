@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
 """Validate a main-branch version bump and optionally create its immutable tag."""
 
@@ -13,7 +12,8 @@ import shutil
 import subprocess
 import sys
 import time
-import tomllib
+
+import tomllib  # isort: skip
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -88,7 +88,7 @@ def git_executable() -> str:
 
 
 def run_git(repository: Path, *arguments: str) -> str:
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(  # noqa: S603, RUF100
         [git_executable(), "-C", str(repository), *arguments],
         check=False,
         capture_output=True,
@@ -113,7 +113,7 @@ def build_plan(repository: Path, before: str, head: str) -> ReleasePlan | None:
         raise ReleaseTagError(f"Checked-out HEAD {actual_head} does not match event SHA {head}")
     run_git(repository, "rev-parse", "--verify", f"{before}^{{commit}}")
     run_git(repository, "rev-parse", "--verify", f"{head}^{{commit}}")
-    ancestor = subprocess.run(  # noqa: S603
+    ancestor = subprocess.run(  # noqa: S603, RUF100
         [git_executable(), "-C", str(repository), "merge-base", "--is-ancestor", before, head],
         check=False,
         capture_output=True,
@@ -155,7 +155,7 @@ class GitHubClient:
     ) -> Any:
         url = f"{self.api_url}/repos/{self.repository}/{path}"
         body = json.dumps(payload).encode("utf-8") if payload is not None else None
-        request = urllib.request.Request(  # noqa: S310
+        request = urllib.request.Request(  # noqa: S310, RUF100
             url,
             data=body,
             method=method,
@@ -168,7 +168,7 @@ class GitHubClient:
             },
         )
         try:
-            with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310
+            with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310, RUF100
                 return json.load(response)
         except urllib.error.HTTPError as exc:
             if allow_not_found and exc.code == 404:
@@ -335,8 +335,7 @@ def emit(outputs: dict[str, str]) -> None:
     output_path = os.environ.get("GITHUB_OUTPUT")
     if output_path:
         with Path(output_path).open("a", encoding="utf-8") as stream:
-            for key, value in outputs.items():
-                stream.write(f"{key}={value}\n")
+            stream.writelines(f"{key}={value}\n" for key, value in outputs.items())
 
 
 def common_arguments(parser: argparse.ArgumentParser) -> None:
