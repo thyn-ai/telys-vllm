@@ -25,12 +25,6 @@ if TYPE_CHECKING:
     from vllm.v1.attention.backend import AttentionMetadata
 
 
-# Private A/B candidate, not a tuned public configuration. With 16-token blocks
-# and 16-bit KV, Qwen2.5-1.5B/7B use 8/16 KiB per layer-block, so 1 MiB covers
-# four/two blocks across 28 layers. This threshold requires A40 A/B proof.
-_SMALL_SAVE_SYNC_THRESHOLD_BYTES = 1024**2
-
-
 def _require_torch() -> None:
     if torch is None:
         raise RuntimeError("torch is required for GPU KV extraction/injection")
@@ -101,12 +95,10 @@ class AsyncKVExtractionBatch:
 
     Outputs must not be read until the context exits. A single CUDA event is
     recorded and synchronized at exit when pinned copies were submitted, and
-    the batch retains pinned buffers until that drain completes. Small batches
-    use blocking copies to avoid pinned allocation and event overhead. Bytes
-    are accumulated in layer order, so crossing the threshold produces an
-    explicit mix of synchronous early layers and pinned asynchronous later
-    layers. Hosts without pinned memory use the original blocking transfer;
-    nonblocking copy or stream failures are fatal.
+    the batch retains pinned buffers until that drain completes. Every CUDA
+    layer uses the batched pinned path, independent of save size. CPU sources
+    and hosts without pinned memory use blocking transfers; nonblocking copy
+    or stream failures are fatal.
     """
 
     def __init__(self, telemetry: Telemetry | None = None) -> None:
@@ -157,7 +149,7 @@ class AsyncKVExtractionBatch:
         block_size: int,
         attn_metadata: AttentionMetadata | None,
     ) -> torch.Tensor:
-        """Stage one stacked layer, or copy small saves synchronously."""
+        """Stage one stacked layer on CPU, using pinned copies for CUDA."""
         _require_torch()
         if self._closed:
             raise RuntimeError("async KV extraction batch is closed")
@@ -171,10 +163,7 @@ class AsyncKVExtractionBatch:
             )
             gather_ctx["input_bytes"] = source.nbytes
         self._total_input_bytes += source.nbytes
-        if (
-            not source.is_cuda
-            or self._total_input_bytes < _SMALL_SAVE_SYNC_THRESHOLD_BYTES
-        ):
+        if not source.is_cuda:
             return self._copy_to_cpu(source)
 
         pinned = self._allocate_pinned(source)

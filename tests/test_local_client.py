@@ -13,6 +13,7 @@ import importlib
 import importlib.util
 import json
 import sys
+import threading
 from types import ModuleType
 from typing import Any, ClassVar
 
@@ -20,6 +21,8 @@ import pytest
 
 from telys_vllm.client import TelysMaintenanceReport, TelysRecord
 from telys_vllm.config import TelysConnectorConfig
+from telys_vllm.connector import _ChunkContentValidator
+from telys_vllm.store import TelysStoreError
 
 # ---------------------------------------------------------------------------
 # Minimal stub Telys SDK
@@ -30,15 +33,20 @@ class _StubCollection:
     """In-memory collection that mirrors the subset of ``telys.engine.Collection``
     that ``TelysLocalClient`` calls."""
 
-    def __init__(self) -> None:
+    def __init__(self, filter_columns=()) -> None:
+        self.col_names = list(filter_columns)
         self._rows: dict[str, dict[str, Any]] = {}
         self.search_calls = 0
         self.ids_calls = 0
         self.full_ids_calls = 0
 
     def upsert(self, vectors, ids, metadata):
-        for key, row in zip(ids, metadata):
-            self._rows[key] = dict(row)
+        for key, row in zip(ids, metadata, strict=False):
+            self._rows[key] = {
+                column: value
+                for column, value in row.items()
+                if column in self.col_names
+            }
 
     def search(
         self,
@@ -86,7 +94,7 @@ class _StubEngine:
         self, name, dim, partition_by, *, filter_columns=(), **kwargs
     ):
         self.last_filter_columns = filter_columns
-        col = _StubCollection()
+        col = _StubCollection(filter_columns)
         self._cols[name] = col
         return col
 
@@ -180,7 +188,11 @@ def test_metadata_only_record(lc, monkeypatch):
     client.put(
         "ns/chunk/bb/1",
         b"ignored-by-v4",
-        {"vllm.slab_offset": "1234", "vllm.slab_length": "56", "meta": "x"},
+        {
+            "vllm.slab_offset": "1234",
+            "vllm.slab_length": "56",
+            "vllm.model": "x",
+        },
     )
 
     col = client._collection
@@ -189,13 +201,13 @@ def test_metadata_only_record(lc, monkeypatch):
     assert "vllm.payload" not in row
     assert row["vllm.slab_offset"] == "1234"
     assert row["vllm.slab_length"] == "56"
-    assert row["meta"] == "x"
+    assert row["vllm.model"] == "x"
 
     client._record_cache.clear()
     record = client.get("ns/chunk/bb/1")
     assert record.value == b""
     assert record.metadata["vllm.slab_offset"] == "1234"
-    assert record.metadata["meta"] == "x"
+    assert record.metadata["vllm.model"] == "x"
 
 
 def test_get_decodes_v2_meta_blob(lc, monkeypatch):
@@ -273,7 +285,7 @@ def test_shared_engine_makes_writes_visible_across_clients(lc, monkeypatch):
     """Two connector roles in the same process must share one Telys collection
     and hot cache; otherwise scheduler lookups see 0% hits (the v1 bench bug)."""
     client1 = _make_client(lc, monkeypatch, TELYS_PATH="/tmp/stub-telys")
-    client1.put("ns/kv/shared", b"payload", {"meta": "x"})
+    client1.put("ns/kv/shared", b"payload", {"vllm.model": "x"})
 
     # A second client for the same path/namespace must reuse the shared engine.
     client2 = _make_client(lc, monkeypatch, TELYS_PATH="/tmp/stub-telys")
@@ -285,7 +297,7 @@ def test_shared_engine_makes_writes_visible_across_clients(lc, monkeypatch):
     record = client2.get("ns/kv/shared")
     assert record is not None
     assert record.value == b""
-    assert record.metadata["meta"] == "x"
+    assert record.metadata["vllm.model"] == "x"
 
 
 def test_close_is_idempotent_and_closes_remote(lc, monkeypatch):
@@ -733,6 +745,7 @@ def _complete_metadata(**overrides):
         "vllm.block_size": "16",
         "vllm.model": "model",
         "vllm.engine_id": "engine",
+        "vllm.content_sha256": hashlib.sha256(b"payload").hexdigest(),
     }
     metadata.update(overrides)
     return metadata
@@ -785,6 +798,60 @@ def test_content_digest_survives_close_reopen(lc, monkeypatch, tmp_path, client_
             client.close()
 
 
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_old_schema_digest_sidecar_survives_close_reopen(
+    lc, monkeypatch, tmp_path, client_kind
+):
+    old_filter_columns = (
+        "__key",
+        "vllm.payload",
+        "vllm.meta_blob",
+        "vllm.slab_offset",
+        "vllm.slab_length",
+        "vllm.chunk_format",
+        "vllm.block_start_hash",
+        "vllm.block_count",
+        "vllm.block_size",
+        "vllm.model",
+        "vllm.engine_id",
+    )
+    engine = _StubEngine(str(tmp_path / "old-schema"))
+    engine.create_collection(
+        "test_ns_kv",
+        dim=1,
+        partition_by="__key",
+        filter_columns=old_filter_columns,
+    )
+    monkeypatch.setattr(sys.modules["telys"], "Telys", lambda _: engine)
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    key = _chunk_key("chain")
+    digest = hashlib.sha256(b"payload").hexdigest()
+    metadata = {"vllm.content_sha256": digest}
+    if client_kind == "blob":
+        metadata = _complete_metadata(**metadata)
+
+    try:
+        client.put(key, b"payload", metadata)
+        row = client._collection._rows[key]
+        assert "vllm.content_sha256" not in client._collection.col_names
+        assert "vllm.content_sha256" not in row
+        assert "vllm.meta_blob" in row
+        client.close()
+
+        client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+        client._collection.search_calls = 0
+        record = client.get(key)
+
+        assert record is not None
+        assert record.metadata["vllm.content_sha256"] == digest
+        assert "vllm.content_sha256" not in client._collection.col_names
+        if client_kind == "blob":
+            assert client._collection.search_calls == 0
+    finally:
+        if not client._closed:
+            client.close()
+
+
 @pytest.mark.parametrize(
     "digest_override",
     [
@@ -797,7 +864,9 @@ def test_blob_read_preserves_digest_state_for_connector(
 ):
     client = _make_blob_client(lc, monkeypatch, tmp_path / "digest-state")
     key = _chunk_key("chain")
-    metadata = _complete_metadata(**digest_override)
+    metadata = _complete_metadata()
+    metadata.pop("vllm.content_sha256")
+    metadata.update(digest_override)
     client._blob_store.put(key, b"payload", metadata)
 
     try:
@@ -808,6 +877,73 @@ def test_blob_read_preserves_digest_state_for_connector(
         assert record.metadata.get("vllm.content_sha256") == digest_override.get(
             "vllm.content_sha256"
         )
+        assert client._collection.search_calls == 1
+    finally:
+        client.close()
+
+
+def test_blob_changed_payload_without_digest_recovers_collection_digest(
+    lc, monkeypatch, tmp_path
+):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "changed-payload")
+    key = _chunk_key("chain")
+    original_digest = hashlib.sha256(b"original").hexdigest()
+    collection_metadata = _complete_metadata(
+        **{"vllm.content_sha256": original_digest}
+    )
+    blob_metadata = _complete_metadata()
+    blob_metadata.pop("vllm.content_sha256")
+    client._collection._rows[key] = {
+        "__key": key,
+        **collection_metadata,
+    }
+    client._blob_store.put(key, b"changed", blob_metadata)
+
+    try:
+        record = client.get(key)
+
+        assert record is not None
+        assert record.value == b"changed"
+        assert record.metadata["vllm.content_sha256"] == original_digest
+        assert client._collection.search_calls == 1
+        validator = _ChunkContentValidator(max_entries=1, max_bytes=1024)
+        with pytest.raises(TelysStoreError, match="content digest mismatch"):
+            validator.validate(key, record.value, record.metadata, None)
+    finally:
+        client.close()
+
+
+@pytest.mark.parametrize("legacy_sidecar", [False, True])
+def test_blob_conflicting_valid_digests_fail_explicitly(
+    lc, monkeypatch, tmp_path, legacy_sidecar
+):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "conflicting-digest")
+    key = _chunk_key("chain")
+    collection_metadata = _complete_metadata(
+        **{"vllm.content_sha256": hashlib.sha256(b"original").hexdigest()}
+    )
+    blob_metadata = _complete_metadata(
+        **{"vllm.content_sha256": hashlib.sha256(b"changed").hexdigest()}
+    )
+    blob_metadata.pop("vllm.model")
+    if legacy_sidecar:
+        client._collection._rows[key] = {
+            "__key": key,
+            "vllm.meta_blob": json.dumps(
+                {"payload": "", "metadata": collection_metadata}
+            ),
+        }
+    else:
+        client._collection._rows[key] = {
+            "__key": key,
+            **collection_metadata,
+        }
+    client._blob_store.put(key, b"changed", blob_metadata)
+
+    try:
+        with pytest.raises(lc.TelysLocalClientError, match="conflicting content"):
+            client.get(key)
+        assert client._collection.search_calls == 1
     finally:
         client.close()
 
@@ -1102,4 +1238,137 @@ def test_close_resets_chunk_index(lc, monkeypatch, tmp_path, client_kind):
     client.close()
 
     assert client._chunk_key_index == {}
+    assert client._chunk_keys_by_start == {}
     assert client._chunk_lengths == {}
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_large_delete_does_not_scan_global_key_set(
+    lc, monkeypatch, tmp_path, client_kind
+):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    keys = [f"test-ns/chunk/{index:04x}/1" for index in range(128)]
+    try:
+        for key in keys:
+            client.put(key, b"payload", {})
+        counting_keys = _IterationCountingSet(client._key_set)
+        client._key_set = counting_keys
+
+        for key in keys:
+            assert client.delete(key) is True
+
+        assert counting_keys.iterations == 0
+        assert client._chunk_key_index == {}
+        assert client._chunk_keys_by_start == {}
+        assert client._chunk_lengths == {}
+    finally:
+        client.close()
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_overlapping_put_delete_cannot_resurrect_record(
+    lc, monkeypatch, tmp_path, client_kind
+):
+    first = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    second = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    key = _chunk_key("chain")
+    first.put(key, b"original", {"meta": "original"})
+    put_paused = threading.Event()
+    release_put = threading.Event()
+    delete_done = threading.Event()
+    errors = []
+    original_propagate = first._cache_record_for_overlapping_clients
+
+    def pause_replacement_propagation(cache_key, record):
+        if record.metadata.get("meta") == "replacement":
+            put_paused.set()
+            if not release_put.wait(5):
+                raise RuntimeError("timed out waiting to finish replacement put")
+        original_propagate(cache_key, record)
+
+    def put_replacement():
+        try:
+            first.put(key, b"replacement", {"meta": "replacement"})
+        except Exception as exc:  # noqa: BLE001 - assert thread failures in caller
+            errors.append(exc)
+
+    def delete_record():
+        try:
+            second.delete(key)
+        except Exception as exc:  # noqa: BLE001 - assert thread failures in caller
+            errors.append(exc)
+        finally:
+            delete_done.set()
+
+    monkeypatch.setattr(
+        first,
+        "_cache_record_for_overlapping_clients",
+        pause_replacement_propagation,
+    )
+    put_thread = threading.Thread(target=put_replacement)
+    delete_thread = threading.Thread(target=delete_record)
+    try:
+        put_thread.start()
+        assert put_paused.wait(2)
+        delete_thread.start()
+        # An unlocked implementation completes deletion before the paused put
+        # propagates, producing the stale-resurrection ordering this rejects.
+        delete_done.wait(0.05)
+        release_put.set()
+        put_thread.join(5)
+        delete_thread.join(5)
+
+        assert not put_thread.is_alive()
+        assert not delete_thread.is_alive()
+        assert not errors
+        assert first.get(key) is None
+        assert second.get(key) is None
+        assert key not in first._collection._rows
+        if client_kind == "blob":
+            assert key not in first._blob_store.records
+    finally:
+        release_put.set()
+        put_thread.join(5)
+        delete_thread.join(5)
+        first.close()
+        second.close()
+
+
+@pytest.mark.parametrize("key_format", ["chain", "legacy"])
+@pytest.mark.parametrize(
+    "raw_length",
+    [
+        pytest.param("١", id="unicode-digit"),
+        pytest.param("9" * 10000, id="huge-digit-string"),
+        pytest.param("9" * 11, id="over-digit-limit"),
+    ],
+)
+def test_chunk_key_parser_rejects_unsafe_lengths(lc, key_format, raw_length):
+    if key_format == "chain":
+        key = f"test-ns/chunk/aa/bb/{raw_length}"
+    else:
+        key = f"test-ns/chunk/aa/{raw_length}"
+
+    assert lc._parse_chunk_key(key) is None
+
+
+def test_chunk_key_parser_accepts_bounded_ascii_length(lc):
+    assert lc._parse_chunk_key("test-ns/chunk/aa/9999999999") == (
+        "test-ns/chunk/aa",
+        9999999999,
+        False,
+    )
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_unicode_digit_legacy_key_is_ignored_by_chunk_index(
+    lc, monkeypatch, tmp_path, client_kind
+):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    try:
+        client.put("test-ns/chunk/aa/١", b"payload", {})
+
+        assert client.chunk_candidates("test-ns/chunk/aa") == {}
+        assert client.chunk_length("test-ns/chunk/aa") == 0
+    finally:
+        client.close()
