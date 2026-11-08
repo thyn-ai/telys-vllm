@@ -592,9 +592,11 @@ class TelysBlobClient(TelysClient):
         )
 
     def _seed_key_set(self) -> None:
-        """Load existing chunk keys and chunk-length map from Telys."""
+        """Load chunk keys from collection metadata and durable BlobStore records."""
         try:
-            ids = self._collection.ids()
+            ids = set(self._collection.ids())
+            if self._blob_store is not None:
+                ids.update(self._blob_store.keys())
             for key in ids:
                 self._key_set.add(key)
                 self._track_chunk_key(key)
@@ -663,6 +665,16 @@ class TelysBlobClient(TelysClient):
             if record is not None:
                 return record
 
+        blob_found = False
+        payload = b""
+        blob_metadata: dict[str, Any] = {}
+        if self._blob_store is not None:
+            try:
+                payload, blob_metadata = self._blob_store.get(key)
+                blob_found = True
+            except KeyError:
+                pass
+
         try:
             result = self._collection.search(
                 _zero_vector(1),
@@ -671,29 +683,28 @@ class TelysBlobClient(TelysClient):
                 with_metadata=True,
             )
         except Exception as exc:
-            if "unknown filter column" in str(exc):
+            if "unknown filter column" not in str(exc):
+                raise
+            if not blob_found:
                 return None
-            raise
+            result = {"ids": []}
         ids = result.get("ids") or []
-        if not ids:
-            return None
-        metadata_list = result.get("metadata") or []
-        if not metadata_list:
-            raise TelysLocalClientError(
-                f"Telys returned a hit for {key!r} but no metadata"
-            )
-        raw_metadata = dict(metadata_list[0])
-        raw_metadata.pop(_KEY_COLUMN, None)
-
-        if self._blob_store is not None:
-            try:
-                payload, _ = self._blob_store.get(key)
-            except KeyError:
+        if ids:
+            metadata_list = result.get("metadata") or []
+            if not metadata_list:
+                raise TelysLocalClientError(
+                    f"Telys returned a hit for {key!r} but no metadata"
+                )
+            raw_metadata = dict(metadata_list[0])
+            raw_metadata.pop(_KEY_COLUMN, None)
+            if self._blob_store is not None and not blob_found:
                 raise TelysLocalClientError(
                     f"metadata exists for {key!r} but BlobStore payload is missing"
-                ) from None
+                )
+        elif blob_found:
+            raw_metadata = dict(blob_metadata)
         else:
-            payload = b""
+            return None
 
         record = TelysRecord(
             key=key,
@@ -714,7 +725,7 @@ class TelysBlobClient(TelysClient):
     def put(self, key: str, value: bytes, metadata: Mapping[str, str]) -> None:
         self._check_open()
         if self._blob_store is not None:
-            self._blob_store.put(key, value)
+            self._blob_store.put(key, value, metadata=dict(metadata))
         row_metadata = {
             _KEY_COLUMN: key,
             **metadata,

@@ -12,7 +12,7 @@ import importlib
 import importlib.util
 import sys
 from types import ModuleType
-from typing import Any
+from typing import Any, ClassVar
 
 import pytest
 
@@ -368,4 +368,93 @@ def test_integration_round_trip_with_real_telys(tmp_path, monkeypatch):
     report = client.compact()
     assert isinstance(report, TelysMaintenanceReport)
 
+    client.close()
+
+
+class _StubBlobStore:
+    """Path-scoped in-memory BlobStore with durable payload and metadata."""
+
+    _stores: ClassVar[dict[str, dict[str, tuple[bytes, dict[str, Any]]]]] = {}
+
+    def __init__(self, path: str) -> None:
+        self.records = self._stores.setdefault(path, {})
+
+    def put(self, key, payload, metadata=None):
+        self.records[key] = (bytes(payload), dict(metadata or {}))
+
+    def get(self, key):
+        try:
+            payload, metadata = self.records[key]
+        except KeyError:
+            raise KeyError(key) from None
+        return payload, dict(metadata)
+
+    def keys(self):
+        return set(self.records)
+
+    def contains(self, key):
+        return key in self.records
+
+    def delete(self, key):
+        self.records.pop(key, None)
+
+    def sync(self):
+        return None
+
+    def close(self):
+        return None
+
+
+def test_blob_restart_uses_durable_keys_and_metadata(lc, monkeypatch):
+    monkeypatch.setenv("TELYS_PATH", "/tmp/blob-restart-metadata")
+    sys.modules["telys"].BlobStore = _StubBlobStore
+    config = TelysConnectorConfig(namespace="test-ns")
+    key = "test-ns/chunk/aa/2"
+
+    first = lc.TelysBlobClient(config)
+    first.put(
+        key,
+        b"payload",
+        {"vllm.chunk_format": "fast", "vllm.block_count": "2"},
+    )
+    first.close()
+
+    # The fresh collection has no rows, matching a worker whose embedded engine
+    # metadata is unavailable even though its BlobStore records are durable.
+    second = lc.TelysBlobClient(config)
+    assert second.chunk_length("test-ns/chunk/aa") == 2
+    record = second.get(key)
+    assert record is not None
+    assert record.value == b"payload"
+    assert record.metadata["vllm.chunk_format"] == "fast"
+    assert record.metadata["vllm.block_count"] == "2"
+    second.close()
+
+
+def test_blob_restart_decodes_legacy_chunk_without_metadata(lc, monkeypatch):
+    import torch
+
+    from telys_vllm.codec import TelysFastChunkCodec
+    from telys_vllm.store import TelysBlockStore
+
+    monkeypatch.setenv("TELYS_PATH", "/tmp/blob-restart-legacy")
+    sys.modules["telys"].BlobStore = _StubBlobStore
+    block_hash = b"\xaa" * 32
+    key = f"test-ns/chunk/{block_hash.hex()}/1"
+    tensor = torch.arange(16 * 4 * 256, dtype=torch.bfloat16).reshape(1, 16, 4, 256)
+    payload = TelysFastChunkCodec().encode_chunk({"layer.0": tensor})
+    _StubBlobStore("/tmp/blob-restart-legacy_blobs").put(key, payload)
+
+    client = lc.TelysBlobClient(TelysConnectorConfig(namespace="test-ns"))
+    store = TelysBlockStore(
+        client,
+        TelysConnectorConfig(namespace="test-ns"),
+        model_id="model",
+        engine_id="engine",
+        block_size=16,
+    )
+    assert store.lookup_prefix([block_hash]) == 1
+    chunks = store.load_decoded_blocks_fast([block_hash])
+    assert len(chunks) == 1
+    assert torch.equal(chunks[0].layer_tensors["layer.0"], tensor)
     client.close()

@@ -329,3 +329,22 @@ def test_decode_completion_saves_prompt_boundary_and_generated_blocks():
     assert generated.saves[0].block_ids == block_ids[4:8]
     assert len(request.block_hashes) == 8
     assert len(generated.saves[0].block_hashes) == 4
+
+
+def test_async_final_schedule_uses_available_hash_boundary():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    request = FakeRequest("req-async-final", 50)
+    request.append_output_token_ids(list(range(62)))
+    block_ids = list(range(len(request.block_hashes)))
+    scheduler.on_new_request(request)
+    scheduler._save_cursors[request.request_id] = 6
+
+    assert request.num_tokens == 112
+    assert len(request.block_hashes) == 7
+    final = _cached_decode_meta(scheduler, request, 113, 1, block_ids)
+
+    assert len(final.saves) == 1
+    assert final.saves[0].block_hashes == [request.block_hashes[6]]
+    assert final.saves[0].block_ids == [block_ids[6]]
+    assert scheduler._save_cursors[request.request_id] == 7
+    assert _cached_decode_meta(scheduler, request, 113, 1, block_ids).saves == []

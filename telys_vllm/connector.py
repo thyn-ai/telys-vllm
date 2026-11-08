@@ -464,7 +464,13 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                     )
                     if len(delta_block_ids) >= save_boundary:
                         block_ids = list(delta_block_ids)
-            self._advance_save_cursor(req_id, total_tokens, block_ids, meta)
+            self._advance_save_cursor(
+                req_id,
+                total_tokens,
+                block_ids,
+                meta,
+                use_available_hashes=True,
+            )
 
         return meta
 
@@ -474,11 +480,19 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         total_tokens: int,
         block_ids: list[int] | None,
         meta: TelysConnectorMetadata,
+        *,
+        use_available_hashes: bool = False,
     ) -> None:
         request = self._reqs.get(req_id)
         if request is None:
             return
-        max_block = (request.num_tokens - 1) // self._block_size
+        # Async scheduling can leave returned-token counting behind the hashes
+        # already available for complete blocks. Cached steps may use that actual
+        # boundary; initial prefill still excludes the last token's block.
+        if use_available_hashes:
+            max_block = len(request.block_hashes)
+        else:
+            max_block = (request.num_tokens - 1) // self._block_size
         boundary = min(total_tokens // self._block_size, max_block)
         cursor = self._save_cursors.get(req_id, 0)
         if boundary <= cursor:

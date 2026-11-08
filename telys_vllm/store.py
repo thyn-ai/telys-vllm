@@ -396,6 +396,14 @@ class TelysBlockStore:
                 )
             payload, metadata = self._read_chunk_bytes(full_key, chunk_record)
             is_fast = metadata.get(self._CHUNK_FORMAT_KEY) == self._CHUNK_FORMAT_FAST
+            if (
+                self._CHUNK_FORMAT_KEY not in metadata
+                and payload
+                and payload[0] == TelysFastChunkCodec._MAGIC
+            ):
+                # Older BlobStore writes omitted metadata; the codec magic is
+                # authoritative when no explicit format marker exists.
+                is_fast = True
             if not is_fast:
                 raise TelysStoreError(
                     f"chunk {full_key!r} was stored with the legacy format; "
