@@ -189,6 +189,83 @@ def test_dry_run_generates_all_commands_without_creating_root(tmp_path):
             assert "--disable-kv-connector" not in line
 
 
+def test_correctness_commands_use_summary_result_filenames(tmp_path):
+    result = dry_run(tmp_path)
+    assert result.returncode == 0, result.stderr
+
+    for arm, runs in (
+        ("A", ("run1",)),
+        ("B", ("run1", "run2")),
+        ("C", ("run1", "run2")),
+    ):
+        for run in runs:
+            line = next(
+                line
+                for line in command_lines(result, run)
+                if line.startswith(f"arm={arm} ")
+            )
+            expected = (
+                tmp_path / "fresh-run" / "results" / f"correctness_arm_{arm}_{run}.json"
+            )
+            assert f"--output-json {expected}" in line
+
+
+@pytest.mark.parametrize(("harness_status", "expected_status"), [(137, 137), (0, 23)])
+def test_lifecycle_preserves_harness_and_tee_exit_statuses(
+    tmp_path, harness_status, expected_status
+):
+    harness = tmp_path / "fake_metrics.py"
+    harness.write_text(
+        """import json
+import os
+from pathlib import Path
+import sys
+
+arguments = sys.argv[1:]
+output = Path(arguments[arguments.index("--output-json") + 1])
+output.write_text(json.dumps({}))
+volume = Path(os.environ["RUNPOD_WORKER_VOLUME"])
+if volume.name == "arm-B":
+    cache = volume / "vllm-filesystem-kv"
+    cache.mkdir(parents=True, exist_ok=True)
+    (cache / "payload").write_text("cache")
+if volume.name == "arm-C":
+    os._exit(int(os.environ["FAKE_C_EXIT_STATUS"]))
+"""
+    )
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    tee = bin_dir / "tee"
+    tee.write_text(
+        """#!/usr/bin/env bash
+/usr/bin/tee "$@"
+status=$?
+if [[ ${1-} == *arm_C_cold.log ]]; then
+    exit 23
+fi
+exit "$status"
+"""
+    )
+    tee.chmod(0o755)
+    root = tmp_path / "fresh-run"
+    result = run_shell(
+        [str(BENCHMARK_SCRIPT), "16384", "unit-test"],
+        env={
+            "PATH": f"{bin_dir}:{os.environ.get('PATH', '/usr/bin:/bin')}",
+            "RUNPOD_BENCHMARK_ROOT": str(root),
+            "RUNPOD_BENCHMARK_METRICS_SCRIPT": str(harness),
+            "FAKE_C_EXIT_STATUS": str(harness_status),
+        },
+    )
+
+    assert result.returncode == expected_status, result.stderr
+    evidence = json.loads((root / "results" / "arm_C_cold.lifecycle.json").read_text())
+    assert evidence["process"]["exit_status"] == harness_status
+    assert evidence["process"]["exit_kind"] == (
+        "completed" if harness_status == 0 else "abrupt-exit"
+    )
+
+
 def test_batch_invariant_is_correctness_only_even_when_inherited(tmp_path):
     result = run_shell(
         [str(BENCHMARK_SCRIPT), "--dry-run", "4096", "unit-test"],
@@ -255,11 +332,47 @@ def test_cache_roots_are_fresh_and_isolated(tmp_path):
 def test_8192_extension_changes_only_the_workload_shape(tmp_path):
     result = dry_run(tmp_path, prefix="8192")
     assert result.returncode == 0, result.stderr
+    assert "--manifest-dir" not in result.stdout
+    assert "verify_persisted_chunks.py" not in result.stdout
     for line in command_lines(result, "cold"):
         assert "--input-length-range 8192:8192" in line
     for line in command_lines(result, "warm"):
         assert "--input-length-range 8192:12288" in line
         assert "--max-model-len 16896" in line
+
+
+def test_16384_lifecycle_profile_adds_only_telys_performance_evidence(tmp_path):
+    result = dry_run(tmp_path, prefix="16384")
+    assert result.returncode == 0, result.stderr
+    assert not (tmp_path / "fresh-run").exists()
+
+    for line in command_lines(result, "cold"):
+        assert "--input-length-range 16384:16384" in line
+    for line in command_lines(result, "warm"):
+        assert "--input-length-range 16384:20480" in line
+        assert "--max-model-len 25088" in line
+    for phase in ("cold", "warm"):
+        telys = next(
+            line for line in command_lines(result, phase) if line.startswith("arm=C ")
+        )
+        assert (
+            f"--manifest-dir {tmp_path}/fresh-run/results/manifests/arm_C_{phase}"
+            in telys
+        )
+        assert "--manifest-arm C" in telys
+        assert f"--manifest-phase {phase}" in telys
+        assert "--manifest-namespace telys-vllm" in telys
+        assert "--manifest-max-chunk-blocks 0" in telys
+        for arm in ("A", "B"):
+            other = next(
+                line
+                for line in command_lines(result, phase)
+                if line.startswith(f"arm={arm} ")
+            )
+            assert "--manifest-dir" not in other
+    assert result.stdout.count("verify_persisted_chunks.py record") == 2
+    for phase in ("run1", "run2"):
+        assert "--manifest-dir" not in "\n".join(command_lines(result, phase))
 
 
 def test_existing_root_is_refused_without_modification(tmp_path):
@@ -433,5 +546,5 @@ def test_json_summary_is_deterministic_and_uses_null_for_missing(tmp_path, capsy
 def test_invalid_prefix_fails_closed(tmp_path, prefix):
     result = dry_run(tmp_path, prefix=prefix)
     assert result.returncode == 64
-    assert "prefix must be 4096 or 8192" in result.stderr
+    assert "prefix must be 4096, 8192, or 16384" in result.stderr
     assert not (tmp_path / "fresh-run").exists()

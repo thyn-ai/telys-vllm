@@ -1,0 +1,163 @@
+{
+  "method": "Identical contiguous bf16 tensors, 28 layers. Encode calls alternate pageable/pinned order with one warmup each. Storage is excluded. Payload equality and SHA256 are checked separately.",
+  "repeats": 7,
+  "runs": {
+    "269": {
+      "median_pinned_vs_pageable_pct": -0.46038077217633866,
+      "payload_bytes": 246809694,
+      "payload_equal": true,
+      "payload_sha256": "b6c910ccc33b81dd01d0c9507dfac171776926d0be7add786b09dc6dca11ee40",
+      "raw_s": {
+        "pageable": [
+          0.271499827,
+          0.268994276,
+          0.262476141,
+          0.269632856,
+          0.27469362,
+          0.2979008,
+          0.407168189
+        ],
+        "pinned": [
+          0.269978386,
+          0.270249894,
+          0.273046791,
+          0.270448123,
+          0.26657846,
+          0.267577244,
+          0.274217286
+        ]
+      },
+      "stats": {
+        "pageable": {
+          "count": 7,
+          "max_s": 0.407168189,
+          "mean_s": 0.2931951012857143,
+          "median_s": 0.271499827,
+          "min_s": 0.262476141,
+          "stdev_s": 0.05149354640480856
+        },
+        "pinned": {
+          "count": 7,
+          "max_s": 0.274217286,
+          "mean_s": 0.27029945485714285,
+          "median_s": 0.270249894,
+          "min_s": 0.26657846,
+          "stdev_s": 0.0027166503618030807
+        }
+      },
+      "warmup_s": {
+        "pageable": [
+          0.27711254
+        ],
+        "pinned": [
+          0.263970128
+        ]
+      }
+    },
+    "512": {
+      "median_pinned_vs_pageable_pct": 2.3799390937704112,
+      "payload_bytes": 469763166,
+      "payload_equal": true,
+      "payload_sha256": "4ab4d9d69ca3e06a31d17da24ad3bcea449f4c08b929bb772c0f1b3d9550250d",
+      "raw_s": {
+        "pageable": [
+          0.549548055,
+          0.602930831,
+          0.602430771,
+          0.537468217,
+          0.602296375,
+          0.463689075,
+          0.461002428
+        ],
+        "pinned": [
+          0.573925313,
+          0.562626964,
+          0.597687799,
+          0.557459501,
+          0.622846241,
+          0.532565504,
+          0.490970537
+        ]
+      },
+      "stats": {
+        "pageable": {
+          "count": 7,
+          "max_s": 0.602930831,
+          "mean_s": 0.5456236788571428,
+          "median_s": 0.549548055,
+          "min_s": 0.461002428,
+          "stdev_s": 0.06282103891826449
+        },
+        "pinned": {
+          "count": 7,
+          "max_s": 0.622846241,
+          "mean_s": 0.5625831227142857,
+          "median_s": 0.562626964,
+          "min_s": 0.490970537,
+          "stdev_s": 0.042911343276208685
+        }
+      },
+      "warmup_s": {
+        "pageable": [
+          0.595224777
+        ],
+        "pinned": [
+          0.516572086
+        ]
+      }
+    },
+    "77": {
+      "median_pinned_vs_pageable_pct": -4.719765121088915,
+      "payload_bytes": 70648926,
+      "payload_equal": true,
+      "payload_sha256": "0314532ad0cc8d0030b0cf8aaeee5db9a5ce9267c25e94eeb44762d7babe7e32",
+      "raw_s": {
+        "pageable": [
+          0.093565185,
+          0.083123573,
+          0.086690797,
+          0.106526716,
+          0.100731439,
+          0.079779944,
+          0.077135366
+        ],
+        "pinned": [
+          0.094810583,
+          0.082599195,
+          0.108615222,
+          0.104326276,
+          0.080586628,
+          0.078051419,
+          0.078525245
+        ]
+      },
+      "stats": {
+        "pageable": {
+          "count": 7,
+          "max_s": 0.106526716,
+          "mean_s": 0.08965043142857143,
+          "median_s": 0.086690797,
+          "min_s": 0.077135366,
+          "stdev_s": 0.011017680540199295
+        },
+        "pinned": {
+          "count": 7,
+          "max_s": 0.108615222,
+          "mean_s": 0.08964493828571428,
+          "median_s": 0.082599195,
+          "min_s": 0.078051419,
+          "stdev_s": 0.012857228696163387
+        }
+      },
+      "warmup_s": {
+        "pageable": [
+          0.099295822
+        ],
+        "pinned": [
+          0.091084652
+        ]
+      }
+    }
+  },
+  "schema_version": 1
+}

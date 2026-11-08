@@ -1,0 +1,118 @@
+{
+  "all_hashes_match": true,
+  "evidence_copy": "/tmp/telys-async-c423-agent5/p4096-results",
+  "file_count": 22,
+  "files": [
+    {
+      "bytes": 364,
+      "name": "arm_A_cold.json",
+      "sha256": "fdce1c5e6f11bbf4bcbd4263627082c46155a4ec55e965f6742f0848f4b8d88c"
+    },
+    {
+      "bytes": 24867,
+      "name": "arm_A_cold.log",
+      "sha256": "588a43e94b9f6fda54ff5ac9fa905631e14f0ff17e386ad64ea458e2976b510a"
+    },
+    {
+      "bytes": 41226,
+      "name": "arm_A_run1.json",
+      "sha256": "638f83eaadc3ee5d1a776fc8ec3e992569db07c37990321127bae682ec21e7d4"
+    },
+    {
+      "bytes": 59528,
+      "name": "arm_A_run1.log",
+      "sha256": "a3cb63aa0618fdc574ce84f679f8c461618800f965cded85eecbddf1e2886d37"
+    },
+    {
+      "bytes": 815,
+      "name": "arm_A_warm.json",
+      "sha256": "a8b57df3e8babf78e9095938fcf2fc2d100213a124ff0affaf421a4ef7733e0b"
+    },
+    {
+      "bytes": 19386,
+      "name": "arm_A_warm.log",
+      "sha256": "04d1fd041f230c62916493d6c2d5095b262a6ddff2c2f6a27371fd32b0a28b43"
+    },
+    {
+      "bytes": 365,
+      "name": "arm_B_cold.json",
+      "sha256": "c6da8a2613cfdd6539dd54aa27b2a40d569539169dd97dba58aa3bf0331b67f3"
+    },
+    {
+      "bytes": 19477,
+      "name": "arm_B_cold.log",
+      "sha256": "e39a2b75cbf629e7851119839c22f703ca1cf2b16062b76c9855dbcbc697ff7f"
+    },
+    {
+      "bytes": 41227,
+      "name": "arm_B_run1.json",
+      "sha256": "6b3198306b5ce6d67ac38c5b75ac15025cd4d38d2a2fa62ee68428ab5f70f977"
+    },
+    {
+      "bytes": 66823,
+      "name": "arm_B_run1.log",
+      "sha256": "13315ae7749886043e2aed0fa469a404d4871fb275d3862dd49caf35ecd215e9"
+    },
+    {
+      "bytes": 41226,
+      "name": "arm_B_run2.json",
+      "sha256": "4d42246ffabfccf0f4531f8fa6b9e7f26c9df7a703a2d8cad872500659e0e709"
+    },
+    {
+      "bytes": 66246,
+      "name": "arm_B_run2.log",
+      "sha256": "9ba94eeb03f955719c067596f5b408e01050935ade1a136419d7f05718325ad9"
+    },
+    {
+      "bytes": 800,
+      "name": "arm_B_warm.json",
+      "sha256": "9373c5413bad99c12a8fdd5b1eaefcb5ebf37f1e38f1e72255216e6dfda5555c"
+    },
+    {
+      "bytes": 45630,
+      "name": "arm_B_warm.log",
+      "sha256": "352527881799368e0a8c962cb16a77636371593862c97a6d37e7470e213aec25"
+    },
+    {
+      "bytes": 364,
+      "name": "arm_C_cold.json",
+      "sha256": "915aafd37d1c52f94c9abc827f15018cc06a2d1128a4ac94df93dfd0158fa7a7"
+    },
+    {
+      "bytes": 17280,
+      "name": "arm_C_cold.log",
+      "sha256": "90f816d580568946d794ce41dd8775e1d3534af74323396cd7fa43b2f28c86a1"
+    },
+    {
+      "bytes": 41226,
+      "name": "arm_C_run1.json",
+      "sha256": "267022332dfa1751973141f10cafce8bbcc847a4affaf5ed63a56a199fe62413"
+    },
+    {
+      "bytes": 61238,
+      "name": "arm_C_run1.log",
+      "sha256": "a6178af16970c7f535ea84bffe6a494955ecebc0f98055c8c3bfb1aff01d6519"
+    },
+    {
+      "bytes": 41225,
+      "name": "arm_C_run2.json",
+      "sha256": "c3eb5d226bda6e26f361c924b8a5d7ab30ffe836fd6d2295213fd48537733a1e"
+    },
+    {
+      "bytes": 60881,
+      "name": "arm_C_run2.log",
+      "sha256": "1197a78349642e096ebbc77949c8a99dbabbda066aa4a7c4bd62804ec421272a"
+    },
+    {
+      "bytes": 814,
+      "name": "arm_C_warm.json",
+      "sha256": "a89a5e0980d6a93ce93210d51e1308e7d06a7bca34a3275035af42ec9f6b7e64"
+    },
+    {
+      "bytes": 23794,
+      "name": "arm_C_warm.log",
+      "sha256": "c660275f27b1aad62e054094f35acab5c564e84e8755afc53b648b976929ea9f"
+    }
+  ],
+  "source": "/runpod-volume/telys-vllm-benchmark/p4096-seed42-async-c423-agent5/results"
+}

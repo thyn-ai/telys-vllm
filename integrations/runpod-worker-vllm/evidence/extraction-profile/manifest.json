@@ -1,0 +1,65 @@
+{
+  "files": {
+    "benchmark_extraction.py": {
+      "bytes": 14287,
+      "sha256": "15e9120eea7a0a9d3f70dba5c179fa9f6365fc8e71782b8ba1dbb0c9537df4c3"
+    },
+    "cold-pinned-console.log": {
+      "bytes": 272,
+      "sha256": "c1f7ed13e0ca3b80209138e973fec96402bac3f60fd26822f1d97eca87c59b83"
+    },
+    "cold_pinned_allocation.json": {
+      "bytes": 1492,
+      "sha256": "b1ffe828fd66a5c32e6f88fd29e38738ed3235feaec47d7de8e0684e84da7770"
+    },
+    "cold_pinned_allocation.py": {
+      "bytes": 2473,
+      "sha256": "4ac4379eab69619ebab0482d40c73f038aa986db58297c39a18de49599b2f4e6"
+    },
+    "encode-pinned-console.log": {
+      "bytes": 1060,
+      "sha256": "5097de8a88eae336eff36a9a7c8befdf0771c012fdcaf33a7cb234b50e175f79"
+    },
+    "encode_pinned_vs_pageable.json": {
+      "bytes": 4074,
+      "sha256": "270d52e9eac715b891ce5599565815e225f5d297e0b4e2f3c8107b9b0e6ca39a"
+    },
+    "encode_pinned_vs_pageable.py": {
+      "bytes": 3419,
+      "sha256": "fab8e545f220fcce79d85548a8467ba3bed2f8cac356b35c2b7fccd46dd32122"
+    },
+    "final-state.json": {
+      "bytes": 5284,
+      "sha256": "de7d4df21eb0cdfac2eb186281d95b31a456e9e9636ce48b567e309afc9794ff"
+    },
+    "microbenchmark-console.log": {
+      "bytes": 2351,
+      "sha256": "8b78b8677f16087887795e0eddcbd94ca70d56c3d45940745d606a54025f4ace"
+    },
+    "microbenchmark.json": {
+      "bytes": 117858,
+      "sha256": "1e0c159e7f59f34921021dfd1ee2ec90ad5658f6e07999b04aa469dc00e7da1a"
+    },
+    "microbenchmark_summary.json": {
+      "bytes": 13435,
+      "sha256": "ea5983dbe4d23fe8a5efe2f7201fa5d416bcd7ce654ce320f66b9d9c8e6c10aa"
+    },
+    "run_log_aggregate.json": {
+      "bytes": 16054,
+      "sha256": "cf22e0714512b8121af4cacfb351127a29eda2a3cb8cafbac686c17f74b6022f"
+    },
+    "summary.md": {
+      "bytes": 6892,
+      "sha256": "3b78e6e0e3091df0aa57061b26c92b14d80145bf66203b4b09dfe366fac5c83d"
+    },
+    "validation.json": {
+      "bytes": 302,
+      "sha256": "d3636e3b8d16bf7c834dc41ff5c8d56dbb7504da949079a87a12a1ee9015ff7d"
+    },
+    "workload_comparison.json": {
+      "bytes": 1684,
+      "sha256": "0b6ff241194807f041434fd0702859617f46b4c9821f1e9f8ade43d245300176"
+    }
+  },
+  "schema_version": 1
+}

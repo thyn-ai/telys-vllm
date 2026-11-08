@@ -1,0 +1,10 @@
+{
+  "all_assertions_passed": true,
+  "cold_allocation_fresh_processes_per_size": 5,
+  "component_repeats_per_size": 7,
+  "encode_repeats_per_memory_type_per_size": 7,
+  "exact_repeats_per_path_per_size": 11,
+  "output_layers_checked": 84,
+  "schema_version": 1,
+  "source_tree_telys_vllm_status": ""
+}

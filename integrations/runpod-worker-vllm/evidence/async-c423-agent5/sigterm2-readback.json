@@ -1,0 +1,6 @@
+{
+  "abrupt_sigterm_lost_pending_write": true,
+  "pending_at_put": 1,
+  "record_present_after_fresh_open": false,
+  "sigterm_exit_code": 143
+}

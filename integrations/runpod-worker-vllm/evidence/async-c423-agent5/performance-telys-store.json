@@ -1,0 +1,4676 @@
+{
+  "all_chunks_read_and_decoded": true,
+  "by_engine_id": {
+    "152cb257-7355-494f-82f4-b6515ccb2dd9": {
+      "blocks": 2596,
+      "chunks": 25,
+      "payload_bytes": 2381868334
+    },
+    "2b60b739-b666-498c-b76d-065c4fdb0c50": {
+      "blocks": 269,
+      "chunks": 1,
+      "payload_bytes": 246809694
+    }
+  },
+  "chunk_count": 26,
+  "chunks": [
+    {
+      "blocks": 77,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/027c8fe3ca725e4f342212892407fd01e47370bc7915abc6df268ee39d2118f0/77",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          77,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 70648926,
+      "payload_sha256": "7064a646c3108e34d56ca91d79c8b02cb7a8189f842cfc8e9ed9e22da0063c51"
+    },
+    {
+      "blocks": 29,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/047524e5614e7babd89668708f7045797f17b8c9988c676954767255a7ae7a9f/29",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          29,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 26608734,
+      "payload_sha256": "c318df57a39888b70e01d463b8ef79fb456844affe799da7a62904da301198a0"
+    },
+    {
+      "blocks": 40,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/1f6144eb6483efd9c461541b65771041143581b20a656c08dd33ea861f780706/40",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          40,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 36701278,
+      "payload_sha256": "7ed3290e2de892690cfd038547039b675ad8466693d5bbb883d284be7dcb59a8"
+    },
+    {
+      "blocks": 61,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/3012a14bd05bfa811cb53ba133f9ad5a11d68db4e3eda20a6b42980cad525ff1/61",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          61,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 55968862,
+      "payload_sha256": "c2e433871750b0679849891e5d13cd7b0436b380c12848e656f16e997314a436"
+    },
+    {
+      "blocks": 137,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/32dec61d89411844ba7c7b1c5a59478c0da2f8230ec6edc290da7e51c86276d1/137",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          137,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 125699166,
+      "payload_sha256": "cbf4d08026c0a7228ad479bed55e0668cad43dc3d9ac0ed4ef7c62c2bb021d4b"
+    },
+    {
+      "blocks": 269,
+      "engine_id": "2b60b739-b666-498c-b76d-065c4fdb0c50",
+      "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/269",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          269,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 246809694,
+      "payload_sha256": "a54c9f60e6786ad750fd28092f7813927d3393adbbbf92430757945a5ab3269e"
+    },
+    {
+      "blocks": 197,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/43d5c6ecbc06d7169d36d281d7bc426696790e0877f69007bd0d1dbc6c35b09e/197",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 180749406,
+      "payload_sha256": "5269fd92b8e160930eb7e198073873dd4ef0044917d4a0457d0ad5118d2a64f1"
+    },
+    {
+      "blocks": 197,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/5c0e98754fef0c7b3d4c0f4b0d3ecd66290c79728eb9a60359f2b447dffc6a2b/197",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          197,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 180749406,
+      "payload_sha256": "79b521b38fa0085ab8e7e0ba6113836aa5de36b8f80cad49323adb749dc25821"
+    },
+    {
+      "blocks": 63,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/6d479ad01af82ad871f6319dec4e83560c210e5fe652103f6f1e265fd5f11eb6/63",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          63,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 57803870,
+      "payload_sha256": "db8879dbddfc871a348fae70c900b51b151993784a2b28151367e959f8a01919"
+    },
+    {
+      "blocks": 52,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/6ffe93e2fb752a8fef5b03a448429c884577d49cf33fd70bef51a6424478b7f3/52",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          52,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 47711326,
+      "payload_sha256": "5e48c0cda3fabfd3bf8e46f179009895f94410b3424f9ad3e311c95c79c29168"
+    },
+    {
+      "blocks": 20,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/83bed0bfbdb5994baec53930621e41b283d98478d98a49c7212bd4dddf0c37e7/20",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          20,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 18351198,
+      "payload_sha256": "50822e2cc91a458aa686a9c3108ab0c1ff6785f56a3a8ef50fbd7a253d019624"
+    },
+    {
+      "blocks": 270,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/914fa86b190e885754d8b898d08a092491736d6e982beea223b89b958242da74/270",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          270,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 247727198,
+      "payload_sha256": "824f23ca91b89444d098a35287b5c6f0f0232a4761840efb55b7942a92052f54"
+    },
+    {
+      "blocks": 86,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/9a0a1d489924798ffbc336be960b3256b806c43b8d09b5256092ed558d654bad/86",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 78906462,
+      "payload_sha256": "9745f9e5b655faa131ca2ddb1c4b8f460dc05293afb7ffd8e446f9b50491d7e3"
+    },
+    {
+      "blocks": 160,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/9cc0afb79fd4364e24c6d39fc55eb21b60daaf0506276e04c85c6d8dc25e98aa/160",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 146801758,
+      "payload_sha256": "2e2ba627bc839e6b7a7d4346d24eb90c1608895dbcf92530b3dc2f5f9151c0c2"
+    },
+    {
+      "blocks": 155,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/b3617b8591c5f201d0a5b9b0a498b5e5c6ddafac5bf6fc90ad63706beff55b06/155",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          155,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 142214238,
+      "payload_sha256": "a95f66f759eff14199ab68f6693139a2fc10eeffcfc615861c3a15a051161720"
+    },
+    {
+      "blocks": 160,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/c0c67dd13110c8d192c09bc15bacc246407b815fbbfa7c48149f1188b642e0c6/160",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          160,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 146801758,
+      "payload_sha256": "213809c3fdbee8bd7011b35c6d49f5353ddd09380030353f276839685f27e95d"
+    },
+    {
+      "blocks": 12,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/c95047eda324df53c6959b0539c6f658a802fa63edd1b6665792d087f0cdb3a0/12",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          12,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 11011166,
+      "payload_sha256": "a57e1254a7f6f2d67ca20172369eff3beca327ef41ae64dde5cd535d71e134f4"
+    },
+    {
+      "blocks": 86,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/d78be8b673aa8bdc65b565cf822fbf54c9042d9b535cd624c58cba4b81c5c678/86",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          86,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 78906462,
+      "payload_sha256": "adf696c00ae6f88c72bdab64865daf799bd3028b39cfb9e1a5626383a1659411"
+    },
+    {
+      "blocks": 85,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/d8aabec33bf387f39c4bb7a59335881d7e703f52e6f0922ed0ff003e0e30b7ec/85",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          85,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 77988958,
+      "payload_sha256": "0938c8f14ecfa8b141c81a162351f6eddcb5852907799ff78cf9d0b4a65c3345"
+    },
+    {
+      "blocks": 117,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/dcc14f45e679c3802db199a64355964636665ba381856c0b2e60b38ea1ccd49f/117",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          117,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 107349086,
+      "payload_sha256": "8d31731761fa2222b93d9940014aa97b33ea2a6c015a587027a008373b4eed2f"
+    },
+    {
+      "blocks": 232,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/deddc0380a62fa5d348bc8509ab13640aa6dcbe5c38fdcc84801c9da66903f62/232",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          232,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 212862046,
+      "payload_sha256": "5af853af10f9912bd3b0ae3d03836a536f2a60abb94b563e000b4a7f83687610"
+    },
+    {
+      "blocks": 38,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/dfd1836569993ea75431ca681972cef4c6c2102a45f5b36e357d50616ec191c1/38",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          38,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 34866270,
+      "payload_sha256": "8f8234d2107c13c28b338128577f713427d6a1eb11306bf7821832ad37f46947"
+    },
+    {
+      "blocks": 101,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/e4ec364f10ea5041133c9d05d9b8bfb265b05ebcb80296c15166425301d3ee21/101",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          101,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 92669022,
+      "payload_sha256": "ee56355f5db6faf140b7e99f747c17b1d54833cfe1879b7cb713189e7665e471"
+    },
+    {
+      "blocks": 97,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/efdc7fea8bd0a2d4fead0d7cd9660b749ad9cc5fee2fd91d6e83865266ea5f4f/97",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          97,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 88999006,
+      "payload_sha256": "334d307ed2b20d3eef64c05909a00cac4a1042c006d039a74bd59b755784ac1f"
+    },
+    {
+      "blocks": 79,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/f5546fa4cda6e748666daaa7e5c83e767889262295029c2c38cbd3f5291e14ad/79",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          79,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 72483934,
+      "payload_sha256": "bf2843e6950b839faf9e0f7c27384d3732ff75923e3dc941017b9b31dee69022"
+    },
+    {
+      "blocks": 45,
+      "engine_id": "152cb257-7355-494f-82f4-b6515ccb2dd9",
+      "key": "telys-vllm/chunk/f5b19ade6884743bff9886edcbac2f44d465686b518078c3bc4ab4ab02b23d07/45",
+      "layer_count": 28,
+      "layer_shapes": {
+        "model.layers.0.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.1.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.10.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.11.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.12.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.13.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.14.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.15.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.16.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.17.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.18.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.19.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.2.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.20.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.21.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.22.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.23.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.24.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.25.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.26.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.27.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.3.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.4.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.5.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.6.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.7.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.8.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ],
+        "model.layers.9.self_attn.attn": [
+          45,
+          16,
+          4,
+          256
+        ]
+      },
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "payload_bytes": 41288798,
+      "payload_sha256": "8b3d3f434276bf4f08fa93984dd1f8953ee91d1b8a83afcb1e1b0dc4307b6e10"
+    }
+  ],
+  "namespace": "telys-vllm",
+  "path": "/runpod-volume/telys-vllm-benchmark/p4096-seed42-async-c423-agent5/performance/arm-C/telys-kv",
+  "total_blocks": 2865,
+  "total_payload_bytes": 2628678028
+}

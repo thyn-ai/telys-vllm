@@ -1,0 +1,20 @@
+{
+  "async_kv_loading": false,
+  "async_save_extraction_commit": "c42303965efaba0cbf2f8e0cf90074206af8ad68",
+  "benchmark_prefix": 4096,
+  "benchmarked_head": "c42303965efaba0cbf2f8e0cf90074206af8ad68",
+  "final_head_delta": "lint-only: __enter__ annotation and async extraction test structure; no runtime behavior change",
+  "gpu": "NVIDIA A40, 46068 MiB, 595.91.07",
+  "gpu_memory_utilization": 0.95,
+  "head": "5ae131d5fea4577c88806f118c3520d588fd9461",
+  "max_model_len": 12288,
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "model_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+  "native_prefix_caching": false,
+  "output_tokens": 64,
+  "pytest": "9.2.0",
+  "seed": 42,
+  "telys": "0.1.14",
+  "vllm": "0.32.0",
+  "vllm_multiprocessing": false
+}

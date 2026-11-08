@@ -1,0 +1,68 @@
+{
+  "dtype": "torch.bfloat16",
+  "layers": 28,
+  "method": "Each sample is a fresh Python process. CUDA is initialized and synchronized before timing 28 pinned CPU allocations; no allocation warmup is performed.",
+  "repeats": 5,
+  "runs": {
+    "269": {
+      "raw_s": [
+        0.212414808,
+        0.190650255,
+        0.184517948,
+        0.183815793,
+        0.182767046
+      ],
+      "stats": {
+        "count": 5,
+        "max_s": 0.212414808,
+        "mean_s": 0.19083317,
+        "median_s": 0.184517948,
+        "min_s": 0.182767046,
+        "stdev_s": 0.012449784354689228
+      },
+      "total_bytes": 246808576
+    },
+    "512": {
+      "raw_s": [
+        0.182836561,
+        0.189329295,
+        0.199332915,
+        0.190312606,
+        0.179734496
+      ],
+      "stats": {
+        "count": 5,
+        "max_s": 0.199332915,
+        "mean_s": 0.18830917460000002,
+        "median_s": 0.189329295,
+        "min_s": 0.179734496,
+        "stdev_s": 0.007583730086833873
+      },
+      "total_bytes": 469762048
+    },
+    "77": {
+      "raw_s": [
+        0.05496501,
+        0.071946111,
+        0.092376173,
+        0.047478664,
+        0.053019566
+      ],
+      "stats": {
+        "count": 5,
+        "max_s": 0.092376173,
+        "mean_s": 0.0639571048,
+        "median_s": 0.05496501,
+        "min_s": 0.047478664,
+        "stdev_s": 0.01832685319764885
+      },
+      "total_bytes": 70647808
+    }
+  },
+  "schema_version": 1,
+  "shape_tail": [
+    16,
+    4,
+    256
+  ]
+}

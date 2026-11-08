@@ -1,0 +1,132 @@
+{
+  "correctness": [
+    {
+      "arm": "A",
+      "fresh_warm_matches_reference": null,
+      "label": "no cache",
+      "status": "pass"
+    },
+    {
+      "arm": "B",
+      "fresh_warm_matches_reference": null,
+      "label": "filesystem",
+      "status": "unreported"
+    },
+    {
+      "arm": "C",
+      "fresh_warm_matches_reference": true,
+      "label": "Telys",
+      "status": "pass"
+    }
+  ],
+  "runs": [
+    {
+      "arm": "A",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "no cache",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": null,
+      "phase": "cold",
+      "result_present": false,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": null,
+      "total_output_tokens": null,
+      "total_time_s": null,
+      "ttft_mean_s": null,
+      "ttft_p50_s": null,
+      "ttft_p95_s": null
+    },
+    {
+      "arm": "A",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "no cache",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": null,
+      "phase": "warm",
+      "result_present": false,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": null,
+      "total_output_tokens": null,
+      "total_time_s": null,
+      "ttft_mean_s": null,
+      "ttft_p50_s": null,
+      "ttft_p95_s": null
+    },
+    {
+      "arm": "B",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "filesystem",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": null,
+      "phase": "cold",
+      "result_present": false,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": null,
+      "total_output_tokens": null,
+      "total_time_s": null,
+      "ttft_mean_s": null,
+      "ttft_p50_s": null,
+      "ttft_p95_s": null
+    },
+    {
+      "arm": "B",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "filesystem",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": null,
+      "phase": "warm",
+      "result_present": false,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": null,
+      "total_output_tokens": null,
+      "total_time_s": null,
+      "ttft_mean_s": null,
+      "ttft_p50_s": null,
+      "ttft_p95_s": null
+    },
+    {
+      "arm": "C",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "Telys",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": null,
+      "phase": "cold",
+      "result_present": false,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": null,
+      "total_output_tokens": null,
+      "total_time_s": null,
+      "ttft_mean_s": null,
+      "ttft_p50_s": null,
+      "ttft_p95_s": null
+    },
+    {
+      "arm": "C",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "Telys",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": null,
+      "phase": "warm",
+      "result_present": false,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": null,
+      "total_output_tokens": null,
+      "total_time_s": null,
+      "ttft_mean_s": null,
+      "ttft_p50_s": null,
+      "ttft_p95_s": null
+    }
+  ]
+}

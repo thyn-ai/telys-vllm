@@ -1,0 +1,448 @@
+{
+  "cold_pinned_allocation": {
+    "269": {
+      "raw_s": [
+        0.212414808,
+        0.190650255,
+        0.184517948,
+        0.183815793,
+        0.182767046
+      ],
+      "stats": {
+        "count": 5,
+        "max_s": 0.212414808,
+        "mean_s": 0.19083317,
+        "median_s": 0.184517948,
+        "min_s": 0.182767046,
+        "stdev_s": 0.012449784354689228
+      },
+      "total_bytes": 246808576
+    },
+    "512": {
+      "raw_s": [
+        0.182836561,
+        0.189329295,
+        0.199332915,
+        0.190312606,
+        0.179734496
+      ],
+      "stats": {
+        "count": 5,
+        "max_s": 0.199332915,
+        "mean_s": 0.18830917460000002,
+        "median_s": 0.189329295,
+        "min_s": 0.179734496,
+        "stdev_s": 0.007583730086833873
+      },
+      "total_bytes": 469762048
+    },
+    "77": {
+      "raw_s": [
+        0.05496501,
+        0.071946111,
+        0.092376173,
+        0.047478664,
+        0.053019566
+      ],
+      "stats": {
+        "count": 5,
+        "max_s": 0.092376173,
+        "mean_s": 0.0639571048,
+        "median_s": 0.05496501,
+        "min_s": 0.047478664,
+        "stdev_s": 0.01832685319764885
+      },
+      "total_bytes": 70647808
+    }
+  },
+  "commit": "5ae131d5fea4577c88806f118c3520d588fd9461",
+  "components": {
+    "269": {
+      "contiguous_noop_total_s": 6.894e-06,
+      "device_contiguous_clone_s": 0.000981132,
+      "device_gather_enqueue_s": 0.004340025,
+      "device_gather_total_s": 0.004388392,
+      "idle_event_record_sync_s": 0.000113056,
+      "old_cpu_unbind_stack_s": 0.127441149,
+      "pageable_allocation_s": 0.000321521,
+      "pageable_cpu_method_s": 0.193517518,
+      "pageable_preallocated_copy_s": 0.162341559,
+      "pinned_allocation_s": 0.000280945,
+      "pinned_copy_enqueue_s": 0.000292375,
+      "pinned_cuda_copy_span_s": 0.01197980785369873,
+      "pinned_event_record_s": 1.8545e-05,
+      "pinned_event_wait_including_copy_completion_s": 0.011669625,
+      "source_contiguous": true,
+      "view_total_s": 7.4098e-05
+    },
+    "512": {
+      "contiguous_noop_total_s": 6.456e-06,
+      "device_contiguous_clone_s": 0.001774629,
+      "device_gather_enqueue_s": 0.005278522,
+      "device_gather_total_s": 0.005354187,
+      "idle_event_record_sync_s": 0.00012689,
+      "old_cpu_unbind_stack_s": 0.220111271,
+      "pageable_allocation_s": 0.000287289,
+      "pageable_cpu_method_s": 0.273289569,
+      "pageable_preallocated_copy_s": 0.264405126,
+      "pinned_allocation_s": 0.000221986,
+      "pinned_copy_enqueue_s": 0.000225897,
+      "pinned_cuda_copy_span_s": 0.02014851188659668,
+      "pinned_event_record_s": 1.5068e-05,
+      "pinned_event_wait_including_copy_completion_s": 0.01991466,
+      "source_contiguous": true,
+      "view_total_s": 6.5607e-05
+    },
+    "77": {
+      "contiguous_noop_total_s": 2.1937e-05,
+      "device_contiguous_clone_s": 0.000323827,
+      "device_gather_enqueue_s": 0.00374256,
+      "device_gather_total_s": 0.003770547,
+      "idle_event_record_sync_s": 5.8312e-05,
+      "old_cpu_unbind_stack_s": 0.034999329,
+      "pageable_allocation_s": 0.000267622,
+      "pageable_cpu_method_s": 0.048678816,
+      "pageable_preallocated_copy_s": 0.046434851,
+      "pinned_allocation_s": 0.000211384,
+      "pinned_copy_enqueue_s": 0.00022629,
+      "pinned_cuda_copy_span_s": 0.0032856318950653077,
+      "pinned_event_record_s": 1.5986e-05,
+      "pinned_event_wait_including_copy_completion_s": 0.00305232,
+      "source_contiguous": true,
+      "view_total_s": 6.8841e-05
+    }
+  },
+  "encode": {
+    "269": {
+      "median_pinned_vs_pageable_pct": -0.46038077217633866,
+      "payload_bytes": 246809694,
+      "payload_equal": true,
+      "payload_sha256": "b6c910ccc33b81dd01d0c9507dfac171776926d0be7add786b09dc6dca11ee40",
+      "raw_s": {
+        "pageable": [
+          0.271499827,
+          0.268994276,
+          0.262476141,
+          0.269632856,
+          0.27469362,
+          0.2979008,
+          0.407168189
+        ],
+        "pinned": [
+          0.269978386,
+          0.270249894,
+          0.273046791,
+          0.270448123,
+          0.26657846,
+          0.267577244,
+          0.274217286
+        ]
+      },
+      "stats": {
+        "pageable": {
+          "count": 7,
+          "max_s": 0.407168189,
+          "mean_s": 0.2931951012857143,
+          "median_s": 0.271499827,
+          "min_s": 0.262476141,
+          "stdev_s": 0.05149354640480856
+        },
+        "pinned": {
+          "count": 7,
+          "max_s": 0.274217286,
+          "mean_s": 0.27029945485714285,
+          "median_s": 0.270249894,
+          "min_s": 0.26657846,
+          "stdev_s": 0.0027166503618030807
+        }
+      },
+      "warmup_s": {
+        "pageable": [
+          0.27711254
+        ],
+        "pinned": [
+          0.263970128
+        ]
+      }
+    },
+    "512": {
+      "median_pinned_vs_pageable_pct": 2.3799390937704112,
+      "payload_bytes": 469763166,
+      "payload_equal": true,
+      "payload_sha256": "4ab4d9d69ca3e06a31d17da24ad3bcea449f4c08b929bb772c0f1b3d9550250d",
+      "raw_s": {
+        "pageable": [
+          0.549548055,
+          0.602930831,
+          0.602430771,
+          0.537468217,
+          0.602296375,
+          0.463689075,
+          0.461002428
+        ],
+        "pinned": [
+          0.573925313,
+          0.562626964,
+          0.597687799,
+          0.557459501,
+          0.622846241,
+          0.532565504,
+          0.490970537
+        ]
+      },
+      "stats": {
+        "pageable": {
+          "count": 7,
+          "max_s": 0.602930831,
+          "mean_s": 0.5456236788571428,
+          "median_s": 0.549548055,
+          "min_s": 0.461002428,
+          "stdev_s": 0.06282103891826449
+        },
+        "pinned": {
+          "count": 7,
+          "max_s": 0.622846241,
+          "mean_s": 0.5625831227142857,
+          "median_s": 0.562626964,
+          "min_s": 0.490970537,
+          "stdev_s": 0.042911343276208685
+        }
+      },
+      "warmup_s": {
+        "pageable": [
+          0.595224777
+        ],
+        "pinned": [
+          0.516572086
+        ]
+      }
+    },
+    "77": {
+      "median_pinned_vs_pageable_pct": -4.719765121088915,
+      "payload_bytes": 70648926,
+      "payload_equal": true,
+      "payload_sha256": "0314532ad0cc8d0030b0cf8aaeee5db9a5ce9267c25e94eeb44762d7babe7e32",
+      "raw_s": {
+        "pageable": [
+          0.093565185,
+          0.083123573,
+          0.086690797,
+          0.106526716,
+          0.100731439,
+          0.079779944,
+          0.077135366
+        ],
+        "pinned": [
+          0.094810583,
+          0.082599195,
+          0.108615222,
+          0.104326276,
+          0.080586628,
+          0.078051419,
+          0.078525245
+        ]
+      },
+      "stats": {
+        "pageable": {
+          "count": 7,
+          "max_s": 0.106526716,
+          "mean_s": 0.08965043142857143,
+          "median_s": 0.086690797,
+          "min_s": 0.077135366,
+          "stdev_s": 0.011017680540199295
+        },
+        "pinned": {
+          "count": 7,
+          "max_s": 0.108615222,
+          "mean_s": 0.08964493828571428,
+          "median_s": 0.082599195,
+          "min_s": 0.078051419,
+          "stdev_s": 0.012857228696163387
+        }
+      },
+      "warmup_s": {
+        "pageable": [
+          0.099295822
+        ],
+        "pinned": [
+          0.091084652
+        ]
+      }
+    }
+  },
+  "exact": {
+    "269": {
+      "all_28_layers_sha256_equal": true,
+      "all_28_layers_torch_equal": true,
+      "first_new_async_s": 0.256714326,
+      "first_old_connector_s": 0.121320464,
+      "new_async_median_s": 0.015611714,
+      "new_vs_old_pct": -87.46917281380337,
+      "old_connector_median_s": 0.12458646,
+      "old_over_new_speedup": 7.980319137283709,
+      "old_transfer_only_median_s": 0.145940775
+    },
+    "512": {
+      "all_28_layers_sha256_equal": true,
+      "all_28_layers_torch_equal": true,
+      "first_new_async_s": 0.025379998,
+      "first_old_connector_s": 0.148352395,
+      "new_async_median_s": 0.025468508,
+      "new_vs_old_pct": -87.47104421657168,
+      "old_connector_median_s": 0.20327718,
+      "old_over_new_speedup": 7.981511127389166,
+      "old_transfer_only_median_s": 0.221277606
+    },
+    "77": {
+      "all_28_layers_sha256_equal": true,
+      "all_28_layers_torch_equal": true,
+      "first_new_async_s": 0.090515881,
+      "first_old_connector_s": 0.055703013,
+      "new_async_median_s": 0.009682647,
+      "new_vs_old_pct": -83.45870954268062,
+      "old_connector_median_s": 0.058536225,
+      "old_over_new_speedup": 6.0454775434857835,
+      "old_transfer_only_median_s": 0.043108676
+    }
+  },
+  "limitations": [
+    "No previous fix6 run directory, log, or telemetry JSONL was retained under /tmp or /runpod-volume on this pod; only aggregate total and TTFT values survive.",
+    "Microbenchmarks use an otherwise idle A40 and do not reproduce concurrent model execution, so their speedups are not end-to-end claims.",
+    "Actual block IDs were not retained. The benchmark uses seeded scattered IDs over the full 31181-block LBNHC source extent.",
+    "Storage wall time cannot be compared with fix6 without its phase logs. The async commit does not change store or codec code, and pinned/pageable encoded payloads are identical."
+  ],
+  "run_log_aggregate": {
+    "cold": {
+      "chunks": 1,
+      "save_collect": {
+        "count": 1,
+        "max_s": 0.888,
+        "mean_s": 0.888,
+        "median_s": 0.888,
+        "min_s": 0.888,
+        "p95_nearest_rank_s": 0.888,
+        "total_s": 0.888
+      },
+      "save_encode_persist": {
+        "count": 1,
+        "max_s": 0.225,
+        "mean_s": 0.225,
+        "median_s": 0.225,
+        "min_s": 0.225,
+        "p95_nearest_rank_s": 0.225,
+        "total_s": 0.225
+      }
+    },
+    "correctness_run1": {
+      "chunks": 1,
+      "save_collect": {
+        "count": 1,
+        "max_s": 0.86,
+        "mean_s": 0.86,
+        "median_s": 0.86,
+        "min_s": 0.86,
+        "p95_nearest_rank_s": 0.86,
+        "total_s": 0.86
+      },
+      "save_encode_persist": {
+        "count": 1,
+        "max_s": 0.169,
+        "mean_s": 0.169,
+        "median_s": 0.169,
+        "min_s": 0.169,
+        "p95_nearest_rank_s": 0.169,
+        "total_s": 0.169
+      }
+    },
+    "correctness_run2": {
+      "chunks": 0,
+      "save_collect": null,
+      "save_encode_persist": null
+    },
+    "warm": {
+      "chunks": 25,
+      "save_collect": {
+        "count": 6,
+        "max_s": 1.407,
+        "mean_s": 1.0905,
+        "median_s": 1.2305000000000001,
+        "min_s": 0.228,
+        "p95_nearest_rank_s": 1.407,
+        "total_s": 6.543
+      },
+      "save_encode_persist": {
+        "count": 6,
+        "max_s": 0.755,
+        "mean_s": 0.4543333333333333,
+        "median_s": 0.5005,
+        "min_s": 0.022,
+        "p95_nearest_rank_s": 0.755,
+        "total_s": 2.726
+      }
+    }
+  },
+  "schema_version": 1,
+  "verdict": {
+    "async_loading_remains_disabled": true,
+    "evidence_supports_async_revert": false,
+    "interpretation": "The single real-run regression tracks the filesystem control and is consistent with workload/run variance. Idle-A40 extraction measurements do not show an async implementation slowdown. Missing fix6 phase logs prevent a complete attribution of the absolute delta.",
+    "smallest_next_change": "No extraction source change. Retain async save extraction and leave async loading disabled. For stronger end-to-end evidence, alternate parent and async revisions across repeated fresh full runs with TELYS_VLLM_TELEMETRY=1 and retain all phase logs before changing the implementation."
+  },
+  "workload_comparison": {
+    "absolute_changes": {
+      "A": {
+        "total_pct": 0.8951057225854209,
+        "total_s": 0.1820197486877433,
+        "ttft_mean_pct": 9.340876079193317,
+        "ttft_mean_s": 0.8829930157661448
+      },
+      "B": {
+        "total_pct": 18.636271579564713,
+        "total_s": 2.1255901457672124,
+        "ttft_mean_pct": 31.91469343911697,
+        "ttft_mean_s": 1.9853776535377499
+      },
+      "C": {
+        "total_pct": 21.047541082224754,
+        "total_s": 3.4987049713439937,
+        "ttft_mean_pct": 28.684610348866492,
+        "ttft_mean_s": 3.0848161426734926
+      }
+    },
+    "async_save_shares": {
+      "combined_pct_of_total": 46.06498713197216,
+      "combined_s": 9.269,
+      "save_collect_pct_of_total": 32.51733852675519,
+      "save_collect_raw_gib_per_s": 0.339028231506954,
+      "save_collect_s": 6.543,
+      "save_encode_persist_pct_of_total": 13.547648605216972,
+      "save_encode_persist_raw_gib_per_s": 0.8137423766507703,
+      "save_encode_persist_s": 2.726,
+      "warm_raw_tensor_bytes": 2381840384,
+      "warm_suffix_blocks": 2596,
+      "warm_total_s": 20.121572971343994
+    },
+    "normalized_telys_ratios": {
+      "C_over_A_total": {
+        "change_pct": 19.973650074810536,
+        "current": 0.9807259152553556,
+        "previous": 0.8174510941726087
+      },
+      "C_over_A_ttft_mean": {
+        "change_pct": 17.69121938959306,
+        "current": 1.3389203264324852,
+        "previous": 1.1376552417222048
+      },
+      "C_over_B_total": {
+        "change_pct": 2.032489280517291,
+        "current": 1.4870444179579003,
+        "previous": 1.4574224626330328
+      },
+      "C_over_B_ttft_mean": {
+        "change_pct": -2.448615090586004,
+        "current": 1.68640280982186,
+        "previous": 1.728732822591755
+      }
+    }
+  }
+}

@@ -10,13 +10,14 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 ARMS_SCRIPT="$SCRIPT_DIR/arms.sh"
 METRICS_SCRIPT=${RUNPOD_BENCHMARK_METRICS_SCRIPT:-$SCRIPT_DIR/../../bench/benchmark_prefix_caching_metrics.py}
 CORRECTNESS_SCRIPT=${RUNPOD_BENCHMARK_CORRECTNESS_SCRIPT:-$SCRIPT_DIR/../../bench/verify_warm_hit_output.py}
+LIFECYCLE_SCRIPT="$SCRIPT_DIR/../../bench/verify_persisted_chunks.py"
 SUMMARY_SCRIPT="$SCRIPT_DIR/summarize_results.py"
 MODEL=Qwen/Qwen2.5-7B-Instruct
 OUTPUT_LEN=64
 SEED=42
 
 usage() {
-    printf 'Usage: %s [--dry-run] [4096|8192] [run-id]\n' "${0##*/}" >&2
+    printf 'Usage: %s [--dry-run] [4096|8192|16384] [run-id]\n' "${0##*/}" >&2
 }
 
 fail() {
@@ -96,7 +97,13 @@ cache_has_files() {
 run_process() {
     local arm=$1 phase=$2 cache_root=$3 num_prompts=$4 range=$5 harness=$6
     local output_json="$BENCHMARK_RESULTS/arm_${arm}_${phase}.json"
+    if [[ $phase == run1 || $phase == run2 ]]; then
+        output_json="$BENCHMARK_RESULTS/correctness_arm_${arm}_${phase}.json"
+    fi
     local output_log="$BENCHMARK_RESULTS/arm_${arm}_${phase}.log"
+    local telemetry="$BENCHMARK_RESULTS/arm_${arm}_${phase}.telemetry.jsonl"
+    local evidence="$BENCHMARK_RESULTS/arm_${arm}_${phase}.lifecycle.json"
+    local manifests="$BENCHMARK_RESULTS/manifests/arm_${arm}_${phase}"
 
     (
         export RUNPOD_WORKER_VOLUME="$cache_root"
@@ -121,6 +128,13 @@ run_process() {
             export TELYS_VLLM_SLAB_PATH="${TELYS_PATH}_kv.slab"
         fi
 
+        local lifecycle=0
+        if ((BENCHMARK_LIFECYCLE)) && [[ $arm == C && $harness == "$METRICS_SCRIPT" ]]; then
+            lifecycle=1
+            export TELYS_VLLM_TELEMETRY=1
+            export TELYS_VLLM_TELEMETRY_LOG="$telemetry"
+        fi
+
         local -a command=(
             python3 "$harness"
             --model "$MODEL"
@@ -139,6 +153,15 @@ run_process() {
             command+=(--disable-kv-connector)
         fi
         command+=(--output-json "$output_json")
+        if ((lifecycle)); then
+            command+=(
+                --manifest-dir "$manifests"
+                --manifest-arm "$arm"
+                --manifest-phase "$phase"
+                --manifest-namespace "${TELYS_VLLM_NAMESPACE:-telys-vllm}"
+                --manifest-max-chunk-blocks "${TELYS_VLLM_MAX_CHUNK_BLOCKS:-0}"
+            )
+        fi
         if [[ $phase == cold || $phase == warm ]]; then
             command+=(
                 --num-prompts "$num_prompts"
@@ -153,14 +176,47 @@ run_process() {
             )
         fi
 
+        local -a record_command=(
+            python3 "$LIFECYCLE_SCRIPT" record
+            --output "$evidence"
+            --telemetry "$telemetry"
+            --manifest-dir "$manifests"
+            --arm "$arm"
+            --phase "$phase"
+            --exit-status 0
+        )
         if ((BENCHMARK_DRY_RUN)); then
             print_command "$arm" "$phase" "$cache_root" "${command[@]}"
+            if ((lifecycle)); then
+                printf 'lifecycle_record_command='
+                printf '%q ' "${record_command[@]}"
+                printf '\n'
+            fi
             return 0
         fi
 
         print_command "$arm" "$phase" "$cache_root" "${command[@]}" \
             >>"$BENCHMARK_COMMANDS_LOG"
-        "${command[@]}" 2>&1 | tee "$output_log"
+        if ((lifecycle)); then
+            local command_status=0 tee_status=0
+            local -a pipeline_status=()
+            set +e
+            "${command[@]}" 2>&1 | tee "$output_log"
+            pipeline_status=("${PIPESTATUS[@]}")
+            command_status=${pipeline_status[0]}
+            tee_status=${pipeline_status[1]}
+            set -e
+            record_command[${#record_command[@]}-1]=$command_status
+            "${record_command[@]}"
+            if ((command_status != 0)); then
+                return "$command_status"
+            fi
+            if ((tee_status != 0)); then
+                return "$tee_status"
+            fi
+        else
+            "${command[@]}" 2>&1 | tee "$output_log"
+        fi
     )
 }
 
@@ -204,6 +260,7 @@ main() {
     fi
 
     BENCHMARK_PREFIX=${1:-4096}
+    BENCHMARK_LIFECYCLE=0
     local run_id=${2:-run1}
     case "$BENCHMARK_PREFIX" in
         4096)
@@ -214,8 +271,13 @@ main() {
             BENCHMARK_WARM_MAX=12288
             BENCHMARK_MAX_MODEL_LEN=16896
             ;;
+        16384)
+            BENCHMARK_WARM_MAX=20480
+            BENCHMARK_MAX_MODEL_LEN=25088
+            BENCHMARK_LIFECYCLE=1
+            ;;
         *)
-            fail "prefix must be 4096 or 8192"
+            fail "prefix must be 4096, 8192, or 16384"
             ;;
     esac
     [[ $run_id =~ ^[A-Za-z0-9._-]+$ ]] || fail "invalid run-id: $run_id"
@@ -231,6 +293,9 @@ main() {
     require_file "$METRICS_SCRIPT"
     require_file "$CORRECTNESS_SCRIPT"
     require_file "$SUMMARY_SCRIPT"
+    if ((BENCHMARK_LIFECYCLE)); then
+        require_file "$LIFECYCLE_SCRIPT"
+    fi
     prepare_root "$BENCHMARK_ROOT"
 
     local arm cache_root
