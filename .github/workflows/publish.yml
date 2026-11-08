@@ -81,7 +81,7 @@ jobs:
 
   publish-pypi:
     name: Publish to PyPI
-    needs: [guard]
+    needs: [guard, publish-ghcr]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     timeout-minutes: 10
