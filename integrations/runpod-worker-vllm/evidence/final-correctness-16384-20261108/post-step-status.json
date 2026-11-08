@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "steps": [
+    {
+      "exit_status": 0,
+      "step": "copy_initial_results"
+    },
+    {
+      "exit_status": 0,
+      "step": "copy_commands"
+    },
+    {
+      "exit_status": 0,
+      "step": "summary_json"
+    },
+    {
+      "exit_status": 0,
+      "step": "summary_markdown"
+    },
+    {
+      "exit_status": 0,
+      "step": "ordinary_summary_and_output_equality"
+    },
+    {
+      "exit_status": 0,
+      "step": "persisted_chunk_verification"
+    },
+    {
+      "exit_status": 0,
+      "step": "verification_audit"
+    },
+    {
+      "exit_status": 0,
+      "step": "verification_diagnosis"
+    },
+    {
+      "exit_status": 0,
+      "step": "copy_final_results"
+    }
+  ]
+}

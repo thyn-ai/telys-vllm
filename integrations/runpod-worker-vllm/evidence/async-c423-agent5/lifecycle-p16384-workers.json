@@ -1,0 +1,31 @@
+{
+  "prefix": 16384,
+  "workers": [
+    {
+      "engine_id": "b3e4c71d-cfcc-4acf-9e33-4826655d20ff",
+      "hit_blocks": [
+        0,
+        1077
+      ],
+      "lookup_lines": [
+        "INFO:telys_vllm.connector:telys lookup: req=0-b21b5993 num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=0 hit_tokens=0",
+        "INFO:telys_vllm.connector:telys lookup: req=1-b92198b0 num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=1077 hit_tokens=17232"
+      ],
+      "main_pid": 9614,
+      "run": "run1"
+    },
+    {
+      "engine_id": "069da43d-df39-40c7-9467-6216c976b192",
+      "hit_blocks": [
+        1077,
+        1077
+      ],
+      "lookup_lines": [
+        "Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]INFO:telys_vllm.connector:telys lookup: req=0-9bce273b num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=1077 hit_tokens=17232",
+        "Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]INFO:telys_vllm.connector:telys lookup: req=1-82fa2f5e num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=1077 hit_tokens=17232"
+      ],
+      "main_pid": 10062,
+      "run": "run2"
+    }
+  ]
+}

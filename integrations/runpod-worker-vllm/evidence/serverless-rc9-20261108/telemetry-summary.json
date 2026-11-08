@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "namespace": "serverless-lifecycle-012-rc9",
+  "malformed_lines": 0,
+  "engine_ids": [
+    "4a59097b-1ed6-49e9-9135-8569eaf8171b",
+    "4ca28826-b4a8-4edc-9bc0-da0e169fe9e1",
+    "74afb8fb-a90e-4e25-ba81-af286a2ea9ab",
+    "bd1eb602-7c34-4718-83d6-a0e290c6e7e2",
+    "d599de61-4adc-4d1c-a321-525a4b97f237"
+  ],
+  "lookups": [
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/store.py",
+      "caller_line": 244,
+      "context": {
+        "first_chunk_length": 0,
+        "first_chunk_start_key": "serverless-lifecycle-012-rc9/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e",
+        "hits": 0,
+        "lookups": 1,
+        "total_blocks": 538
+      },
+      "elapsed_us": 91.2,
+      "phase": "store_lookup_prefix",
+      "pid": 252,
+      "ts": 1794144110184051778
+    },
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/connector.py",
+      "caller_line": 351,
+      "context": {
+        "hit_blocks": 0,
+        "hit_tokens": 0,
+        "max_block": 538,
+        "request_id": "cmpl-98b38073ef977a3b-0-8fc6eeeb",
+        "start_block": 0
+      },
+      "elapsed_us": 208.6,
+      "phase": "lookup",
+      "pid": 252,
+      "ts": 1794144110184136311
+    },
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/store.py",
+      "caller_line": 244,
+      "context": {
+        "first_chunk_length": 128,
+        "first_chunk_start_key": "serverless-lifecycle-012-rc9/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e",
+        "hits": 538,
+        "lookups": 5,
+        "total_blocks": 538
+      },
+      "elapsed_us": 386.5,
+      "phase": "store_lookup_prefix",
+      "pid": 252,
+      "ts": 1794144212299444696
+    },
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/connector.py",
+      "caller_line": 351,
+      "context": {
+        "hit_blocks": 538,
+        "hit_tokens": 8608,
+        "max_block": 538,
+        "request_id": "cmpl-abe172c12d71ae3d-0-af52c11d",
+        "start_block": 0
+      },
+      "elapsed_us": 540.2,
+      "phase": "lookup",
+      "pid": 252,
+      "ts": 1794144212299552172
+    },
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/store.py",
+      "caller_line": 244,
+      "context": {
+        "first_chunk_length": 128,
+        "first_chunk_start_key": "serverless-lifecycle-012-rc9/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e",
+        "hits": 538,
+        "lookups": 5,
+        "total_blocks": 538
+      },
+      "elapsed_us": 884.1,
+      "phase": "store_lookup_prefix",
+      "pid": 252,
+      "ts": 1794144219020862540
+    },
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/connector.py",
+      "caller_line": 351,
+      "context": {
+        "hit_blocks": 538,
+        "hit_tokens": 8608,
+        "max_block": 538,
+        "request_id": "cmpl-92e9ad9b698a4c11-0-9349b0c6",
+        "start_block": 0
+      },
+      "elapsed_us": 1211.2,
+      "phase": "lookup",
+      "pid": 252,
+      "ts": 1794144219021056036
+    },
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/store.py",
+      "caller_line": 244,
+      "context": {
+        "first_chunk_length": 128,
+        "first_chunk_start_key": "serverless-lifecycle-012-rc9/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e",
+        "hits": 538,
+        "lookups": 5,
+        "total_blocks": 538
+      },
+      "elapsed_us": 196.9,
+      "phase": "store_lookup_prefix",
+      "pid": 249,
+      "ts": 1794144378589252040
+    },
+    {
+      "caller_file": "/usr/local/lib/python3.12/dist-packages/telys_vllm/connector.py",
+      "caller_line": 351,
+      "context": {
+        "hit_blocks": 538,
+        "hit_tokens": 8608,
+        "max_block": 538,
+        "request_id": "cmpl-991b9d99b6f5b280-0-94e0b710",
+        "start_block": 0
+      },
+      "elapsed_us": 290.6,
+      "phase": "lookup",
+      "pid": 249,
+      "ts": 1794144378589325879
+    }
+  ],
+  "save_collect_block_counts": [
+    128,
+    128,
+    128,
+    128,
+    26,
+    1,
+    1,
+    1,
+    1
+  ]
+}

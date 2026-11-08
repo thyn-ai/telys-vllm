@@ -45,6 +45,67 @@ Key takeaways:
 - The **cross-replica / restart story works**: a second, fresh vLLM process with
   an empty native cache warm-hits the Telys store populated by the first process.
 
+Latest Runpod validation (2026-11-08 final independent A40 profiles and native
+checks; `PR #2, package 0.1.2`, all current PR checks green; `telys==0.1.14`, A40):
+
+| Prefix | Arm / phase | Total time | Mean TTFT |
+|---|---|---:|---:|
+| 16K | No-cache warm | 72.390 s | 35.659 s |
+| 16K | Stock filesystem warm | 26.378 s | 17.936 s |
+| 16K | Telys cold | 7.417 s | 4.712 s |
+| 16K | Telys warm | 42.247 s | 28.955 s |
+| 4K | No-cache warm | 20.541 s | 10.333 s |
+| 4K | Stock filesystem warm | 13.028 s | 7.612 s |
+| 4K | Telys cold | 3.132 s | 1.174 s |
+| 4K | Telys warm | 21.779 s | 14.401 s |
+
+At 16K, Telys warm beat same-run no-cache on total time and mean TTFT; stock
+filesystem KV remained faster. At 4K, Telys warm did **not** beat no-cache, and
+stock filesystem KV was faster. These results do not demonstrate an end-to-end
+async extraction improvement; async loading remains disabled.
+
+All A/B/C ordinary correctness and output-equality checks passed on both profiles.
+The 16K independent verifier passed **1,081/1,081 cold** and **24,333/24,333 warm**
+blocks (**25,414/25,414 combined**), with zero missing blocks, errors, or
+inconclusive results, packed shape `[16, 4, 256]`, and clean pending-write
+telemetry. The 4K dynamic audit passed **273/273 cold blocks**, **8,056 warm
+coverage blocks**, **5,380 reused blocks**, **2,676/2,676 newly persisted blocks**,
+and **2,949/2,949 total-store blocks**; every warm prompt hit 269 blocks, with
+packed shape `[16, 4, 256]`.
+
+The prior full profiles at `6cbfe82` exercised the real cursor and metadata fixes
+for decode and aligned-prompt persistence and for final-decode/restart handling.
+Final native checks at `1a100ac26dff6a98b8ceafec5cdaebf0f5d49135` passed v2
+`meta_blob` projection and nested payload+metadata decoding, dual-codec fallback,
+overlapping-client deletion coherence, and divergent-prefix rejection; evidence is
+under `integrations/runpod-worker-vllm/evidence/final-v2-20261108`. **No full
+profiles ran at `1a100ac`.** Current PR head `3f39593` is workflow-only after
+`1a100ac`. Historical fix6 and corrected pre-fix results remain separately labeled
+in [`integrations/runpod-worker-vllm/RESULTS.md`](integrations/runpod-worker-vllm/RESULTS.md).
+
+### Serverless rc9 lifecycle proof
+
+**Release candidate, not a signed final release.** Acceptance image
+`ghcr.io/thyn-ai/telys-worker-vllm:0.1.2-rc.9` used immutable digest
+`sha256:8d84aa45d5578421696f67d2e7ae2e6fb475c4d8ffb5d0429b7ea748dfd0fea2`.
+Source commit `1a100ac26dff6a98b8ceafec5cdaebf0f5d49135` matched all 10 compared
+Python files in `rc9-source-verification.json`; later `3f39593` changes are release
+workflow only. The final release tag has not been created, and final signed image
+publication remains pending.
+
+Cold worker `yutiyuykg0g2gc` completed in **7.042 s** and persisted **538 prompt
+blocks + 4 generated blocks = 542 blocks**. Fresh worker `tdi0xf9426iu21` returned
+exactly matching output; its first lookup hit **538 blocks / 8,608 tokens**. After
+actual scale-to-zero with FlashBoot OFF and `running=0`, fresh engine
+`4ca28826-b4a8-4edc-9bc0-da0e169fe9e1` on worker `1gsk5j29rzcz0s` returned
+matching output in **6.735 s** and again hit **538/8,608**. Fresh engine IDs
+differed across starts; the concurrent replica responses shared worker
+`tdi0xf9426iu21`.
+
+Initial provisioning reused the existing signed runtime/license on the volume, not
+a new device registration. Async loading remained disabled. The endpoint was
+deleted; templates have a normal 90-minute platform hold before deletion.
+
 ## When it helps / when it doesn't
 
 | Scenario | Verdict | Why |
@@ -63,10 +124,12 @@ recomputation on the workloads above. It is not yet a universal drop-in win:
 performance depends on prefix length, model size, GPU memory budget, and whether
 the deployment restarts or scales replicas.
 
-- Local tests: **131 passing, 7 skipped** (tests that require a live GPU or the
+- Local tests: **278 passed, 8 skipped** (tests that require a live GPU or the
   full Telys runtime are skipped on headless runners).
 - Supported vLLM: `>=0.11` (tested most recently on `0.32.0`).
 - Supported Python: `>=3.10`.
+- Async loading is unsupported in this revision and fails fast; use synchronous
+  loads (`TELYS_VLLM_LOAD_ASYNC=0`).
 
 ## Install
 

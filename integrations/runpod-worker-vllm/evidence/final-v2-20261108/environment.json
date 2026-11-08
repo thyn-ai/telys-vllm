@@ -1,0 +1,10 @@
+{
+  "compute_apps": "",
+  "endpoint_created": false,
+  "full_profiles_run_at_current_pr": false,
+  "gpu": "NVIDIA A40, 0 MiB, 46068 MiB, 0 %",
+  "public_source_edited": false,
+  "release_commit_push_or_external_post": false,
+  "source_head": "1a100ac26dff6a98b8ceafec5cdaebf0f5d49135",
+  "telys_home": "/runpod-volume/telys-home"
+}

@@ -1,0 +1,19 @@
+{
+  "focused_at_4e52b83": {
+    "pod_result": "/tmp/telys-final-compatibility-validation/summary.json",
+    "status": "fail only on native v2 projection; other checks passed"
+  },
+  "full_profiles_at_6cbfe82": {
+    "local_evidence": [
+      "integrations/runpod-worker-vllm/evidence/final-correctness-16384-20261108",
+      "integrations/runpod-worker-vllm/evidence/final-correctness-4096-20261108"
+    ],
+    "pod_result": "/tmp/telys-final-correctness-validation/final-validation.json",
+    "status": "ordinary persistence and chain-key requirements passed"
+  },
+  "note": "prior results were not run at 1a100ac",
+  "reopened_reset_at_4e52b83": {
+    "pod_result": "/tmp/telys-final-compatibility-validation/reopen/read-result.json",
+    "status": "pass"
+  }
+}

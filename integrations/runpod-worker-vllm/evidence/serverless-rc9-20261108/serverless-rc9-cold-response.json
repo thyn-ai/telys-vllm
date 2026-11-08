@@ -1,0 +1,40 @@
+{
+  "delayTime": 148438,
+  "executionTime": 7042,
+  "id": "33f1a9be-1007-4897-bccf-0f10adfd2acf-u1",
+  "output": [
+    {
+      "choices": [
+        {
+          "finish_reason": "length",
+          "index": 0,
+          "logprobs": null,
+          "prompt_logprobs": null,
+          "prompt_token_ids": null,
+          "routed_experts": null,
+          "stop_reason": null,
+          "text": "�_12345678901234567890123456789012345678901234567890123456789012",
+          "token_ids": null
+        }
+      ],
+      "created": 1794144110,
+      "ec_transfer_params": null,
+      "id": "cmpl-98b38073ef977a3b",
+      "kv_transfer_params": null,
+      "metrics": null,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "object": "text_completion",
+      "service_tier": null,
+      "system_fingerprint": "vllm-0.32.0-80154c52",
+      "usage": {
+        "completion_tokens": 64,
+        "completion_tokens_details": null,
+        "prompt_tokens": 8619,
+        "prompt_tokens_details": null,
+        "total_tokens": 8683
+      }
+    }
+  ],
+  "status": "COMPLETED",
+  "workerId": "yutiyuykg0g2gc"
+}

@@ -1,0 +1,11 @@
+{
+  "benchmarked_head": "c42303965efaba0cbf2f8e0cf90074206af8ad68",
+  "delta_files": [
+    "telys_vllm/gpu_ops.py",
+    "tests/test_async_extraction.py"
+  ],
+  "final_source_head": "5ae131d5fea4577c88806f118c3520d588fd9461",
+  "final_test_command": "/opt/telys-venv/bin/python -m pytest -q",
+  "final_test_result": "210 passed, 1 skipped",
+  "runtime_behavior_changed": false
+}

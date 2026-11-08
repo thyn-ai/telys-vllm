@@ -1,0 +1,61 @@
+{
+  "all_output_comparisons_passed": true,
+  "comparisons": [
+    {
+      "arm": "B",
+      "matches_no_cache": true,
+      "phase": "cold",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "B",
+      "matches_no_cache": true,
+      "phase": "warm",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "B",
+      "matches_no_cache": true,
+      "phase": "cold",
+      "run": "run2",
+      "verifier_passed": true
+    },
+    {
+      "arm": "B",
+      "matches_no_cache": true,
+      "phase": "warm",
+      "run": "run2",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "matches_no_cache": true,
+      "phase": "cold",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "matches_no_cache": true,
+      "phase": "warm",
+      "run": "run1",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "matches_no_cache": true,
+      "phase": "cold",
+      "run": "run2",
+      "verifier_passed": true
+    },
+    {
+      "arm": "C",
+      "matches_no_cache": true,
+      "phase": "warm",
+      "run": "run2",
+      "verifier_passed": true
+    }
+  ]
+}

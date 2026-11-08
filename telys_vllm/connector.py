@@ -8,8 +8,11 @@ Implements ``KVConnectorBase_V1`` (+ ``SupportsHMA``) against the abstract
 pure core (:class:`~telys_vllm.store.TelysBlockStore`).
 """
 
+import hashlib
 import importlib
-from collections.abc import Mapping
+import threading
+from collections import OrderedDict
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
@@ -33,6 +36,7 @@ from telys_vllm.config import (
     TelysConnectorConfig,
 )
 from telys_vllm.gpu_ops import (
+    AsyncKVExtractionBatch,
     extract_kv_blocks,
     inject_kv_blocks_contiguous,
     serialize_kv_tensor,
@@ -80,6 +84,98 @@ logger = init_logger(__name__)
 
 class TelysConnectorError(RuntimeError):
     """Raised for connector-side failures (never silently skipped)."""
+
+
+_PINNED_STAGING_MAX_ENTRIES = 256
+_PINNED_STAGING_MAX_BYTES = 1024**3
+
+
+@dataclass
+class _PinnedStagingEntry:
+    tensor: "torch.Tensor"
+    event: Any = None
+
+    def wait(self) -> None:
+        if self.event is not None:
+            self.event.synchronize()
+            self.event = None
+
+
+class _PinnedStagingCache:
+    """Bounded LRU of immutable pinned layer tensors.
+
+    The connector's load lock serializes access. Every reuse, eviction, and
+    clear waits for the last H2D copy that reads the entry before releasing or
+    reusing its storage.
+    """
+
+    def __init__(self, max_entries: int, max_bytes: int) -> None:
+        if max_entries <= 0 or max_bytes <= 0:
+            raise ValueError("pinned staging cache bounds must be positive")
+        self._max_entries = max_entries
+        self._max_bytes = max_bytes
+        self._entries: OrderedDict[bytes, _PinnedStagingEntry] = OrderedDict()
+        self._total_bytes = 0
+
+    def __len__(self) -> int:
+        return len(self._entries)
+
+    @property
+    def total_bytes(self) -> int:
+        return self._total_bytes
+
+    def get(self, key: bytes) -> _PinnedStagingEntry | None:
+        entry = self._entries.get(key)
+        if entry is None:
+            return None
+        entry.wait()
+        self._entries.move_to_end(key)
+        return entry
+
+    def put(self, key: bytes, tensor: "torch.Tensor") -> _PinnedStagingEntry | None:
+        if key in self._entries:
+            raise RuntimeError("pinned staging cache key already exists")
+        nbytes = tensor.nbytes
+        if nbytes > self._max_bytes:
+            return None
+        while self._entries and (
+            len(self._entries) >= self._max_entries
+            or self._total_bytes + nbytes > self._max_bytes
+        ):
+            oldest_key = next(iter(self._entries))
+            oldest = self._entries[oldest_key]
+            oldest.wait()
+            del self._entries[oldest_key]
+            self._total_bytes -= oldest.tensor.nbytes
+        entry = _PinnedStagingEntry(tensor=tensor)
+        self._entries[key] = entry
+        self._total_bytes += nbytes
+        return entry
+
+    def clear(self) -> None:
+        for entry in self._entries.values():
+            entry.wait()
+        self._entries.clear()
+        self._total_bytes = 0
+
+
+def _pinned_staging_key(
+    block_hashes: Sequence[bytes], layer_name: str, tensor: "torch.Tensor"
+) -> bytes:
+    """Identify the exact decoded layer contents staged in pinned memory."""
+    import torch
+
+    digest = hashlib.sha256()
+    fields = [*block_hashes, layer_name.encode("utf-8"), str(tensor.dtype).encode()]
+    for field_value in fields:
+        digest.update(len(field_value).to_bytes(8, "big"))
+        digest.update(field_value)
+    digest.update(tensor.ndim.to_bytes(8, "big"))
+    for dim in tensor.shape:
+        digest.update(int(dim).to_bytes(8, "big"))
+    raw = tensor.detach().contiguous().view(torch.uint8).numpy()
+    digest.update(raw)
+    return digest.digest()
 
 
 @dataclass
@@ -194,6 +290,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         # Dedicated CUDA stream for async H2D copies.  Created lazily so CPU-only
         # tests never pay for it.
         self._load_stream_obj: torch.cuda.Stream | None = None
+        self._load_lock = threading.Lock()
 
         # Scheduler-side state.
         self._reqs: dict[str, Request] = {}
@@ -215,8 +312,13 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         self._step_attn_metadata: (
             AttentionMetadata | Mapping[str, AttentionMetadata] | None
         ) = None
-        # Pinned CPU tensors retained until async H2D copies complete.
+        # Transient and cached pinned tensors retained until their H2D copies
+        # complete. The cache is content-keyed and bounded in entries and bytes.
         self._last_staged: list[torch.Tensor] = []
+        self._last_staged_event: Any = None
+        self._pinned_staging_cache = _PinnedStagingCache(
+            _PINNED_STAGING_MAX_ENTRIES, _PINNED_STAGING_MAX_BYTES
+        )
 
     # ==============================
     # Scheduler-side methods
@@ -313,16 +415,81 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                 end = spec.start_block + len(spec.block_hashes)
                 spec.block_ids = list(new_req.block_ids[0][spec.start_block : end])
                 meta.loads.append(spec)
+            request = self._reqs.get(new_req.req_id)
+            if request is not None:
+                local_boundary = min(
+                    new_req.num_computed_tokens // self._block_size,
+                    (request.num_tokens - 1) // self._block_size,
+                )
+                if local_boundary:
+                    self._save_cursors[new_req.req_id] = max(
+                        self._save_cursors.get(new_req.req_id, 0), local_boundary
+                    )
             self._advance_save_cursor(
                 new_req.req_id, total_tokens, list(new_req.block_ids[0]), meta
             )
 
         cached = scheduler_output.scheduled_cached_reqs
+        block_state = getattr(scheduler_output, "kv_connector_block_state", None)
+        get_block_ids = getattr(block_state, "get_block_ids", None)
+        resumed_req_ids = getattr(cached, "resumed_req_ids", set())
         for i, req_id in enumerate(cached.req_ids):
             total_tokens = cached.num_computed_tokens[i] + num_scheduled[req_id]
-            # Only new requests carry the block-id list we need for saves; the
-            # benchmark workload is one-shot so this is sufficient for now.
-            self._advance_save_cursor(req_id, total_tokens, [], meta)
+            request = self._reqs.get(req_id)
+            load_spec = (
+                self._load_plans.get(req_id) if req_id in resumed_req_ids else None
+            )
+            if request is not None and load_spec is None:
+                local_boundary = min(
+                    cached.num_computed_tokens[i] // self._block_size,
+                    (request.num_tokens - 1) // self._block_size,
+                    (request.num_prompt_tokens - 1) // self._block_size,
+                )
+                if local_boundary:
+                    self._save_cursors[req_id] = max(
+                        self._save_cursors.get(req_id, 0), local_boundary
+                    )
+            block_ids = None
+            if callable(get_block_ids):
+                resolved_block_ids = get_block_ids(req_id)
+                if resolved_block_ids and resolved_block_ids[0] is not None:
+                    block_ids = list(resolved_block_ids[0])
+            if load_spec is not None and not block_ids:
+                block_ids = None
+            if block_ids is None and i < len(cached.new_block_ids):
+                new_block_ids = cached.new_block_ids[i]
+                if new_block_ids and new_block_ids[0] is not None:
+                    if load_spec is not None:
+                        # Resumed requests carry the full replacement table.
+                        block_ids = list(new_block_ids[0])
+                    elif request is not None:
+                        delta_block_ids = new_block_ids[0]
+                        save_boundary = min(
+                            total_tokens // self._block_size,
+                            (request.num_tokens - 1) // self._block_size,
+                        )
+                        if len(delta_block_ids) >= save_boundary:
+                            block_ids = list(delta_block_ids)
+            if load_spec is not None:
+                end = load_spec.start_block + len(load_spec.block_hashes)
+                if block_ids is None or len(block_ids) < end:
+                    raise TelysConnectorError(
+                        f"resumed request {req_id!r} is missing physical group-0 "
+                        f"block IDs for external load blocks "
+                        f"{load_spec.start_block}:{end}"
+                    )
+                load_spec.block_ids = list(block_ids[load_spec.start_block : end])
+                meta.loads.append(load_spec)
+                self._load_plans.pop(req_id)
+                # The hit prefix was already accounted for by the load plan.
+                continue
+            self._advance_save_cursor(
+                req_id,
+                total_tokens,
+                block_ids,
+                meta,
+                use_available_hashes=True,
+            )
 
         return meta
 
@@ -332,11 +499,19 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         total_tokens: int,
         block_ids: list[int] | None,
         meta: TelysConnectorMetadata,
+        *,
+        use_available_hashes: bool = False,
     ) -> None:
         request = self._reqs.get(req_id)
         if request is None:
             return
-        max_block = (request.num_tokens - 1) // self._block_size
+        # Async scheduling can leave returned-token counting behind the hashes
+        # already available for complete blocks. Cached steps may use that actual
+        # boundary; initial prefill still excludes the last token's block.
+        if use_available_hashes:
+            max_block = len(request.block_hashes)
+        else:
+            max_block = (request.num_tokens - 1) // self._block_size
         boundary = min(total_tokens // self._block_size, max_block)
         cursor = self._save_cursors.get(req_id, 0)
         if boundary <= cursor:
@@ -384,6 +559,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         return False
 
     def reset_cache(self) -> bool | None:
+        self._clear_pinned_staging()
         self._store.drain()
         self._store.reset()
         self._reqs.clear()
@@ -428,22 +604,30 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
             if use_fast_path:
                 import torch
 
-                pinned_staged_all: list[torch.Tensor] = []
-                for spec in metadata.loads:
-                    pinned_staged_all.extend(
-                        self._fast_inject_spec(spec, forward_context)
-                    )
-                # Synchronize the dedicated H2D stream with the default stream so
-                # the subsequent forward pass sees the injected KV data.  This is
-                # the only sync point on the warm load path.
-                stream = self._get_load_stream()
-                if stream is not None:
-                    event = torch.cuda.Event()
-                    event.record(stream)
-                    torch.cuda.current_stream().wait_event(event)
-                # Keep references until after the sync so pinned memory is not
-                # freed before the async copies complete.
-                self._last_staged = pinned_staged_all
+                with self._load_lock:
+                    self._release_last_staged()
+                    stream = self._get_load_stream()
+                    try:
+                        pinned_staged_all: list[torch.Tensor] = []
+                        for spec in metadata.loads:
+                            pinned_staged_all.extend(
+                                self._fast_inject_spec(spec, forward_context)
+                            )
+                        # Order the default stream after all H2D copies and
+                        # injection kernels before the subsequent forward pass.
+                        event = None
+                        if stream is not None:
+                            event = torch.cuda.Event()
+                            event.record(stream)
+                            torch.cuda.current_stream().wait_event(event)
+                    except Exception:
+                        if stream is not None:
+                            stream.synchronize()
+                        raise
+                    # Transient buffers stay alive until this event completes;
+                    # cached buffers additionally remain owned by the LRU.
+                    self._last_staged = pinned_staged_all
+                    self._last_staged_event = event
                 return
 
             for spec in metadata.loads:
@@ -575,6 +759,35 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
             self._load_stream_obj = torch.cuda.Stream(priority=-1)
         return self._load_stream_obj
 
+    def _release_last_staged(self) -> None:
+        if self._last_staged_event is not None:
+            self._last_staged_event.synchronize()
+        self._last_staged_event = None
+        self._last_staged = []
+
+    def _clear_pinned_staging(self) -> None:
+        with self._load_lock:
+            self._release_last_staged()
+            self._pinned_staging_cache.clear()
+
+    def _stage_pinned_tensor(
+        self,
+        block_hashes: Sequence[bytes],
+        layer_name: str,
+        source: "torch.Tensor",
+    ) -> tuple["torch.Tensor", _PinnedStagingEntry | None]:
+        """Return cached pinned contents, copying only on a content-key miss."""
+        import torch
+
+        key = _pinned_staging_key(block_hashes, layer_name, source)
+        entry = self._pinned_staging_cache.get(key)
+        if entry is not None:
+            return entry.tensor, entry
+        pinned = torch.empty(source.shape, dtype=source.dtype, pin_memory=True)
+        pinned.copy_(source)
+        entry = self._pinned_staging_cache.put(key, pinned)
+        return pinned, entry
+
     def _fast_inject_spec(
         self,
         spec: TelysLoadSpec,
@@ -632,16 +845,16 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                     ]
                     device = kv_cache_layer.device
                     if torch.cuda.is_available():
-                        pinned = torch.empty(
-                            stacked_cpu.shape,
-                            dtype=stacked_cpu.dtype,
-                            pin_memory=True,
+                        pinned, cache_entry = self._stage_pinned_tensor(
+                            chunk.block_hashes, layer_name, stacked_cpu
                         )
-                        pinned.copy_(stacked_cpu)
                         pinned_staged.append(pinned)
                         if stream is not None:
                             with torch.cuda.stream(stream):
                                 gpu_tensor = pinned.to(device, non_blocking=True)
+                                if cache_entry is not None:
+                                    cache_entry.event = torch.cuda.Event()
+                                    cache_entry.event.record(stream)
                                 inject_kv_blocks_contiguous(
                                     kv_cache_layer,
                                     chunk_block_ids,
@@ -697,19 +910,29 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         ordered_hashes = list(block_hash_to_id.keys())
         block_ids = [block_hash_to_id[h] for h in ordered_hashes]
         layer_stacked: dict[str, torch.Tensor] = {}
-        for layer_name, kv_cache in self._kv_caches.items():
-            layer_attn = (
-                attn_metadata.get(layer_name)
-                if isinstance(attn_metadata, dict)
-                else attn_metadata
-            )
-            tensors = extract_kv_blocks(
-                kv_cache, block_ids, self._block_size, layer_attn
-            )
-            if not tensors or not isinstance(tensors[0], torch.Tensor):
-                return None
-            stacked = torch.stack(tensors)  # [N, block_size, *]
-            layer_stacked[layer_name] = stacked
+        use_async_extraction = all(
+            isinstance(kv_cache, torch.Tensor) for kv_cache in self._kv_caches.values()
+        )
+        with AsyncKVExtractionBatch() as extraction_batch:
+            for layer_name, kv_cache in self._kv_caches.items():
+                layer_attn = (
+                    attn_metadata.get(layer_name)
+                    if isinstance(attn_metadata, dict)
+                    else attn_metadata
+                )
+                if use_async_extraction:
+                    stacked = extraction_batch.extract(
+                        kv_cache, block_ids, self._block_size, layer_attn
+                    )
+                else:
+                    # Preserve test-double and legacy fallback behavior.
+                    tensors = extract_kv_blocks(
+                        kv_cache, block_ids, self._block_size, layer_attn
+                    )
+                    if not tensors or not isinstance(tensors[0], torch.Tensor):
+                        return None
+                    stacked = torch.stack(tensors)
+                layer_stacked[layer_name] = stacked
         return ordered_hashes, layer_stacked
 
     def wait_for_layer_load(self, layer_name: str) -> None:
@@ -791,7 +1014,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                     for block_hash, block_id in zip(save_hashes, spec.block_ids):
                         block_hash_to_id.setdefault(bytes(block_hash), block_id)
                     for run in self._split_into_runs(save_hashes):
-                        key = self._store.chunk_key(run[0], len(run))
+                        key = self._store.chunk_key(run[0], len(run), run[-1])
                         if key in seen_keys or self._store.contains(key):
                             continue
                         seen_keys.add(key)
@@ -911,6 +1134,9 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
 
         layer_blobs: dict[str, dict[bytes, bytes]] = {}
         block_ids = sorted(block_hash_to_id.values())
+        block_id_to_index: dict[int, int] = {}
+        for index, block_id in enumerate(block_ids):
+            block_id_to_index.setdefault(block_id, index)
         for layer_name, kv_cache in self._kv_caches.items():
             # Attention metadata is unavailable when torch.compile elides the
             # per-layer save_kv_layer decorator. Extraction only needs it for
@@ -925,7 +1151,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
             )
             blobs = [serialize_kv_tensor(t) for t in tensors]
             layer_blobs[layer_name] = {
-                block_hash: blobs[block_ids.index(block_id)]
+                block_hash: blobs[block_id_to_index[block_id]]
                 for block_hash, block_id in block_hash_to_id.items()
             }
         return layer_blobs
@@ -967,6 +1193,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         return None, None
 
     def shutdown(self):
+        self._clear_pinned_staging()
         self._store.drain()
         self._store.close()
 

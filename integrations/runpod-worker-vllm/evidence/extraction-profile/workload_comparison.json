@@ -1,0 +1,57 @@
+{
+  "absolute_changes": {
+    "A": {
+      "total_pct": 0.8951057225854209,
+      "total_s": 0.1820197486877433,
+      "ttft_mean_pct": 9.340876079193317,
+      "ttft_mean_s": 0.8829930157661448
+    },
+    "B": {
+      "total_pct": 18.636271579564713,
+      "total_s": 2.1255901457672124,
+      "ttft_mean_pct": 31.91469343911697,
+      "ttft_mean_s": 1.9853776535377499
+    },
+    "C": {
+      "total_pct": 21.047541082224754,
+      "total_s": 3.4987049713439937,
+      "ttft_mean_pct": 28.684610348866492,
+      "ttft_mean_s": 3.0848161426734926
+    }
+  },
+  "async_save_shares": {
+    "combined_pct_of_total": 46.06498713197216,
+    "combined_s": 9.269,
+    "save_collect_pct_of_total": 32.51733852675519,
+    "save_collect_raw_gib_per_s": 0.339028231506954,
+    "save_collect_s": 6.543,
+    "save_encode_persist_pct_of_total": 13.547648605216972,
+    "save_encode_persist_raw_gib_per_s": 0.8137423766507703,
+    "save_encode_persist_s": 2.726,
+    "warm_raw_tensor_bytes": 2381840384,
+    "warm_suffix_blocks": 2596,
+    "warm_total_s": 20.121572971343994
+  },
+  "normalized_telys_ratios": {
+    "C_over_A_total": {
+      "change_pct": 19.973650074810536,
+      "current": 0.9807259152553556,
+      "previous": 0.8174510941726087
+    },
+    "C_over_A_ttft_mean": {
+      "change_pct": 17.69121938959306,
+      "current": 1.3389203264324852,
+      "previous": 1.1376552417222048
+    },
+    "C_over_B_total": {
+      "change_pct": 2.032489280517291,
+      "current": 1.4870444179579003,
+      "previous": 1.4574224626330328
+    },
+    "C_over_B_ttft_mean": {
+      "change_pct": -2.448615090586004,
+      "current": 1.68640280982186,
+      "previous": 1.728732822591755
+    }
+  }
+}

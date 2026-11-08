@@ -35,7 +35,7 @@ BLOCK_SIZE = 16
 # in a KVSlab managed by TelysBlockStore.
 _SHARED_STORE: dict[str, dict[str, str]] = {}
 
-#: Map from chunk start key (without the trailing /count) to max block count.
+#: Map from namespace/chunk/start to the maximum stored block count.
 _CHUNK_LENGTHS: dict[str, int] = {}
 
 #: Every client handed out via make_fake_client, oldest first.
@@ -49,7 +49,11 @@ def reset_fakes() -> None:
 
 
 def _chunk_start_key(key: str) -> str:
-    return key.rsplit("/", 1)[0]
+    prefix, marker, chunk_key = key.rpartition("/chunk/")
+    if not marker:
+        return key.rsplit("/", 1)[0]
+    start_hash = chunk_key.split("/", 1)[0]
+    return f"{prefix}{marker}{start_hash}"
 
 
 def track_chunk_key(key: str) -> None:
@@ -68,6 +72,9 @@ def untrack_chunk_key(key: str) -> None:
     """Remove a chunk key from the shared chunk-length map."""
     start_key = _chunk_start_key(key)
     _CHUNK_LENGTHS.pop(start_key, None)
+    for remaining_key in _SHARED_STORE:
+        if "/chunk/" in remaining_key and _chunk_start_key(remaining_key) == start_key:
+            track_chunk_key(remaining_key)
 
 
 def _provenance(key: str) -> TelysProvenance:
@@ -93,6 +100,21 @@ class FakeTelysClient(TelysClient):
 
     def contains(self, key: str) -> bool:
         return key in _SHARED_STORE
+
+    def keys(self) -> set[str]:
+        return set(_SHARED_STORE)
+
+    def chunk_candidates(self, start_key: str) -> dict[int, str]:
+        candidates: dict[int, str] = {}
+        for key in _SHARED_STORE:
+            if not key.startswith(f"{start_key}/"):
+                continue
+            parts = key[len(start_key) + 1 :].split("/")
+            if len(parts) == 2 and parts[1].isdigit():
+                candidates[int(parts[1])] = key
+            elif len(parts) == 1 and parts[0].isdigit():
+                candidates[int(parts[0])] = key
+        return candidates
 
     def chunk_length(self, start_key: str) -> int:
         return _CHUNK_LENGTHS.get(start_key, 0)
@@ -198,6 +220,7 @@ class FakeRequest:
     ) -> None:
         self.request_id = request_id
         self._num_tokens = num_tokens
+        self.num_prompt_tokens = num_tokens
         self.prompt_token_ids = list(range(num_tokens))
         full_blocks = num_tokens // BLOCK_SIZE
         self.block_hashes: list[bytes] = (
@@ -209,6 +232,11 @@ class FakeRequest:
     @property
     def num_tokens(self) -> int:
         return self._num_tokens
+
+    def append_output_token_ids(self, token_ids: list[int]) -> None:
+        """Mirror vLLM extending token count and full-block hashes on decode."""
+        self._num_tokens += len(token_ids)
+        self.block_hashes = make_hashes(self._num_tokens // BLOCK_SIZE)
 
 
 #: Temporary directories created when callers don't supply a pytest tmp_path.

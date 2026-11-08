@@ -7,11 +7,9 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      publish:
-        description: "Publish to PyPI (only meaningful on a tag)"
-        type: boolean
-        default: false
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,20 +21,46 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: "3.12"
 
+      - name: Validate release tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import sys
+          import tomllib
+          from pathlib import Path
+
+          with Path("pyproject.toml").open("rb") as stream:
+              version = tomllib.load(stream)["project"]["version"]
+          tag = os.environ["GITHUB_REF_NAME"]
+          stable_version = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+          if not re.fullmatch(stable_version, version) or tag != f"v{version}":
+              print(
+                  f"::error::Release tag must be v{version} for the stable "
+                  f"pyproject.toml version; received {tag}.",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+          PY
+
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v4.1.0
+        uses: astral-sh/setup-uv@5f42d5af6c403a722299fda36d451c39f302a433 # v4.1.0
 
       - name: Install package + dev + vllm extras
         run: uv pip install --system -e ".[dev,vllm]"
 
       - name: Install ruff
-        run: uv pip install --system ruff
+        run: uv pip install --system "ruff==0.17.3"
 
       - name: Lint with ruff
         run: ruff check telys_vllm tests bench
@@ -49,34 +73,33 @@ jobs:
 
       - name: Upload wheel artifact
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: dist
           path: dist
+          if-no-files-found: error
 
   publish-pypi:
     name: Publish to PyPI
-    needs: [guard]
-    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish == true) }}
+    needs: [guard, publish-ghcr]
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: pypi
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v4.1.0
+        uses: astral-sh/setup-uv@5f42d5af6c403a722299fda36d451c39f302a433 # v4.1.0
 
       - name: Download wheel artifact
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: dist
           path: dist
-
-      - name: Build wheel (manual dispatch fallback)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
-        run: uv build --wheel --out-dir dist
 
       - name: Publish to PyPI
         env:
@@ -89,3 +112,306 @@ jobs:
             exit 1
           fi
           uv publish dist/*.whl
+
+  publish-ghcr:
+    name: Publish signed image to GHCR
+    needs: [guard]
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: ghcr
+    permissions:
+      artifact-metadata: write
+      attestations: write
+      contents: read
+      id-token: write
+      packages: write
+    env:
+      EXPECTED_BASE_DIGEST: sha256:9c233cb2cb372045b265ecbb47bddb37c5104bded923311515084f4006fd5562
+      EXPECTED_BASE_IMAGE: runpod/worker-v1-vllm:v2.30.3
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/telys-worker-vllm
+      INTEGRATION_DOCKERFILE: integrations/runpod-worker-vllm/Dockerfile
+    outputs:
+      base-image-ref: ${{ steps.base.outputs.ref }}
+      image-digest: ${{ steps.image.outputs.digest }}
+      image-ref: ${{ steps.image.outputs.ref }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          version: v0.38.2
+          driver: docker-container
+          driver-opts: image=moby/buildkit:v0.34.2@sha256:c5f8862f52499773af85bc07695b2379ef08e8002352b0df2c4864c91d78dabe
+
+      - name: Pin and verify the integration base image
+        id: base
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          source = Path(os.environ["INTEGRATION_DOCKERFILE"]).read_text()
+          bases = re.findall(r"(?mi)^FROM[ \t]+([^ \t\r\n]+)", source)
+          expected = os.environ["EXPECTED_BASE_IMAGE"]
+          if bases != [expected]:
+              raise SystemExit(
+                  f"Expected exactly one FROM {expected!r}; found {bases!r}. "
+                  "Update the reviewed base image tag and digest together."
+              )
+          PY
+
+          base_ref="${EXPECTED_BASE_IMAGE}@${EXPECTED_BASE_DIGEST}"
+          manifest="$RUNNER_TEMP/telys-vllm-base-manifest.json"
+          docker buildx imagetools inspect --raw "$base_ref" > "$manifest"
+          actual_digest="sha256:$(python3 -c 'import hashlib, pathlib, sys; print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())' "$manifest")"
+          if [[ "$actual_digest" != "$EXPECTED_BASE_DIGEST" ]]; then
+            echo "::error::Base image manifest hash does not match the reviewed digest."
+            exit 1
+          fi
+
+          pinned_dockerfile="$RUNNER_TEMP/Dockerfile.telys-vllm.pinned"
+          BASE_REF="$base_ref" PINNED_DOCKERFILE="$pinned_dockerfile" python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          source_path = Path(os.environ["INTEGRATION_DOCKERFILE"])
+          source = source_path.read_text()
+          original = f"FROM {os.environ['EXPECTED_BASE_IMAGE']}"
+          replacement = f"FROM {os.environ['BASE_REF']}"
+          if source.count(original) != 1:
+              raise SystemExit("Could not uniquely pin the integration base image.")
+          Path(os.environ["PINNED_DOCKERFILE"]).write_text(
+              source.replace(original, replacement, 1)
+          )
+          PY
+          {
+            echo "dockerfile=$pinned_dockerfile"
+            echo "ref=$base_ref"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Generate release image metadata
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          flavor: latest=false
+          tags: type=semver,pattern={{version}}
+          labels: |
+            org.opencontainers.image.base.name=${{ steps.base.outputs.ref }}
+            org.opencontainers.image.base.digest=${{ env.EXPECTED_BASE_DIGEST }}
+
+      - name: Log in to GHCR
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push the release image
+        id: publish
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: ${{ steps.base.outputs.dockerfile }}
+          platforms: linux/amd64
+          pull: true
+          push: true
+          no-cache: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: mode=max
+          sbom: true
+
+      - name: Bind the immutable image reference
+        id: image
+        env:
+          IMAGE_DIGEST: ${{ steps.publish.outputs.digest }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "::error::Build output did not contain a valid SHA-256 image digest."
+            exit 1
+          fi
+          {
+            echo "digest=$IMAGE_DIGEST"
+            echo "ref=${IMAGE_NAME}@${IMAGE_DIGEST}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
+        with:
+          cosign-release: v3.1.4
+
+      - name: Sign the image digest with Sigstore keyless
+        env:
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: cosign sign --yes --oidc-provider=github-actions "$IMAGE_REF"
+
+      - name: Attest build provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.image.outputs.digest }}
+          push-to-registry: true
+          create-storage-record: true
+
+      - name: Verify the published image, signature, and provenance
+        id: release
+        env:
+          BASE_IMAGE_REF: ${{ steps.base.outputs.ref }}
+          EXPECTED_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/publish.yml@${{ github.ref }}
+          GH_TOKEN: ${{ github.token }}
+          IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
+          IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          set -euo pipefail
+          mapfile -t tags <<< "$IMAGE_TAGS"
+          expected_tag="${IMAGE_NAME}:${GITHUB_REF_NAME#v}"
+          if [[ "${#tags[@]}" -ne 1 || "${tags[0]}" != "$expected_tag" ]]; then
+            echo "::error::Expected exactly one release tag: $expected_tag"
+            exit 1
+          fi
+
+          manifest="$RUNNER_TEMP/telys-vllm-published-manifest.json"
+          docker buildx imagetools inspect --raw "${tags[0]}" > "$manifest"
+          remote_digest="sha256:$(python3 -c 'import hashlib, pathlib, sys; print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())' "$manifest")"
+          if [[ "$remote_digest" != "$IMAGE_DIGEST" ]]; then
+            echo "::error::The published tag digest differs from the signed build digest."
+            exit 1
+          fi
+
+          cosign verify \
+            --certificate-identity "$EXPECTED_IDENTITY" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            --certificate-github-workflow-ref "$GITHUB_REF" \
+            --certificate-github-workflow-repository "$GITHUB_REPOSITORY" \
+            --certificate-github-workflow-sha "$GITHUB_SHA" \
+            --certificate-github-workflow-trigger "push" \
+            --output json \
+            "$IMAGE_REF" > "$RUNNER_TEMP/telys-vllm-cosign-verification.json"
+
+          gh attestation verify "oci://$IMAGE_REF" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/publish.yml" \
+            --cert-identity "$EXPECTED_IDENTITY" \
+            --source-digest "$GITHUB_SHA" \
+            --source-ref "$GITHUB_REF" \
+            --deny-self-hosted-runners \
+            --bundle-from-oci \
+            --format json > "$RUNNER_TEMP/telys-vllm-provenance-verification.json"
+
+          evidence="$RUNNER_TEMP/ghcr-image-${GITHUB_REF_NAME#v}.json"
+          EVIDENCE_FILE="$evidence" IMAGE_TAG="${tags[0]}" python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          evidence = {
+              "base_image": os.environ["BASE_IMAGE_REF"],
+              "image": os.environ["IMAGE_REF"],
+              "provenance": {
+                  "certificate_identity": os.environ["EXPECTED_IDENTITY"],
+                  "predicate_type": "https://slsa.dev/provenance/v1",
+                  "verified": True,
+              },
+              "signature": {
+                  "certificate_identity": os.environ["EXPECTED_IDENTITY"],
+                  "keyless": True,
+                  "oidc_issuer": "https://token.actions.githubusercontent.com",
+                  "verified": True,
+              },
+              "source": {
+                  "ref": os.environ["GITHUB_REF"],
+                  "repository": os.environ["GITHUB_REPOSITORY"],
+                  "sha": os.environ["GITHUB_SHA"],
+              },
+              "tag": os.environ["IMAGE_TAG"],
+          }
+          Path(os.environ["EVIDENCE_FILE"]).write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+          echo "evidence-file=$evidence" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Verified GHCR release"
+            echo
+            echo "\`$IMAGE_REF\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload immutable release reference
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          name: ghcr-image-${{ github.ref_name }}
+          path: ${{ steps.release.outputs.evidence-file }}
+          if-no-files-found: error
+          retention-days: 90
+
+  release:
+    name: Create GitHub Release
+    needs: [publish-pypi, publish-ghcr]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download wheel
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: dist
+          path: dist
+
+      - name: Download signed image evidence
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: ghcr-image-${{ github.ref_name }}
+          path: release-image
+
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' -print)
+          if [[ "${#wheels[@]}" -ne 1 ]]; then
+            echo "::error::Expected exactly one release wheel, found ${#wheels[@]}."
+            exit 1
+          fi
+          image_file=$(find release-image -maxdepth 1 -type f -name '*.json' -print -quit)
+          if [[ -z "$image_file" ]]; then
+            echo "::error::Signed GHCR evidence is missing."
+            exit 1
+          fi
+          image_ref=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["image"])' "$image_file")
+          if [[ "$image_ref" != ghcr.io/thyn-ai/telys-worker-vllm@sha256:* ]]; then
+            echo "::error::Unexpected image reference: $image_ref"
+            exit 1
+          fi
+          cat > release-notes.md <<EOF
+          ## telys-vllm ${GITHUB_REF_NAME}
+
+          - Wheel: \`${wheels[0]##*/}\`
+          - Image: \`${image_ref}\`
+          - Source: \`${GITHUB_SHA}\`
+          - Sigstore signature and SLSA provenance verified before publication.
+          - Async KV loading remains disabled in this revision.
+          EOF
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" \
+              --title "telys-vllm ${GITHUB_REF_NAME}" \
+              --notes-file release-notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "telys-vllm ${GITHUB_REF_NAME}" \
+              --notes-file release-notes.md
+          fi
+          gh release upload "$GITHUB_REF_NAME" --clobber \
+            "${wheels[0]}" "$image_file"

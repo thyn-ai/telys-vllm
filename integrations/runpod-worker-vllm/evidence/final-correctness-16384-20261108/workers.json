@@ -1,0 +1,270 @@
+{
+  "all_engine_ids_present": true,
+  "all_main_pids_present": true,
+  "distinct_engine_ids": 4,
+  "distinct_main_pids": 4,
+  "processes": [
+    {
+      "engine_id": "b362e890-c813-455e-be9d-ccb03c10216a",
+      "lookup_count": 1,
+      "lookups": [
+        {
+          "hit_blocks": 0,
+          "hit_tokens": 0,
+          "max_block": 1077,
+          "num_computed": 0,
+          "num_tokens": 17241,
+          "request": "0-b899f4ff",
+          "start_block": 0
+        }
+      ],
+      "main_pid": 63662,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/arm_C_cold.log",
+      "phase": "cold"
+    },
+    {
+      "engine_id": "619df941-324e-4596-b988-238e87ef987a",
+      "lookup_count": 20,
+      "lookups": [
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1209,
+          "num_computed": 0,
+          "num_tokens": 19351,
+          "request": "0-9c3a2768",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1219,
+          "num_computed": 0,
+          "num_tokens": 19516,
+          "request": "1-b73de24d",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1181,
+          "num_computed": 0,
+          "num_tokens": 18901,
+          "request": "2-b9bc9c39",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1223,
+          "num_computed": 0,
+          "num_tokens": 19581,
+          "request": "3-b7355f72",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1208,
+          "num_computed": 0,
+          "num_tokens": 19330,
+          "request": "4-95b7bc4f",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1341,
+          "num_computed": 0,
+          "num_tokens": 21459,
+          "request": "5-a0301002",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1107,
+          "num_computed": 0,
+          "num_tokens": 17714,
+          "request": "6-bdbd474f",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1106,
+          "num_computed": 0,
+          "num_tokens": 17709,
+          "request": "7-8c4d4b26",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1145,
+          "num_computed": 0,
+          "num_tokens": 18331,
+          "request": "8-bdccd3d0",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1241,
+          "num_computed": 0,
+          "num_tokens": 19863,
+          "request": "9-90061158",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1140,
+          "num_computed": 0,
+          "num_tokens": 18251,
+          "request": "10-a03f2c07",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1337,
+          "num_computed": 0,
+          "num_tokens": 21406,
+          "request": "11-b4b9760c",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1093,
+          "num_computed": 0,
+          "num_tokens": 17495,
+          "request": "12-a920835b",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1153,
+          "num_computed": 0,
+          "num_tokens": 18452,
+          "request": "13-ba768df4",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1328,
+          "num_computed": 0,
+          "num_tokens": 21250,
+          "request": "14-a6ecd61f",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1100,
+          "num_computed": 0,
+          "num_tokens": 17616,
+          "request": "15-abd968ee",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1304,
+          "num_computed": 0,
+          "num_tokens": 20876,
+          "request": "16-9660aded",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1217,
+          "num_computed": 0,
+          "num_tokens": 19479,
+          "request": "17-a0f56cdb",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1293,
+          "num_computed": 0,
+          "num_tokens": 20696,
+          "request": "18-90e056ff",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1308,
+          "num_computed": 0,
+          "num_tokens": 20936,
+          "request": "19-aec5d8b4",
+          "start_block": 0
+        }
+      ],
+      "main_pid": 64177,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/arm_C_warm.log",
+      "phase": "warm"
+    },
+    {
+      "engine_id": "98b23a8e-ca24-419a-9487-45ce9d6c1292",
+      "lookup_count": 2,
+      "lookups": [
+        {
+          "hit_blocks": 0,
+          "hit_tokens": 0,
+          "max_block": 1077,
+          "num_computed": 0,
+          "num_tokens": 17241,
+          "request": "0-a2d7482b",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1077,
+          "num_computed": 0,
+          "num_tokens": 17241,
+          "request": "1-953ac828",
+          "start_block": 0
+        }
+      ],
+      "main_pid": 66038,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/arm_C_run1.log",
+      "phase": "run1"
+    },
+    {
+      "engine_id": "5445702b-1b42-4f09-9a01-2884cc5222b0",
+      "lookup_count": 2,
+      "lookups": [
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1077,
+          "num_computed": 0,
+          "num_tokens": 17241,
+          "request": "0-a5d6fc98",
+          "start_block": 0
+        },
+        {
+          "hit_blocks": 1077,
+          "hit_tokens": 17232,
+          "max_block": 1077,
+          "num_computed": 0,
+          "num_tokens": 17241,
+          "request": "1-997b08f5",
+          "start_block": 0
+        }
+      ],
+      "main_pid": 66477,
+      "path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/arm_C_run2.log",
+      "phase": "run2"
+    }
+  ],
+  "sequential_fresh_processes_have_distinct_engines": true
+}

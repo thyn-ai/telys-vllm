@@ -51,22 +51,13 @@ def _is_mla(attn_metadata: AttentionMetadata | None) -> bool:
     return isinstance(attn_metadata, MLACommonMetadata)
 
 
-def extract_kv_blocks(
+def _extract_kv_blocks_on_device(
     kv_layer: torch.Tensor,
     block_ids: list[int],
     block_size: int,
     attn_metadata: AttentionMetadata | None,
-) -> list[torch.Tensor]:
-    """Extract one CPU tensor per block from a paged KV layer.
-
-    Returns a list aligned with ``block_ids``.  Serialization is deferred to
-    the caller so the connector can group blocks into chunks before paying for
-    ``torch.save`` / codec framing.
-    """
-    _require_torch()
-    if not block_ids:
-        return []
-
+) -> torch.Tensor:
+    """Select all requested blocks without initiating a host transfer."""
     slot_mapping = _slot_mapping(block_ids, block_size, kv_layer.device)
 
     if _is_mla(attn_metadata):
@@ -82,7 +73,156 @@ def extract_kv_blocks(
             len(block_ids), block_size, extracted.shape[1], extracted.shape[2]
         )
 
-    return [extracted[i].detach().cpu() for i in range(len(block_ids))]
+    return extracted.detach()
+
+
+def _extract_kv_blocks_stacked(
+    kv_layer: torch.Tensor,
+    block_ids: list[int],
+    block_size: int,
+    attn_metadata: AttentionMetadata | None,
+) -> torch.Tensor:
+    """Extract all requested blocks and copy them to CPU in one transfer."""
+    return _extract_kv_blocks_on_device(
+        kv_layer, block_ids, block_size, attn_metadata
+    ).cpu()
+
+
+class AsyncKVExtractionBatch:
+    """Batched pinned D2H extraction for the connector fast-save path.
+
+    Outputs must not be read until the context exits. A single CUDA event is
+    recorded and synchronized at exit, and the batch retains pinned buffers
+    until that drain completes. Hosts without pinned memory use the original
+    blocking transfer; nonblocking copy or stream failures are fatal.
+    """
+
+    def __init__(self) -> None:
+        self._stream: torch.cuda.Stream | None = None
+        self._copy_started = False
+        self._closed = False
+        self._pinned_buffers: list[torch.Tensor] = []
+
+    def __enter__(self):
+        if self._closed:
+            raise RuntimeError("async KV extraction batch is closed")
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        try:
+            try:
+                self._synchronize()
+            except Exception as sync_exc:
+                if exc_value is None:
+                    raise
+                sync_failure = str(sync_exc)
+                if sync_exc.__cause__ is not None:
+                    sync_failure += f"; cause: {sync_exc.__cause__}"
+                note = (
+                    "async KV extraction synchronization failure while handling "
+                    f"the original exception: {sync_failure}"
+                )
+                add_note = getattr(exc_value, "add_note", None)
+                if add_note is not None:
+                    add_note(note)
+                else:
+                    exc_value.__notes__ = [
+                        *getattr(exc_value, "__notes__", []),
+                        note,
+                    ]
+        finally:
+            self._closed = True
+            if not self._copy_started:
+                self._pinned_buffers.clear()
+        return False
+
+    def extract(
+        self,
+        kv_layer: torch.Tensor,
+        block_ids: list[int],
+        block_size: int,
+        attn_metadata: AttentionMetadata | None,
+    ) -> torch.Tensor:
+        """Stage one stacked layer, or fall back to a synchronous CPU copy."""
+        _require_torch()
+        if self._closed:
+            raise RuntimeError("async KV extraction batch is closed")
+        if not block_ids:
+            raise ValueError("async KV extraction requires at least one block")
+
+        source = _extract_kv_blocks_on_device(
+            kv_layer, block_ids, block_size, attn_metadata
+        )
+        if not source.is_cuda:
+            return source.cpu()
+        try:
+            pinned = torch.empty(
+                source.shape, dtype=source.dtype, device="cpu", pin_memory=True
+            )
+        except (RuntimeError, TypeError) as exc:
+            error_text = str(exc).lower()
+            pinning_unavailable = isinstance(exc, TypeError) or any(
+                marker in error_text
+                for marker in ("pin_memory", "pin memory", "pinned memory")
+            )
+            if pinning_unavailable:
+                return source.cpu()
+            raise
+        if not pinned.is_pinned():
+            return source.cpu()
+
+        stream = torch.cuda.current_stream(source.device)
+        if self._stream is not None and stream != self._stream:
+            raise RuntimeError(
+                "async KV extraction requires one CUDA stream per save batch; "
+                "use synchronous extraction"
+            )
+        self._stream = stream
+        self._pinned_buffers.append(pinned)
+        self._copy_started = True
+        try:
+            pinned.copy_(source, non_blocking=True)
+        except Exception as exc:
+            raise RuntimeError(
+                "nonblocking pinned KV extraction failed on this stack; "
+                "use synchronous extraction"
+            ) from exc
+        return pinned
+
+    def _synchronize(self) -> None:
+        if not self._copy_started:
+            return
+        assert self._stream is not None
+        try:
+            event = torch.cuda.Event()
+            event.record(self._stream)
+            event.synchronize()
+        except Exception as exc:
+            raise RuntimeError(
+                "failed to synchronize async KV extraction; use synchronous extraction"
+            ) from exc
+        self._copy_started = False
+
+
+def extract_kv_blocks(
+    kv_layer: torch.Tensor,
+    block_ids: list[int],
+    block_size: int,
+    attn_metadata: AttentionMetadata | None,
+) -> list[torch.Tensor]:
+    """Extract one CPU tensor per block from a paged KV layer.
+
+    Returns a list aligned with ``block_ids``. The blocks are views of one
+    stacked CPU allocation, populated by a single device-to-host transfer.
+    Serialization is deferred to the caller so the connector can group blocks
+    into chunks before paying for ``torch.save`` / codec framing.
+    """
+    _require_torch()
+    if not block_ids:
+        return []
+
+    stacked = _extract_kv_blocks_stacked(kv_layer, block_ids, block_size, attn_metadata)
+    return list(stacked.unbind(dim=0))
 
 
 def serialize_kv_tensor(tensor: torch.Tensor) -> bytes:
@@ -97,7 +237,7 @@ def serialize_kv_tensor(tensor: torch.Tensor) -> bytes:
         [tensor.nbytes of raw data]
 
     This avoids pickle/torch.save overhead and makes deserialization a
-    zero-copy ``torch.frombuffer`` view.
+    zero-copy ``torch.frombuffer`` view for immutable bytes inputs.
     """
     _require_torch()
     if tensor.ndim > 4:
@@ -163,14 +303,17 @@ def _code_to_dtype(code: int) -> torch.dtype:
         raise ValueError(f"unknown dtype code: {code}") from exc
 
 
-def deserialize_kv_tensor(buf: bytes) -> torch.Tensor:
+def deserialize_kv_tensor(buf: bytes | bytearray | memoryview) -> torch.Tensor:
     """Deserialize a KV block tensor from raw bytes or a legacy torch.save blob.
 
-    Raw-byte blobs are decoded with ``torch.frombuffer`` (zero-copy). Legacy
-    blobs produced by older versions with ``torch.save`` are detected by the
-    pickle protocol marker and decoded with ``torch.load``.
+    Immutable bytes are decoded with ``torch.frombuffer`` (zero-copy); other
+    bytes-like inputs are copied first to isolate tensors from later mutation.
+    Legacy blobs produced by older versions with ``torch.save`` are detected by
+    the pickle protocol marker and decoded with ``torch.load``.
     """
     _require_torch()
+    if not isinstance(buf, bytes):
+        buf = bytes(buf)
     if (
         len(buf) < 3
         or buf[0] != _RAW_FORMAT_VERSION

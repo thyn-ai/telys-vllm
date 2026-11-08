@@ -1,0 +1,4299 @@
+{
+  "block_count": [
+    77,
+    269,
+    512
+  ],
+  "commit": "5ae131d5fea4577c88806f118c3520d588fd9461",
+  "component_repeats": 7,
+  "cuda": "13.0",
+  "device": "NVIDIA A40",
+  "device_total_memory_bytes": 47699722240,
+  "dtype": "torch.bfloat16",
+  "exact_repeats": 11,
+  "layer_is_contiguous": false,
+  "layer_shape": [
+    31181,
+    4,
+    16,
+    256
+  ],
+  "layer_stride": [
+    16384,
+    256,
+    1024,
+    1
+  ],
+  "logical_layout": "LBHNC",
+  "logical_shape": [
+    28,
+    31181,
+    4,
+    16,
+    256
+  ],
+  "logical_stride": [
+    510869504,
+    16384,
+    256,
+    1024,
+    1
+  ],
+  "method_notes": [
+    "old_connector_exact reproduces parent 0438349: extract_kv_blocks followed by torch.stack for each of 28 layers.",
+    "old_transfer_only times only _extract_kv_blocks_stacked, whose .cpu() includes pageable allocation and synchronous D2H.",
+    "new_async_exact invokes the unchanged AsyncKVExtractionBatch at commit 5ae131d.",
+    "Exact paths are interleaved in forward/reverse order and synchronized before each call.",
+    "pinned_event_wait_including_copy_completion is not pure event API overhead; idle_event_record_sync separately measures an idle event.",
+    "pinned_cuda_copy_span uses CUDA events around preallocated pinned copies and includes host enqueue gaps on the same stream.",
+    "device_contiguous_clone is a hypothetical extra contiguous GPU copy; the actual extracted source is already contiguous.",
+    "Input generation is seeded; all measured extraction operations are deterministic."
+  ],
+  "physical_layout": "LBNHC",
+  "physical_shape": [
+    28,
+    31181,
+    16,
+    4,
+    256
+  ],
+  "physical_stride": [
+    510869504,
+    16384,
+    1024,
+    256,
+    1
+  ],
+  "python": "3.12.3 (main, Nov  6 2025, 13:44:16) [GCC 13.3.0]",
+  "runs": {
+    "269": {
+      "block_ids": [
+        18695,
+        8694,
+        16134,
+        24394,
+        26518,
+        11787,
+        3717,
+        14199,
+        26657,
+        27078,
+        8574,
+        16100,
+        6793,
+        1027,
+        14650,
+        16780,
+        28520,
+        8204,
+        29294,
+        22928,
+        11868,
+        28066,
+        21689,
+        13063,
+        7780,
+        9822,
+        25051,
+        22078,
+        9714,
+        30944,
+        7649,
+        29789,
+        7281,
+        312,
+        30460,
+        19239,
+        13451,
+        8495,
+        19967,
+        270,
+        10068,
+        11460,
+        19207,
+        1989,
+        10558,
+        16852,
+        4429,
+        27712,
+        14414,
+        8902,
+        1007,
+        378,
+        17072,
+        27088,
+        10615,
+        29155,
+        14245,
+        18133,
+        18705,
+        20188,
+        30202,
+        31132,
+        27116,
+        5243,
+        3686,
+        14200,
+        9889,
+        8052,
+        25484,
+        30901,
+        26602,
+        4586,
+        9322,
+        26479,
+        20143,
+        24833,
+        6225,
+        29443,
+        16071,
+        22445,
+        27199,
+        8001,
+        24234,
+        24338,
+        6699,
+        8219,
+        26794,
+        2172,
+        15387,
+        2414,
+        27926,
+        3180,
+        7898,
+        27403,
+        28017,
+        13112,
+        13958,
+        26550,
+        4521,
+        9967,
+        22011,
+        31034,
+        19917,
+        11576,
+        401,
+        12965,
+        3404,
+        9305,
+        29756,
+        20040,
+        30386,
+        7507,
+        11955,
+        19526,
+        14957,
+        17288,
+        22361,
+        25373,
+        19973,
+        10591,
+        21660,
+        4925,
+        18563,
+        30450,
+        12673,
+        16498,
+        215,
+        16879,
+        15354,
+        13614,
+        1684,
+        21877,
+        282,
+        13072,
+        2474,
+        18824,
+        25030,
+        23785,
+        11469,
+        28338,
+        13220,
+        24544,
+        6032,
+        8485,
+        1324,
+        773,
+        945,
+        9690,
+        15317,
+        3951,
+        2832,
+        4171,
+        10193,
+        5490,
+        5627,
+        15860,
+        1740,
+        5913,
+        1246,
+        4512,
+        11047,
+        7804,
+        29669,
+        30675,
+        11837,
+        15854,
+        702,
+        1844,
+        13835,
+        3479,
+        12002,
+        14979,
+        30194,
+        6587,
+        28204,
+        2182,
+        6372,
+        4085,
+        20688,
+        4642,
+        10660,
+        27722,
+        25150,
+        7749,
+        7493,
+        18579,
+        30104,
+        4641,
+        5836,
+        380,
+        5205,
+        10301,
+        15744,
+        16770,
+        31066,
+        25838,
+        7228,
+        26900,
+        24189,
+        24882,
+        9141,
+        26364,
+        11262,
+        13464,
+        23059,
+        25693,
+        25162,
+        4012,
+        26294,
+        6743,
+        29387,
+        26683,
+        27262,
+        6503,
+        1660,
+        10049,
+        21049,
+        28016,
+        21875,
+        17517,
+        26308,
+        14056,
+        1150,
+        13825,
+        15613,
+        1679,
+        29441,
+        3773,
+        3320,
+        12649,
+        30895,
+        27485,
+        22214,
+        17380,
+        4852,
+        19128,
+        25073,
+        5944,
+        15527,
+        7135,
+        17282,
+        16544,
+        8412,
+        21920,
+        12957,
+        19171,
+        24088,
+        25698,
+        27673,
+        22856,
+        19165,
+        3998,
+        2791,
+        1536,
+        22149,
+        21693,
+        29802,
+        14034,
+        3825,
+        13015,
+        20595,
+        6304,
+        20194,
+        14339,
+        5586,
+        26689,
+        12259,
+        23424,
+        12342
+      ],
+      "components": {
+        "layout": {
+          "all_sources_contiguous": true,
+          "component_copy_parity": true,
+          "contiguous_noop_total_s": 6.894e-06,
+          "contiguous_returns_same_object": true,
+          "source_shape": [
+            269,
+            16,
+            4,
+            256
+          ],
+          "source_stride": [
+            16384,
+            1024,
+            256,
+            1
+          ],
+          "view_shares_storage": true,
+          "view_total_s": 7.4098e-05
+        },
+        "raw_s": {
+          "device_contiguous_clone_s": [
+            0.001058644,
+            0.00098187,
+            0.00097066,
+            0.000970724,
+            0.000982293,
+            0.000969221,
+            0.000981132
+          ],
+          "device_gather_enqueue_s": [
+            0.004364528,
+            0.004250457,
+            0.004340025,
+            0.004681583,
+            0.004288793,
+            0.004322628,
+            0.004582216
+          ],
+          "device_gather_total_s": [
+            0.004402811,
+            0.004289362,
+            0.004388392,
+            0.004719818,
+            0.004326967,
+            0.004364816,
+            0.004620796
+          ],
+          "idle_event_record_sync_s": [
+            9.1531e-05,
+            8.7356e-05,
+            0.000113056,
+            0.000302231,
+            8.0374e-05,
+            0.000117806,
+            0.000122451
+          ],
+          "old_cpu_unbind_stack_s": [
+            0.132580948,
+            0.11371715,
+            0.120966759,
+            0.131112409,
+            0.127441149,
+            0.120721711,
+            0.131703591
+          ],
+          "pageable_allocation_s": [
+            0.000320268,
+            0.000323105,
+            0.000267072,
+            0.000321521,
+            0.000322503,
+            0.000285448,
+            0.000340466
+          ],
+          "pageable_cpu_method_s": [
+            0.175834416,
+            0.155679587,
+            0.150608046,
+            0.226733619,
+            0.220625379,
+            0.193517518,
+            0.23268723
+          ],
+          "pageable_preallocated_copy_s": [
+            0.162341559,
+            0.13341693,
+            0.14109492,
+            0.223958372,
+            0.199691606,
+            0.157515061,
+            0.218131615
+          ],
+          "pinned_allocation_s": [
+            0.000337545,
+            0.0002172,
+            0.000243798,
+            0.000280945,
+            0.000296916,
+            0.000265291,
+            0.00030368
+          ],
+          "pinned_copy_enqueue_s": [
+            0.00025602,
+            0.000220806,
+            0.000265754,
+            0.000318583,
+            0.000295293,
+            0.000292375,
+            0.00029795
+          ],
+          "pinned_cuda_copy_span_s": [
+            0.01107868766784668,
+            0.010641311645507813,
+            0.011147232055664062,
+            0.012014687538146973,
+            0.01197980785369873,
+            0.013412063598632812,
+            0.012115072250366211
+          ],
+          "pinned_event_record_s": [
+            1.8314e-05,
+            1.535e-05,
+            1.5091e-05,
+            2.1537e-05,
+            1.8545e-05,
+            2.1923e-05,
+            2.449e-05
+          ],
+          "pinned_event_wait_including_copy_completion_s": [
+            0.010809523,
+            0.010410708,
+            0.010881346,
+            0.011677604,
+            0.011669625,
+            0.013113408,
+            0.011806738
+          ]
+        },
+        "stats": {
+          "device_contiguous_clone_s": {
+            "count": 7,
+            "max_s": 0.001058644,
+            "mean_s": 0.000987792,
+            "median_s": 0.000981132,
+            "min_s": 0.000969221,
+            "q1_s": 0.00097066,
+            "q3_s": 0.000982293,
+            "stdev_s": 3.177885743173704e-05,
+            "total_s": 0.006914544
+          },
+          "device_gather_enqueue_s": {
+            "count": 7,
+            "max_s": 0.004681583,
+            "mean_s": 0.004404318571428571,
+            "median_s": 0.004340025,
+            "min_s": 0.004250457,
+            "q1_s": 0.004288793,
+            "q3_s": 0.004582216,
+            "stdev_s": 0.00016224102523802563,
+            "total_s": 0.03083023
+          },
+          "device_gather_total_s": {
+            "count": 7,
+            "max_s": 0.004719818,
+            "mean_s": 0.004444708857142857,
+            "median_s": 0.004388392,
+            "min_s": 0.004289362,
+            "q1_s": 0.004326967,
+            "q3_s": 0.004620796,
+            "stdev_s": 0.0001612438116460376,
+            "total_s": 0.031112962
+          },
+          "idle_event_record_sync_s": {
+            "count": 7,
+            "max_s": 0.000302231,
+            "mean_s": 0.00013068642857142856,
+            "median_s": 0.000113056,
+            "min_s": 8.0374e-05,
+            "q1_s": 8.7356e-05,
+            "q3_s": 0.000122451,
+            "stdev_s": 7.736721292825349e-05,
+            "total_s": 0.000914805
+          },
+          "old_cpu_unbind_stack_s": {
+            "count": 7,
+            "max_s": 0.132580948,
+            "mean_s": 0.12546338814285715,
+            "median_s": 0.127441149,
+            "min_s": 0.11371715,
+            "q1_s": 0.120721711,
+            "q3_s": 0.131703591,
+            "stdev_s": 0.007142595827790076,
+            "total_s": 0.878243717
+          },
+          "pageable_allocation_s": {
+            "count": 7,
+            "max_s": 0.000340466,
+            "mean_s": 0.0003114832857142857,
+            "median_s": 0.000321521,
+            "min_s": 0.000267072,
+            "q1_s": 0.000285448,
+            "q3_s": 0.000323105,
+            "stdev_s": 2.5575448472537662e-05,
+            "total_s": 0.002180383
+          },
+          "pageable_cpu_method_s": {
+            "count": 7,
+            "max_s": 0.23268723,
+            "mean_s": 0.1936693992857143,
+            "median_s": 0.193517518,
+            "min_s": 0.150608046,
+            "q1_s": 0.155679587,
+            "q3_s": 0.226733619,
+            "stdev_s": 0.03405357118411069,
+            "total_s": 1.355685795
+          },
+          "pageable_preallocated_copy_s": {
+            "count": 7,
+            "max_s": 0.223958372,
+            "mean_s": 0.17659286614285713,
+            "median_s": 0.162341559,
+            "min_s": 0.13341693,
+            "q1_s": 0.14109492,
+            "q3_s": 0.218131615,
+            "stdev_s": 0.036954563613600604,
+            "total_s": 1.236150063
+          },
+          "pinned_allocation_s": {
+            "count": 7,
+            "max_s": 0.000337545,
+            "mean_s": 0.0002779107142857143,
+            "median_s": 0.000280945,
+            "min_s": 0.0002172,
+            "q1_s": 0.000243798,
+            "q3_s": 0.00030368,
+            "stdev_s": 3.999882745662381e-05,
+            "total_s": 0.001945375
+          },
+          "pinned_copy_enqueue_s": {
+            "count": 7,
+            "max_s": 0.000318583,
+            "mean_s": 0.00027811157142857145,
+            "median_s": 0.000292375,
+            "min_s": 0.000220806,
+            "q1_s": 0.00025602,
+            "q3_s": 0.00029795,
+            "stdev_s": 3.279944683912186e-05,
+            "total_s": 0.001946781
+          },
+          "pinned_cuda_copy_span_s": {
+            "count": 7,
+            "max_s": 0.013412063598632812,
+            "mean_s": 0.011769837515694754,
+            "median_s": 0.01197980785369873,
+            "min_s": 0.010641311645507813,
+            "q1_s": 0.01107868766784668,
+            "q3_s": 0.012115072250366211,
+            "stdev_s": 0.0009182436964629583,
+            "total_s": 0.08238886260986328
+          },
+          "pinned_event_record_s": {
+            "count": 7,
+            "max_s": 2.449e-05,
+            "mean_s": 1.9321428571428573e-05,
+            "median_s": 1.8545e-05,
+            "min_s": 1.5091e-05,
+            "q1_s": 1.535e-05,
+            "q3_s": 2.1923e-05,
+            "stdev_s": 3.5042256803818474e-06,
+            "total_s": 0.00013525
+          },
+          "pinned_event_wait_including_copy_completion_s": {
+            "count": 7,
+            "max_s": 0.013113408,
+            "mean_s": 0.011481278857142856,
+            "median_s": 0.011669625,
+            "min_s": 0.010410708,
+            "q1_s": 0.010809523,
+            "q3_s": 0.011806738,
+            "stdev_s": 0.0008945282135227168,
+            "total_s": 0.080368952
+          }
+        }
+      },
+      "exact": {
+        "median_comparison": {
+          "new_vs_old_connector_pct": -87.46917281380337,
+          "new_vs_old_transfer_only_pct": -89.30270584077685,
+          "old_cpu_restack_share_of_old_connector_pct": -17.14015712461852
+        },
+        "order": [
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ]
+        ],
+        "raw_s": {
+          "new_async_exact": [
+            0.015664395,
+            0.015140962,
+            0.016427948,
+            0.014951101,
+            0.015174401,
+            0.015329601,
+            0.016064328,
+            0.016069335,
+            0.015611714,
+            0.015357885,
+            0.028705346
+          ],
+          "old_connector_exact": [
+            0.119947604,
+            0.139077435,
+            0.09603668,
+            0.12458646,
+            0.126537231,
+            0.118973956,
+            0.123287394,
+            0.13519636,
+            0.099808926,
+            0.138584782,
+            0.210894178
+          ],
+          "old_transfer_only": [
+            0.145940775,
+            0.185880721,
+            0.137608471,
+            0.12744227,
+            0.124847389,
+            0.123942636,
+            0.125372769,
+            0.150244822,
+            0.148710565,
+            0.187258536,
+            0.221265433
+          ]
+        },
+        "stats": {
+          "new_async_exact": {
+            "count": 11,
+            "max_s": 0.028705346,
+            "mean_s": 0.016772456,
+            "median_s": 0.015611714,
+            "min_s": 0.014951101,
+            "q1_s": 0.015174401,
+            "q3_s": 0.016069335,
+            "stdev_s": 0.003983707108280251,
+            "total_s": 0.184497016
+          },
+          "old_connector_exact": {
+            "count": 11,
+            "max_s": 0.210894178,
+            "mean_s": 0.1302664550909091,
+            "median_s": 0.12458646,
+            "min_s": 0.09603668,
+            "q1_s": 0.118973956,
+            "q3_s": 0.138584782,
+            "stdev_s": 0.030166498219645364,
+            "total_s": 1.432931006
+          },
+          "old_transfer_only": {
+            "count": 11,
+            "max_s": 0.221265433,
+            "mean_s": 0.152592217,
+            "median_s": 0.145940775,
+            "min_s": 0.123942636,
+            "q1_s": 0.125372769,
+            "q3_s": 0.185880721,
+            "stdev_s": 0.03206121135189702,
+            "total_s": 1.6785143869999999
+          }
+        },
+        "warmup_s": {
+          "new_async_exact": [
+            0.256714326,
+            0.015719595
+          ],
+          "old_connector_exact": [
+            0.121320464,
+            0.113776586
+          ],
+          "old_transfer_only": [
+            0.204690944,
+            0.145312057
+          ]
+        }
+      },
+      "parity": {
+        "all_sha256_equal": true,
+        "all_torch_equal": true,
+        "layers": [
+          {
+            "layer": 0,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "b70f11980079c2b36f5a9c7e3890cd651e9096d1b9cc33e141154d5adee5e37b",
+            "sha256_old": "b70f11980079c2b36f5a9c7e3890cd651e9096d1b9cc33e141154d5adee5e37b",
+            "sha256_transfer_only": "b70f11980079c2b36f5a9c7e3890cd651e9096d1b9cc33e141154d5adee5e37b",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 1,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "b387eab05d9830da3af1ea96c92a353a66a22dd43e1bc52507cf88dadc606bcd",
+            "sha256_old": "b387eab05d9830da3af1ea96c92a353a66a22dd43e1bc52507cf88dadc606bcd",
+            "sha256_transfer_only": "b387eab05d9830da3af1ea96c92a353a66a22dd43e1bc52507cf88dadc606bcd",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 2,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "6adc88d0e7bb97e9721903a7dde10c13c7ed222a6941357249f1bdd49dcfa884",
+            "sha256_old": "6adc88d0e7bb97e9721903a7dde10c13c7ed222a6941357249f1bdd49dcfa884",
+            "sha256_transfer_only": "6adc88d0e7bb97e9721903a7dde10c13c7ed222a6941357249f1bdd49dcfa884",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 3,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "8462efec33f9fee23df59b84f4f4c2bd6f7dda714f3bf9fc67571c3bcaf7e5b6",
+            "sha256_old": "8462efec33f9fee23df59b84f4f4c2bd6f7dda714f3bf9fc67571c3bcaf7e5b6",
+            "sha256_transfer_only": "8462efec33f9fee23df59b84f4f4c2bd6f7dda714f3bf9fc67571c3bcaf7e5b6",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 4,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "db6480d018d6e4d7e267d391d3c248c3d00a16865df2a0be1192f5037f78fc36",
+            "sha256_old": "db6480d018d6e4d7e267d391d3c248c3d00a16865df2a0be1192f5037f78fc36",
+            "sha256_transfer_only": "db6480d018d6e4d7e267d391d3c248c3d00a16865df2a0be1192f5037f78fc36",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 5,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "a354862431c18dca5cb1355abd2a58fc7d74f74fc447fcaf51254031e40e4a5b",
+            "sha256_old": "a354862431c18dca5cb1355abd2a58fc7d74f74fc447fcaf51254031e40e4a5b",
+            "sha256_transfer_only": "a354862431c18dca5cb1355abd2a58fc7d74f74fc447fcaf51254031e40e4a5b",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 6,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "75e499660705544c07cc8b1f388e70104dc4282cbee4e8d5cd7ce3c504fd65a8",
+            "sha256_old": "75e499660705544c07cc8b1f388e70104dc4282cbee4e8d5cd7ce3c504fd65a8",
+            "sha256_transfer_only": "75e499660705544c07cc8b1f388e70104dc4282cbee4e8d5cd7ce3c504fd65a8",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 7,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "b50d549e4c4ab9cb6e85a3894c9e10a38e740f295d9684313dd0ed84c4b2a370",
+            "sha256_old": "b50d549e4c4ab9cb6e85a3894c9e10a38e740f295d9684313dd0ed84c4b2a370",
+            "sha256_transfer_only": "b50d549e4c4ab9cb6e85a3894c9e10a38e740f295d9684313dd0ed84c4b2a370",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 8,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "113cc4b765717871402c9eb0645fef8d452581fdcb17452bc9a62ddc27ac5868",
+            "sha256_old": "113cc4b765717871402c9eb0645fef8d452581fdcb17452bc9a62ddc27ac5868",
+            "sha256_transfer_only": "113cc4b765717871402c9eb0645fef8d452581fdcb17452bc9a62ddc27ac5868",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 9,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "3256f6a3078b12697fa769a3b1cba6382f52a6f30590ac98ed0eaadc7f22ee95",
+            "sha256_old": "3256f6a3078b12697fa769a3b1cba6382f52a6f30590ac98ed0eaadc7f22ee95",
+            "sha256_transfer_only": "3256f6a3078b12697fa769a3b1cba6382f52a6f30590ac98ed0eaadc7f22ee95",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 10,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "9324b31190cccc89e771e6e06225b56d06f1a88be505d7217fc938a7a777be32",
+            "sha256_old": "9324b31190cccc89e771e6e06225b56d06f1a88be505d7217fc938a7a777be32",
+            "sha256_transfer_only": "9324b31190cccc89e771e6e06225b56d06f1a88be505d7217fc938a7a777be32",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 11,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "f0c97e97644acf7326a2f1585c82ac88131c32bf4d0beb145c6ce4f46b98f006",
+            "sha256_old": "f0c97e97644acf7326a2f1585c82ac88131c32bf4d0beb145c6ce4f46b98f006",
+            "sha256_transfer_only": "f0c97e97644acf7326a2f1585c82ac88131c32bf4d0beb145c6ce4f46b98f006",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 12,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "ccfa753a6bb2483f13393408dc536bc6e65a7e17b9e40da9c09f0a95f72529f8",
+            "sha256_old": "ccfa753a6bb2483f13393408dc536bc6e65a7e17b9e40da9c09f0a95f72529f8",
+            "sha256_transfer_only": "ccfa753a6bb2483f13393408dc536bc6e65a7e17b9e40da9c09f0a95f72529f8",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 13,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "a9e3f9b541e2c1db985eaa274ed72112f85081a92f236eb026ae77fd790ce7b6",
+            "sha256_old": "a9e3f9b541e2c1db985eaa274ed72112f85081a92f236eb026ae77fd790ce7b6",
+            "sha256_transfer_only": "a9e3f9b541e2c1db985eaa274ed72112f85081a92f236eb026ae77fd790ce7b6",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 14,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "5b5e795d50a4b72b6acfb21220fab70a7d0d839d39598d2e3d48b25866ff30dc",
+            "sha256_old": "5b5e795d50a4b72b6acfb21220fab70a7d0d839d39598d2e3d48b25866ff30dc",
+            "sha256_transfer_only": "5b5e795d50a4b72b6acfb21220fab70a7d0d839d39598d2e3d48b25866ff30dc",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 15,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "6034a2510bf2d6983d824ba900491a202d81b5d149a78b896d8552aa575583e4",
+            "sha256_old": "6034a2510bf2d6983d824ba900491a202d81b5d149a78b896d8552aa575583e4",
+            "sha256_transfer_only": "6034a2510bf2d6983d824ba900491a202d81b5d149a78b896d8552aa575583e4",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 16,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "d239ca53529ae67f60cffd5b690c8855963fabae6fd51fe65e37fb30caf7f464",
+            "sha256_old": "d239ca53529ae67f60cffd5b690c8855963fabae6fd51fe65e37fb30caf7f464",
+            "sha256_transfer_only": "d239ca53529ae67f60cffd5b690c8855963fabae6fd51fe65e37fb30caf7f464",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 17,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "e096de411e8e90079d596fdec3e1fa0a88899dc85055c86889224fbde5a91ba3",
+            "sha256_old": "e096de411e8e90079d596fdec3e1fa0a88899dc85055c86889224fbde5a91ba3",
+            "sha256_transfer_only": "e096de411e8e90079d596fdec3e1fa0a88899dc85055c86889224fbde5a91ba3",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 18,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "f75347b99cb1f230322877c7e98f1b63f9f63657366d6dcefe5cee4ca3d5e3f2",
+            "sha256_old": "f75347b99cb1f230322877c7e98f1b63f9f63657366d6dcefe5cee4ca3d5e3f2",
+            "sha256_transfer_only": "f75347b99cb1f230322877c7e98f1b63f9f63657366d6dcefe5cee4ca3d5e3f2",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 19,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "39c27cc46a3b8b47f788e5a75078fc88873536605f7c4494fdff75524ab78dc1",
+            "sha256_old": "39c27cc46a3b8b47f788e5a75078fc88873536605f7c4494fdff75524ab78dc1",
+            "sha256_transfer_only": "39c27cc46a3b8b47f788e5a75078fc88873536605f7c4494fdff75524ab78dc1",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 20,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "153e7344827d8a880f054f383e1b528a87586948b4f3d90c9ce9498b5da51730",
+            "sha256_old": "153e7344827d8a880f054f383e1b528a87586948b4f3d90c9ce9498b5da51730",
+            "sha256_transfer_only": "153e7344827d8a880f054f383e1b528a87586948b4f3d90c9ce9498b5da51730",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 21,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "b57dccfcbf10069ffff50b8c157f865f23e9b5e6f3b7caf903e752102984c225",
+            "sha256_old": "b57dccfcbf10069ffff50b8c157f865f23e9b5e6f3b7caf903e752102984c225",
+            "sha256_transfer_only": "b57dccfcbf10069ffff50b8c157f865f23e9b5e6f3b7caf903e752102984c225",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 22,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "799c9645b3d0ca53e80f981d53cf9ea044765df3b9c5e6d8e53e398dec744d95",
+            "sha256_old": "799c9645b3d0ca53e80f981d53cf9ea044765df3b9c5e6d8e53e398dec744d95",
+            "sha256_transfer_only": "799c9645b3d0ca53e80f981d53cf9ea044765df3b9c5e6d8e53e398dec744d95",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 23,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "78bd919ac204d08321466b3955900d13428af7f3a309e8cf27fd9ebc94d700b7",
+            "sha256_old": "78bd919ac204d08321466b3955900d13428af7f3a309e8cf27fd9ebc94d700b7",
+            "sha256_transfer_only": "78bd919ac204d08321466b3955900d13428af7f3a309e8cf27fd9ebc94d700b7",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 24,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "c3f18c976520497186fdc36590642e043335c861bfea9c2d1262e0bcd724144d",
+            "sha256_old": "c3f18c976520497186fdc36590642e043335c861bfea9c2d1262e0bcd724144d",
+            "sha256_transfer_only": "c3f18c976520497186fdc36590642e043335c861bfea9c2d1262e0bcd724144d",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 25,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "1d679c5d61b53a4d816d9e2b36c7d6414943792449b9a1382e74e8704f6b1e2b",
+            "sha256_old": "1d679c5d61b53a4d816d9e2b36c7d6414943792449b9a1382e74e8704f6b1e2b",
+            "sha256_transfer_only": "1d679c5d61b53a4d816d9e2b36c7d6414943792449b9a1382e74e8704f6b1e2b",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 26,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "57d9552f67b3faf9650c3719f4399b1df3a793c0663169c528de1c9f8205ad8e",
+            "sha256_old": "57d9552f67b3faf9650c3719f4399b1df3a793c0663169c528de1c9f8205ad8e",
+            "sha256_transfer_only": "57d9552f67b3faf9650c3719f4399b1df3a793c0663169c528de1c9f8205ad8e",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 27,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "d6f6973157e4da88c8d077fafe2508800c9df18f2230bf18587c024d7e4d918f",
+            "sha256_old": "d6f6973157e4da88c8d077fafe2508800c9df18f2230bf18587c024d7e4d918f",
+            "sha256_transfer_only": "d6f6973157e4da88c8d077fafe2508800c9df18f2230bf18587c024d7e4d918f",
+            "shape": [
+              269,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          }
+        ]
+      }
+    },
+    "512": {
+      "block_ids": [
+        27764,
+        15884,
+        6364,
+        7498,
+        28732,
+        15793,
+        8451,
+        24534,
+        30110,
+        7769,
+        5403,
+        26291,
+        23406,
+        4119,
+        25902,
+        15238,
+        2838,
+        15831,
+        28397,
+        13410,
+        23154,
+        11612,
+        29552,
+        30401,
+        11240,
+        5507,
+        20795,
+        4798,
+        17054,
+        4945,
+        2432,
+        13132,
+        25457,
+        20434,
+        15380,
+        19951,
+        14772,
+        24993,
+        28023,
+        15175,
+        16087,
+        17936,
+        6173,
+        12616,
+        24974,
+        30445,
+        29061,
+        18788,
+        5952,
+        406,
+        22852,
+        25306,
+        14750,
+        14385,
+        28828,
+        30744,
+        14248,
+        11817,
+        26667,
+        6797,
+        21555,
+        20602,
+        22519,
+        6250,
+        17438,
+        7567,
+        23165,
+        28040,
+        17633,
+        14595,
+        22600,
+        29886,
+        21379,
+        29566,
+        8753,
+        21854,
+        30367,
+        8283,
+        156,
+        14905,
+        29011,
+        24692,
+        30839,
+        12318,
+        7457,
+        11623,
+        28273,
+        1416,
+        28507,
+        24551,
+        9038,
+        30858,
+        24308,
+        22901,
+        1949,
+        726,
+        4107,
+        7621,
+        26588,
+        12158,
+        23839,
+        7364,
+        19391,
+        16408,
+        14464,
+        24223,
+        19487,
+        21024,
+        1705,
+        3755,
+        12723,
+        19999,
+        26074,
+        13574,
+        21791,
+        21923,
+        235,
+        24020,
+        16633,
+        24350,
+        31049,
+        29944,
+        28866,
+        11373,
+        30235,
+        28935,
+        7784,
+        7044,
+        4455,
+        28675,
+        30260,
+        988,
+        21680,
+        14654,
+        17619,
+        30114,
+        27645,
+        956,
+        15783,
+        10242,
+        18527,
+        6617,
+        30463,
+        24997,
+        6639,
+        23826,
+        1827,
+        725,
+        19322,
+        404,
+        29016,
+        29666,
+        2060,
+        20487,
+        27584,
+        17852,
+        359,
+        16647,
+        29923,
+        13178,
+        6648,
+        7772,
+        25176,
+        17283,
+        618,
+        27962,
+        6536,
+        20993,
+        25361,
+        5699,
+        11075,
+        15876,
+        21665,
+        27513,
+        21593,
+        23342,
+        3785,
+        12717,
+        30827,
+        29752,
+        28829,
+        2226,
+        2098,
+        1051,
+        17162,
+        24948,
+        30621,
+        20233,
+        13781,
+        6019,
+        19949,
+        7362,
+        1818,
+        12264,
+        13528,
+        1488,
+        830,
+        26485,
+        6155,
+        23838,
+        19606,
+        20126,
+        19430,
+        25483,
+        15956,
+        10558,
+        26427,
+        14479,
+        30189,
+        25772,
+        6992,
+        12461,
+        15681,
+        8960,
+        22191,
+        2970,
+        5629,
+        17065,
+        9889,
+        26629,
+        5081,
+        17605,
+        21336,
+        24037,
+        23217,
+        24680,
+        8084,
+        20617,
+        6957,
+        11089,
+        21742,
+        444,
+        7374,
+        13188,
+        16413,
+        26838,
+        28483,
+        8342,
+        670,
+        12151,
+        12424,
+        29865,
+        16687,
+        27922,
+        28233,
+        22848,
+        12537,
+        29924,
+        2856,
+        1136,
+        10162,
+        8175,
+        18093,
+        9782,
+        19381,
+        1440,
+        29310,
+        3844,
+        7658,
+        30525,
+        25067,
+        11543,
+        8627,
+        23766,
+        14040,
+        18193,
+        23123,
+        19176,
+        3574,
+        5962,
+        9987,
+        26210,
+        14985,
+        21315,
+        27898,
+        10614,
+        15899,
+        7092,
+        7247,
+        17025,
+        11731,
+        6989,
+        17103,
+        16091,
+        6015,
+        21206,
+        20116,
+        1548,
+        12351,
+        24242,
+        26897,
+        126,
+        14307,
+        2761,
+        3819,
+        6046,
+        23109,
+        14010,
+        4502,
+        26264,
+        23917,
+        18258,
+        1245,
+        3768,
+        30364,
+        8958,
+        10578,
+        4494,
+        21009,
+        7968,
+        7563,
+        17076,
+        15081,
+        30219,
+        20026,
+        5350,
+        11055,
+        26359,
+        24252,
+        18166,
+        30542,
+        25275,
+        11003,
+        30529,
+        26041,
+        29800,
+        15057,
+        25047,
+        3882,
+        13939,
+        12355,
+        9411,
+        394,
+        27874,
+        8725,
+        27173,
+        1141,
+        16789,
+        18773,
+        8557,
+        20424,
+        7601,
+        21285,
+        26620,
+        3955,
+        3317,
+        6426,
+        13099,
+        30520,
+        25304,
+        22692,
+        12487,
+        28537,
+        10685,
+        21133,
+        28916,
+        23470,
+        26738,
+        22099,
+        14311,
+        8501,
+        21402,
+        25064,
+        29028,
+        5198,
+        22124,
+        3490,
+        15061,
+        7811,
+        18846,
+        19000,
+        13228,
+        26713,
+        26184,
+        2787,
+        7838,
+        22968,
+        11903,
+        27418,
+        15153,
+        29761,
+        11658,
+        26857,
+        13322,
+        25074,
+        17292,
+        23698,
+        24561,
+        4987,
+        17278,
+        26292,
+        9412,
+        16725,
+        2136,
+        23939,
+        18523,
+        19948,
+        2738,
+        1123,
+        17600,
+        20218,
+        1036,
+        5116,
+        22275,
+        20894,
+        13994,
+        5342,
+        29632,
+        2539,
+        3008,
+        1752,
+        11957,
+        11979,
+        19218,
+        18254,
+        4716,
+        7083,
+        1467,
+        27552,
+        24000,
+        2902,
+        18345,
+        10593,
+        29084,
+        8879,
+        14597,
+        14671,
+        30241,
+        2300,
+        7978,
+        17217,
+        10536,
+        24720,
+        16779,
+        15036,
+        23294,
+        6021,
+        20643,
+        17474,
+        4654,
+        14003,
+        28229,
+        18853,
+        19568,
+        25137,
+        23298,
+        24500,
+        28328,
+        7204,
+        19935,
+        25601,
+        118,
+        21783,
+        18483,
+        13380,
+        9102,
+        1964,
+        25732,
+        3508,
+        16646,
+        26868,
+        3045,
+        21936,
+        15542,
+        15389,
+        19064,
+        29726,
+        27986,
+        9666,
+        27566,
+        19665,
+        14898,
+        31075,
+        31063,
+        23774,
+        9750,
+        18644,
+        14415,
+        26731,
+        18033,
+        3818,
+        26541,
+        21427,
+        20895,
+        24784,
+        23191,
+        24042,
+        22270,
+        8074,
+        23530,
+        17702,
+        20836,
+        10434,
+        14394,
+        5564,
+        16564,
+        2208,
+        19561,
+        2147,
+        23305,
+        30788,
+        28859,
+        7937,
+        21816,
+        19848,
+        18378,
+        12253,
+        26216,
+        9351,
+        27237,
+        14864,
+        13291
+      ],
+      "components": {
+        "layout": {
+          "all_sources_contiguous": true,
+          "component_copy_parity": true,
+          "contiguous_noop_total_s": 6.456e-06,
+          "contiguous_returns_same_object": true,
+          "source_shape": [
+            512,
+            16,
+            4,
+            256
+          ],
+          "source_stride": [
+            16384,
+            1024,
+            256,
+            1
+          ],
+          "view_shares_storage": true,
+          "view_total_s": 6.5607e-05
+        },
+        "raw_s": {
+          "device_contiguous_clone_s": [
+            0.00186035,
+            0.001773878,
+            0.001774629,
+            0.001775726,
+            0.001775222,
+            0.001762828,
+            0.001766718
+          ],
+          "device_gather_enqueue_s": [
+            0.005259099,
+            0.005200505,
+            0.005278522,
+            0.009434728,
+            0.005430653,
+            0.005388957,
+            0.004882243
+          ],
+          "device_gather_total_s": [
+            0.005334003,
+            0.005268994,
+            0.005354187,
+            0.009509838,
+            0.005505577,
+            0.005463989,
+            0.004958907
+          ],
+          "idle_event_record_sync_s": [
+            0.000132768,
+            0.000124753,
+            0.000128853,
+            0.000113548,
+            0.000127156,
+            0.00012689,
+            0.0001079
+          ],
+          "old_cpu_unbind_stack_s": [
+            0.226331948,
+            0.211853019,
+            0.226852538,
+            0.226050066,
+            0.220111271,
+            0.218995093,
+            0.219591892
+          ],
+          "pageable_allocation_s": [
+            0.000296423,
+            0.000304513,
+            0.000287289,
+            0.000277315,
+            0.000271998,
+            0.000286021,
+            0.000352946
+          ],
+          "pageable_cpu_method_s": [
+            0.274428128,
+            0.271672426,
+            0.274233927,
+            0.273289569,
+            0.273807371,
+            0.272859248,
+            0.272932087
+          ],
+          "pageable_preallocated_copy_s": [
+            0.271123202,
+            0.255688884,
+            0.266274484,
+            0.256562453,
+            0.264405126,
+            0.26161642,
+            0.265240735
+          ],
+          "pinned_allocation_s": [
+            0.000224191,
+            0.000215495,
+            0.00027472,
+            0.000221986,
+            0.000232409,
+            0.000217683,
+            0.000197378
+          ],
+          "pinned_copy_enqueue_s": [
+            0.00022904,
+            0.00022097,
+            0.000230399,
+            0.000225897,
+            0.000233962,
+            0.000213294,
+            0.000207558
+          ],
+          "pinned_cuda_copy_span_s": [
+            0.020278623580932617,
+            0.020013408660888674,
+            0.020082304000854492,
+            0.02014851188659668,
+            0.0202938232421875,
+            0.02020924758911133,
+            0.019966175079345703
+          ],
+          "pinned_event_record_s": [
+            1.4938e-05,
+            1.5068e-05,
+            1.549e-05,
+            1.434e-05,
+            1.5541e-05,
+            1.5269e-05,
+            1.3774e-05
+          ],
+          "pinned_event_wait_including_copy_completion_s": [
+            0.020040062,
+            0.01979147,
+            0.019841432,
+            0.01991466,
+            0.020048837,
+            0.01998608,
+            0.019751495
+          ]
+        },
+        "stats": {
+          "device_contiguous_clone_s": {
+            "count": 7,
+            "max_s": 0.00186035,
+            "mean_s": 0.0017841929999999999,
+            "median_s": 0.001774629,
+            "min_s": 0.001762828,
+            "q1_s": 0.001766718,
+            "q3_s": 0.001775726,
+            "stdev_s": 3.3940550354013614e-05,
+            "total_s": 0.012489351
+          },
+          "device_gather_enqueue_s": {
+            "count": 7,
+            "max_s": 0.009434728,
+            "mean_s": 0.005839243857142857,
+            "median_s": 0.005278522,
+            "min_s": 0.004882243,
+            "q1_s": 0.005200505,
+            "q3_s": 0.005430653,
+            "stdev_s": 0.0015954114405766337,
+            "total_s": 0.040874706999999996
+          },
+          "device_gather_total_s": {
+            "count": 7,
+            "max_s": 0.009509838,
+            "mean_s": 0.005913642142857142,
+            "median_s": 0.005354187,
+            "min_s": 0.004958907,
+            "q1_s": 0.005268994,
+            "q3_s": 0.005505577,
+            "stdev_s": 0.0015956916873530035,
+            "total_s": 0.041395495
+          },
+          "idle_event_record_sync_s": {
+            "count": 7,
+            "max_s": 0.000132768,
+            "mean_s": 0.000123124,
+            "median_s": 0.00012689,
+            "min_s": 0.0001079,
+            "q1_s": 0.000113548,
+            "q3_s": 0.000128853,
+            "stdev_s": 8.966526176098892e-06,
+            "total_s": 0.000861868
+          },
+          "old_cpu_unbind_stack_s": {
+            "count": 7,
+            "max_s": 0.226852538,
+            "mean_s": 0.22139797528571428,
+            "median_s": 0.220111271,
+            "min_s": 0.211853019,
+            "q1_s": 0.218995093,
+            "q3_s": 0.226331948,
+            "stdev_s": 0.0054396058020831995,
+            "total_s": 1.549785827
+          },
+          "pageable_allocation_s": {
+            "count": 7,
+            "max_s": 0.000352946,
+            "mean_s": 0.0002966435714285715,
+            "median_s": 0.000287289,
+            "min_s": 0.000271998,
+            "q1_s": 0.000277315,
+            "q3_s": 0.000304513,
+            "stdev_s": 2.7120978705651103e-05,
+            "total_s": 0.002076505
+          },
+          "pageable_cpu_method_s": {
+            "count": 7,
+            "max_s": 0.274428128,
+            "mean_s": 0.2733175365714286,
+            "median_s": 0.273289569,
+            "min_s": 0.271672426,
+            "q1_s": 0.272859248,
+            "q3_s": 0.274233927,
+            "stdev_s": 0.0009468274455870716,
+            "total_s": 1.9132227560000001
+          },
+          "pageable_preallocated_copy_s": {
+            "count": 7,
+            "max_s": 0.271123202,
+            "mean_s": 0.26298732914285716,
+            "median_s": 0.264405126,
+            "min_s": 0.255688884,
+            "q1_s": 0.256562453,
+            "q3_s": 0.266274484,
+            "stdev_s": 0.005485002687934322,
+            "total_s": 1.840911304
+          },
+          "pinned_allocation_s": {
+            "count": 7,
+            "max_s": 0.00027472,
+            "mean_s": 0.000226266,
+            "median_s": 0.000221986,
+            "min_s": 0.000197378,
+            "q1_s": 0.000215495,
+            "q3_s": 0.000232409,
+            "stdev_s": 2.3917739107198236e-05,
+            "total_s": 0.0015838620000000001
+          },
+          "pinned_copy_enqueue_s": {
+            "count": 7,
+            "max_s": 0.000233962,
+            "mean_s": 0.00022301714285714286,
+            "median_s": 0.000225897,
+            "min_s": 0.000207558,
+            "q1_s": 0.000213294,
+            "q3_s": 0.000230399,
+            "stdev_s": 9.631246863353527e-06,
+            "total_s": 0.00156112
+          },
+          "pinned_cuda_copy_span_s": {
+            "count": 7,
+            "max_s": 0.0202938232421875,
+            "mean_s": 0.020141727719988144,
+            "median_s": 0.02014851188659668,
+            "min_s": 0.019966175079345703,
+            "q1_s": 0.020013408660888674,
+            "q3_s": 0.020278623580932617,
+            "stdev_s": 0.0001273408622688143,
+            "total_s": 0.140992094039917
+          },
+          "pinned_event_record_s": {
+            "count": 7,
+            "max_s": 1.5541e-05,
+            "mean_s": 1.4917142857142856e-05,
+            "median_s": 1.5068e-05,
+            "min_s": 1.3774e-05,
+            "q1_s": 1.434e-05,
+            "q3_s": 1.549e-05,
+            "stdev_s": 6.460429368010114e-07,
+            "total_s": 0.00010441999999999999
+          },
+          "pinned_event_wait_including_copy_completion_s": {
+            "count": 7,
+            "max_s": 0.020048837,
+            "mean_s": 0.019910576571428574,
+            "median_s": 0.01991466,
+            "min_s": 0.019751495,
+            "q1_s": 0.01979147,
+            "q3_s": 0.020040062,
+            "stdev_s": 0.0001196342745758329,
+            "total_s": 0.139374036
+          }
+        }
+      },
+      "exact": {
+        "median_comparison": {
+          "new_vs_old_connector_pct": -87.47104421657168,
+          "new_vs_old_transfer_only_pct": -88.49024604866703,
+          "old_cpu_restack_share_of_old_connector_pct": -8.855113987708796
+        },
+        "order": [
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ]
+        ],
+        "raw_s": {
+          "new_async_exact": [
+            0.025468508,
+            0.025578343,
+            0.025340108,
+            0.025647899,
+            0.02534338,
+            0.025577495,
+            0.025434023,
+            0.025607673,
+            0.025831756,
+            0.025278514,
+            0.025375661
+          ],
+          "old_connector_exact": [
+            0.176566529,
+            0.223415539,
+            0.178925754,
+            0.221964019,
+            0.151765144,
+            0.220784297,
+            0.153500421,
+            0.226569403,
+            0.20327718,
+            0.223600416,
+            0.202671648
+          ],
+          "old_transfer_only": [
+            0.224543241,
+            0.22258131,
+            0.203978774,
+            0.221277606,
+            0.186981032,
+            0.222649158,
+            0.220046967,
+            0.223207932,
+            0.206214442,
+            0.224696411,
+            0.197245615
+          ]
+        },
+        "stats": {
+          "new_async_exact": {
+            "count": 11,
+            "max_s": 0.025831756,
+            "mean_s": 0.025498487272727275,
+            "median_s": 0.025468508,
+            "min_s": 0.025278514,
+            "q1_s": 0.02534338,
+            "q3_s": 0.025607673,
+            "stdev_s": 0.00016601318722685336,
+            "total_s": 0.28048336
+          },
+          "old_connector_exact": {
+            "count": 11,
+            "max_s": 0.226569403,
+            "mean_s": 0.19845821363636365,
+            "median_s": 0.20327718,
+            "min_s": 0.151765144,
+            "q1_s": 0.176566529,
+            "q3_s": 0.223415539,
+            "stdev_s": 0.028634591760678466,
+            "total_s": 2.18304035
+          },
+          "old_transfer_only": {
+            "count": 11,
+            "max_s": 0.224696411,
+            "mean_s": 0.21394749890909093,
+            "median_s": 0.221277606,
+            "min_s": 0.186981032,
+            "q1_s": 0.203978774,
+            "q3_s": 0.223207932,
+            "stdev_s": 0.013115177991985819,
+            "total_s": 2.353422488
+          }
+        },
+        "warmup_s": {
+          "new_async_exact": [
+            0.025379998,
+            0.02640741
+          ],
+          "old_connector_exact": [
+            0.148352395,
+            0.150084972
+          ],
+          "old_transfer_only": [
+            0.13576517,
+            0.229996583
+          ]
+        }
+      },
+      "parity": {
+        "all_sha256_equal": true,
+        "all_torch_equal": true,
+        "layers": [
+          {
+            "layer": 0,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "c6f1859f8fda6fdbb99eaa78f1d1f739e3a566db895cbcea32acdf7172827371",
+            "sha256_old": "c6f1859f8fda6fdbb99eaa78f1d1f739e3a566db895cbcea32acdf7172827371",
+            "sha256_transfer_only": "c6f1859f8fda6fdbb99eaa78f1d1f739e3a566db895cbcea32acdf7172827371",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 1,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "9882b54be526b333b1b9999f2d7fac397ff6d3b7bd274dac368f11683510bc58",
+            "sha256_old": "9882b54be526b333b1b9999f2d7fac397ff6d3b7bd274dac368f11683510bc58",
+            "sha256_transfer_only": "9882b54be526b333b1b9999f2d7fac397ff6d3b7bd274dac368f11683510bc58",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 2,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "6b43caad0e069b20f6450953a47ebaffc38b15b55d74f075f0747ec91be42208",
+            "sha256_old": "6b43caad0e069b20f6450953a47ebaffc38b15b55d74f075f0747ec91be42208",
+            "sha256_transfer_only": "6b43caad0e069b20f6450953a47ebaffc38b15b55d74f075f0747ec91be42208",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 3,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "f55fa61a4737c2ad339cda8da9a68ea87304cfd356750dd7e8f8d7bac43dadb4",
+            "sha256_old": "f55fa61a4737c2ad339cda8da9a68ea87304cfd356750dd7e8f8d7bac43dadb4",
+            "sha256_transfer_only": "f55fa61a4737c2ad339cda8da9a68ea87304cfd356750dd7e8f8d7bac43dadb4",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 4,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "a8795f33568dd2067ae707f49542f1b4adb5c5f5645622cdb51de99bc570f7fd",
+            "sha256_old": "a8795f33568dd2067ae707f49542f1b4adb5c5f5645622cdb51de99bc570f7fd",
+            "sha256_transfer_only": "a8795f33568dd2067ae707f49542f1b4adb5c5f5645622cdb51de99bc570f7fd",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 5,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "76b27f78ff81bc4815e123dea19e5628d3f25e5603fc9d531534cb1d0874be93",
+            "sha256_old": "76b27f78ff81bc4815e123dea19e5628d3f25e5603fc9d531534cb1d0874be93",
+            "sha256_transfer_only": "76b27f78ff81bc4815e123dea19e5628d3f25e5603fc9d531534cb1d0874be93",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 6,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "159f4d9145563be99f78c48d27198176133a5cd3bcff1b461a969be9c2e90173",
+            "sha256_old": "159f4d9145563be99f78c48d27198176133a5cd3bcff1b461a969be9c2e90173",
+            "sha256_transfer_only": "159f4d9145563be99f78c48d27198176133a5cd3bcff1b461a969be9c2e90173",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 7,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "60eff82a01e4bad76cddd84aa40427b19aa3116085a41d4fb99d0d54dd38dc4c",
+            "sha256_old": "60eff82a01e4bad76cddd84aa40427b19aa3116085a41d4fb99d0d54dd38dc4c",
+            "sha256_transfer_only": "60eff82a01e4bad76cddd84aa40427b19aa3116085a41d4fb99d0d54dd38dc4c",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 8,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "d4eedbfa389758fd09582b240f8b26d683b4f071d720ee6ca16a6671e7688ff4",
+            "sha256_old": "d4eedbfa389758fd09582b240f8b26d683b4f071d720ee6ca16a6671e7688ff4",
+            "sha256_transfer_only": "d4eedbfa389758fd09582b240f8b26d683b4f071d720ee6ca16a6671e7688ff4",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 9,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "599c9d098eed7a3eec9508dbf2bfbf34c2b42086d9043578755a8fe3be91f0e5",
+            "sha256_old": "599c9d098eed7a3eec9508dbf2bfbf34c2b42086d9043578755a8fe3be91f0e5",
+            "sha256_transfer_only": "599c9d098eed7a3eec9508dbf2bfbf34c2b42086d9043578755a8fe3be91f0e5",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 10,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "1691438ec50e2699a8152b1d4f6fa74432883cbe01f052b82a36ea59d3b31eae",
+            "sha256_old": "1691438ec50e2699a8152b1d4f6fa74432883cbe01f052b82a36ea59d3b31eae",
+            "sha256_transfer_only": "1691438ec50e2699a8152b1d4f6fa74432883cbe01f052b82a36ea59d3b31eae",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 11,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "239da1c95243ee0b3e6e32059c50105c40ecd75a4f223ca724e73da67fe3c0e6",
+            "sha256_old": "239da1c95243ee0b3e6e32059c50105c40ecd75a4f223ca724e73da67fe3c0e6",
+            "sha256_transfer_only": "239da1c95243ee0b3e6e32059c50105c40ecd75a4f223ca724e73da67fe3c0e6",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 12,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "702baf6df023fdd6bf2154df111c6e09883697e98d1de86fcc60d18b912a17d9",
+            "sha256_old": "702baf6df023fdd6bf2154df111c6e09883697e98d1de86fcc60d18b912a17d9",
+            "sha256_transfer_only": "702baf6df023fdd6bf2154df111c6e09883697e98d1de86fcc60d18b912a17d9",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 13,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "449e4fd609a048cd32550383a5ad499d607a8b4c1ea4db1b7d4695ab8ed2e9df",
+            "sha256_old": "449e4fd609a048cd32550383a5ad499d607a8b4c1ea4db1b7d4695ab8ed2e9df",
+            "sha256_transfer_only": "449e4fd609a048cd32550383a5ad499d607a8b4c1ea4db1b7d4695ab8ed2e9df",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 14,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "7649b880c0ca3e080ebdf080b153c9b9c5a79a4f6f3761364ec11113c4361698",
+            "sha256_old": "7649b880c0ca3e080ebdf080b153c9b9c5a79a4f6f3761364ec11113c4361698",
+            "sha256_transfer_only": "7649b880c0ca3e080ebdf080b153c9b9c5a79a4f6f3761364ec11113c4361698",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 15,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "4f946bcc818e1f871cb2703ce798f0af1b2625e76ef5b4b19656acd12efa6f35",
+            "sha256_old": "4f946bcc818e1f871cb2703ce798f0af1b2625e76ef5b4b19656acd12efa6f35",
+            "sha256_transfer_only": "4f946bcc818e1f871cb2703ce798f0af1b2625e76ef5b4b19656acd12efa6f35",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 16,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "2abab4fcd1d637a3b9f4aaa4a641d81d154c9bc6346326f7851dfa6d4ba8e67b",
+            "sha256_old": "2abab4fcd1d637a3b9f4aaa4a641d81d154c9bc6346326f7851dfa6d4ba8e67b",
+            "sha256_transfer_only": "2abab4fcd1d637a3b9f4aaa4a641d81d154c9bc6346326f7851dfa6d4ba8e67b",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 17,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "fe27dee93f7bff1f648c4e3b300a980db23b8bb302f8727d0b3a735a296bb410",
+            "sha256_old": "fe27dee93f7bff1f648c4e3b300a980db23b8bb302f8727d0b3a735a296bb410",
+            "sha256_transfer_only": "fe27dee93f7bff1f648c4e3b300a980db23b8bb302f8727d0b3a735a296bb410",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 18,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "7bde1fb77ee64a27530bc47ea1ec3687f0d12e9df2d875c26f3bf975806aee29",
+            "sha256_old": "7bde1fb77ee64a27530bc47ea1ec3687f0d12e9df2d875c26f3bf975806aee29",
+            "sha256_transfer_only": "7bde1fb77ee64a27530bc47ea1ec3687f0d12e9df2d875c26f3bf975806aee29",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 19,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "660b0549bade8c25be4e68ea54c8f3b53ead6764d5d7a2459f96c04c66d7f55d",
+            "sha256_old": "660b0549bade8c25be4e68ea54c8f3b53ead6764d5d7a2459f96c04c66d7f55d",
+            "sha256_transfer_only": "660b0549bade8c25be4e68ea54c8f3b53ead6764d5d7a2459f96c04c66d7f55d",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 20,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "7a0cd6e7eb7c5dbecc7d11375c280807d5eefc43f06fb2aa1a5ca820b024c843",
+            "sha256_old": "7a0cd6e7eb7c5dbecc7d11375c280807d5eefc43f06fb2aa1a5ca820b024c843",
+            "sha256_transfer_only": "7a0cd6e7eb7c5dbecc7d11375c280807d5eefc43f06fb2aa1a5ca820b024c843",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 21,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "59614a18faf3ba55f133d4a64ee744e00e4af66a3aae1f3a24564e869cbbcd9b",
+            "sha256_old": "59614a18faf3ba55f133d4a64ee744e00e4af66a3aae1f3a24564e869cbbcd9b",
+            "sha256_transfer_only": "59614a18faf3ba55f133d4a64ee744e00e4af66a3aae1f3a24564e869cbbcd9b",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 22,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "360ad0b5ec603a2c4ac6436bc99ceecc40df6436b5f4b4d12b43ad79eff90fdb",
+            "sha256_old": "360ad0b5ec603a2c4ac6436bc99ceecc40df6436b5f4b4d12b43ad79eff90fdb",
+            "sha256_transfer_only": "360ad0b5ec603a2c4ac6436bc99ceecc40df6436b5f4b4d12b43ad79eff90fdb",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 23,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "63eff026fb59bf1a117161a8f900393eb848eb7d576f1869caed43b9f887ea27",
+            "sha256_old": "63eff026fb59bf1a117161a8f900393eb848eb7d576f1869caed43b9f887ea27",
+            "sha256_transfer_only": "63eff026fb59bf1a117161a8f900393eb848eb7d576f1869caed43b9f887ea27",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 24,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "5f0baea22dad04eb4d92e6879743d1e8e37ea7ec10268dda1b636fbb89012089",
+            "sha256_old": "5f0baea22dad04eb4d92e6879743d1e8e37ea7ec10268dda1b636fbb89012089",
+            "sha256_transfer_only": "5f0baea22dad04eb4d92e6879743d1e8e37ea7ec10268dda1b636fbb89012089",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 25,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "730ffd726b8a382e4db441825dcffa285a5633428d9fd2f436e2a992f40d18fb",
+            "sha256_old": "730ffd726b8a382e4db441825dcffa285a5633428d9fd2f436e2a992f40d18fb",
+            "sha256_transfer_only": "730ffd726b8a382e4db441825dcffa285a5633428d9fd2f436e2a992f40d18fb",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 26,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "592e184731b14d487461c2eeaccfc13beb5d1133f37f4f9ba145cecc368c8330",
+            "sha256_old": "592e184731b14d487461c2eeaccfc13beb5d1133f37f4f9ba145cecc368c8330",
+            "sha256_transfer_only": "592e184731b14d487461c2eeaccfc13beb5d1133f37f4f9ba145cecc368c8330",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 27,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "35d59dddbc8d7592f2c362084bdf690c7f24262bab8695dc1f8b2e97998f2aad",
+            "sha256_old": "35d59dddbc8d7592f2c362084bdf690c7f24262bab8695dc1f8b2e97998f2aad",
+            "sha256_transfer_only": "35d59dddbc8d7592f2c362084bdf690c7f24262bab8695dc1f8b2e97998f2aad",
+            "shape": [
+              512,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          }
+        ]
+      }
+    },
+    "77": {
+      "block_ids": [
+        29370,
+        22790,
+        19887,
+        29309,
+        19078,
+        29892,
+        11169,
+        25248,
+        2600,
+        18963,
+        16139,
+        14699,
+        14200,
+        26171,
+        25673,
+        28097,
+        5885,
+        16195,
+        16063,
+        10923,
+        10530,
+        15725,
+        18831,
+        7210,
+        30239,
+        3926,
+        13556,
+        8843,
+        30838,
+        1016,
+        21291,
+        13336,
+        4663,
+        27796,
+        3079,
+        25446,
+        4615,
+        10600,
+        7538,
+        17710,
+        20804,
+        28386,
+        30155,
+        28969,
+        21230,
+        16599,
+        1031,
+        26072,
+        21896,
+        19247,
+        25573,
+        28642,
+        6969,
+        3172,
+        30311,
+        23794,
+        14172,
+        27661,
+        16827,
+        19292,
+        25531,
+        19237,
+        6510,
+        9510,
+        25496,
+        7197,
+        28646,
+        24727,
+        22592,
+        11143,
+        10799,
+        15453,
+        18513,
+        11283,
+        6090,
+        417,
+        16369
+      ],
+      "components": {
+        "layout": {
+          "all_sources_contiguous": true,
+          "component_copy_parity": true,
+          "contiguous_noop_total_s": 2.1937e-05,
+          "contiguous_returns_same_object": true,
+          "source_shape": [
+            77,
+            16,
+            4,
+            256
+          ],
+          "source_stride": [
+            16384,
+            1024,
+            256,
+            1
+          ],
+          "view_shares_storage": true,
+          "view_total_s": 6.8841e-05
+        },
+        "raw_s": {
+          "device_contiguous_clone_s": [
+            0.000370933,
+            0.000321999,
+            0.000321352,
+            0.000323843,
+            0.000325937,
+            0.000323827,
+            0.00032132
+          ],
+          "device_gather_enqueue_s": [
+            0.003793151,
+            0.00374256,
+            0.003695992,
+            0.003736376,
+            0.003783851,
+            0.00373776,
+            0.00376452
+          ],
+          "device_gather_total_s": [
+            0.003825206,
+            0.003770547,
+            0.00372308,
+            0.003768453,
+            0.003817288,
+            0.003766947,
+            0.003792358
+          ],
+          "idle_event_record_sync_s": [
+            6.1834e-05,
+            5.8082e-05,
+            5.6969e-05,
+            6.7656e-05,
+            6.7844e-05,
+            5.8312e-05,
+            5.359e-05
+          ],
+          "old_cpu_unbind_stack_s": [
+            0.035186545,
+            0.034999329,
+            0.034354626,
+            0.033632089,
+            0.037527657,
+            0.034729974,
+            0.035241213
+          ],
+          "pageable_allocation_s": [
+            0.000261821,
+            0.000270919,
+            0.000258265,
+            0.000258642,
+            0.000267622,
+            0.000383249,
+            0.000298673
+          ],
+          "pageable_cpu_method_s": [
+            0.048678816,
+            0.051754667,
+            0.041541979,
+            0.044972768,
+            0.058171298,
+            0.050708086,
+            0.04819402
+          ],
+          "pageable_preallocated_copy_s": [
+            0.045480903,
+            0.047953624,
+            0.041605018,
+            0.044409319,
+            0.048718789,
+            0.046434851,
+            0.048629332
+          ],
+          "pinned_allocation_s": [
+            0.000207509,
+            0.000239906,
+            0.000184955,
+            0.000206425,
+            0.000245331,
+            0.00022501,
+            0.000211384
+          ],
+          "pinned_copy_enqueue_s": [
+            0.00022103,
+            0.00022629,
+            0.00019359,
+            0.000212971,
+            0.00027047,
+            0.000228356,
+            0.000231312
+          ],
+          "pinned_cuda_copy_span_s": [
+            0.0032856318950653077,
+            0.0032832961082458496,
+            0.0030824320316314695,
+            0.003220128059387207,
+            0.0040113282203674315,
+            0.003447455883026123,
+            0.0034126720428466796
+          ],
+          "pinned_event_record_s": [
+            1.5819e-05,
+            2.5928e-05,
+            1.3815e-05,
+            1.5034e-05,
+            1.919e-05,
+            1.5986e-05,
+            1.7847e-05
+          ],
+          "pinned_event_wait_including_copy_completion_s": [
+            0.00305232,
+            0.003034382,
+            0.002879197,
+            0.002995822,
+            0.003723161,
+            0.003207436,
+            0.003167145
+          ]
+        },
+        "stats": {
+          "device_contiguous_clone_s": {
+            "count": 7,
+            "max_s": 0.000370933,
+            "mean_s": 0.0003298872857142857,
+            "median_s": 0.000323827,
+            "min_s": 0.00032132,
+            "q1_s": 0.000321352,
+            "q3_s": 0.000325937,
+            "stdev_s": 1.817548903252478e-05,
+            "total_s": 0.002309211
+          },
+          "device_gather_enqueue_s": {
+            "count": 7,
+            "max_s": 0.003793151,
+            "mean_s": 0.0037506014285714285,
+            "median_s": 0.00374256,
+            "min_s": 0.003695992,
+            "q1_s": 0.003736376,
+            "q3_s": 0.003783851,
+            "stdev_s": 3.2974348686300265e-05,
+            "total_s": 0.02625421
+          },
+          "device_gather_total_s": {
+            "count": 7,
+            "max_s": 0.003825206,
+            "mean_s": 0.0037805541428571426,
+            "median_s": 0.003770547,
+            "min_s": 0.00372308,
+            "q1_s": 0.003766947,
+            "q3_s": 0.003817288,
+            "stdev_s": 3.4683107441656896e-05,
+            "total_s": 0.026463879
+          },
+          "idle_event_record_sync_s": {
+            "count": 7,
+            "max_s": 6.7844e-05,
+            "mean_s": 6.061242857142858e-05,
+            "median_s": 5.8312e-05,
+            "min_s": 5.359e-05,
+            "q1_s": 5.6969e-05,
+            "q3_s": 6.7656e-05,
+            "stdev_s": 5.44187277375301e-06,
+            "total_s": 0.000424287
+          },
+          "old_cpu_unbind_stack_s": {
+            "count": 7,
+            "max_s": 0.037527657,
+            "mean_s": 0.035095918999999996,
+            "median_s": 0.034999329,
+            "min_s": 0.033632089,
+            "q1_s": 0.034354626,
+            "q3_s": 0.035241213,
+            "stdev_s": 0.0012095613578779986,
+            "total_s": 0.245671433
+          },
+          "pageable_allocation_s": {
+            "count": 7,
+            "max_s": 0.000383249,
+            "mean_s": 0.00028559871428571426,
+            "median_s": 0.000267622,
+            "min_s": 0.000258265,
+            "q1_s": 0.000258642,
+            "q3_s": 0.000298673,
+            "stdev_s": 4.5248107867306766e-05,
+            "total_s": 0.001999191
+          },
+          "pageable_cpu_method_s": {
+            "count": 7,
+            "max_s": 0.058171298,
+            "mean_s": 0.049145947714285716,
+            "median_s": 0.048678816,
+            "min_s": 0.041541979,
+            "q1_s": 0.044972768,
+            "q3_s": 0.051754667,
+            "stdev_s": 0.005276722272750914,
+            "total_s": 0.344021634
+          },
+          "pageable_preallocated_copy_s": {
+            "count": 7,
+            "max_s": 0.048718789,
+            "mean_s": 0.04617597657142857,
+            "median_s": 0.046434851,
+            "min_s": 0.041605018,
+            "q1_s": 0.044409319,
+            "q3_s": 0.048629332,
+            "stdev_s": 0.0025887501090286046,
+            "total_s": 0.323231836
+          },
+          "pinned_allocation_s": {
+            "count": 7,
+            "max_s": 0.000245331,
+            "mean_s": 0.00021721714285714285,
+            "median_s": 0.000211384,
+            "min_s": 0.000184955,
+            "q1_s": 0.000206425,
+            "q3_s": 0.000239906,
+            "stdev_s": 2.102178087467513e-05,
+            "total_s": 0.00152052
+          },
+          "pinned_copy_enqueue_s": {
+            "count": 7,
+            "max_s": 0.00027047,
+            "mean_s": 0.00022628842857142856,
+            "median_s": 0.00022629,
+            "min_s": 0.00019359,
+            "q1_s": 0.000212971,
+            "q3_s": 0.000231312,
+            "stdev_s": 2.3294185911632844e-05,
+            "total_s": 0.0015840189999999999
+          },
+          "pinned_cuda_copy_span_s": {
+            "count": 7,
+            "max_s": 0.0040113282203674315,
+            "mean_s": 0.0033918491772242957,
+            "median_s": 0.0032856318950653077,
+            "min_s": 0.0030824320316314695,
+            "q1_s": 0.003220128059387207,
+            "q3_s": 0.003447455883026123,
+            "stdev_s": 0.0002987677399107616,
+            "total_s": 0.02374294424057007
+          },
+          "pinned_event_record_s": {
+            "count": 7,
+            "max_s": 2.5928e-05,
+            "mean_s": 1.7659857142857144e-05,
+            "median_s": 1.5986e-05,
+            "min_s": 1.3815e-05,
+            "q1_s": 1.5034e-05,
+            "q3_s": 1.919e-05,
+            "stdev_s": 4.053951793356347e-06,
+            "total_s": 0.000123619
+          },
+          "pinned_event_wait_including_copy_completion_s": {
+            "count": 7,
+            "max_s": 0.003723161,
+            "mean_s": 0.0031513518571428573,
+            "median_s": 0.00305232,
+            "min_s": 0.002879197,
+            "q1_s": 0.002995822,
+            "q3_s": 0.003207436,
+            "stdev_s": 0.00027450185464912536,
+            "total_s": 0.022059463
+          }
+        }
+      },
+      "exact": {
+        "median_comparison": {
+          "new_vs_old_connector_pct": -83.45870954268062,
+          "new_vs_old_transfer_only_pct": -77.5389831040044,
+          "old_cpu_restack_share_of_old_connector_pct": 26.355558459740102
+        },
+        "order": [
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ],
+          [
+            "new_async_exact",
+            "old_connector_exact",
+            "old_transfer_only"
+          ],
+          [
+            "old_transfer_only",
+            "old_connector_exact",
+            "new_async_exact"
+          ]
+        ],
+        "raw_s": {
+          "new_async_exact": [
+            0.009682647,
+            0.010434014,
+            0.010109946,
+            0.009895718,
+            0.009921884,
+            0.009269037,
+            0.010154479,
+            0.008960982,
+            0.009349173,
+            0.008906013,
+            0.00907019
+          ],
+          "old_connector_exact": [
+            0.061295939,
+            0.053762865,
+            0.061087228,
+            0.058536225,
+            0.064181798,
+            0.060276777,
+            0.056125114,
+            0.0536679,
+            0.056620433,
+            0.053384464,
+            0.058536288
+          ],
+          "old_transfer_only": [
+            0.046598971,
+            0.039326168,
+            0.048415149,
+            0.042107179,
+            0.050975626,
+            0.042183907,
+            0.049030955,
+            0.041155164,
+            0.043307429,
+            0.043108676,
+            0.04159969
+          ]
+        },
+        "stats": {
+          "new_async_exact": {
+            "count": 11,
+            "max_s": 0.010434014,
+            "mean_s": 0.009614007545454545,
+            "median_s": 0.009682647,
+            "min_s": 0.008906013,
+            "q1_s": 0.00907019,
+            "q3_s": 0.010109946,
+            "stdev_s": 0.0005293310090488489,
+            "total_s": 0.105754083
+          },
+          "old_connector_exact": {
+            "count": 11,
+            "max_s": 0.064181798,
+            "mean_s": 0.05795227554545455,
+            "median_s": 0.058536225,
+            "min_s": 0.053384464,
+            "q1_s": 0.053762865,
+            "q3_s": 0.061087228,
+            "stdev_s": 0.003574697154342375,
+            "total_s": 0.637475031
+          },
+          "old_transfer_only": {
+            "count": 11,
+            "max_s": 0.050975626,
+            "mean_s": 0.04434626490909091,
+            "median_s": 0.043108676,
+            "min_s": 0.039326168,
+            "q1_s": 0.04159969,
+            "q3_s": 0.048415149,
+            "stdev_s": 0.003778273781873475,
+            "total_s": 0.48780891400000004
+          }
+        },
+        "warmup_s": {
+          "new_async_exact": [
+            0.090515881,
+            0.01008312
+          ],
+          "old_connector_exact": [
+            0.055703013,
+            0.059795844
+          ],
+          "old_transfer_only": [
+            0.159930771,
+            0.076282786
+          ]
+        }
+      },
+      "parity": {
+        "all_sha256_equal": true,
+        "all_torch_equal": true,
+        "layers": [
+          {
+            "layer": 0,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "71b71bc54330c3e82673e8fd2c3453ac8641720cab3d4e08538cb5261c50051f",
+            "sha256_old": "71b71bc54330c3e82673e8fd2c3453ac8641720cab3d4e08538cb5261c50051f",
+            "sha256_transfer_only": "71b71bc54330c3e82673e8fd2c3453ac8641720cab3d4e08538cb5261c50051f",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 1,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "32bdf59c2df307c9a2a164bbc6b4cf378c8023c78f8c598e19fa5af0b39a8454",
+            "sha256_old": "32bdf59c2df307c9a2a164bbc6b4cf378c8023c78f8c598e19fa5af0b39a8454",
+            "sha256_transfer_only": "32bdf59c2df307c9a2a164bbc6b4cf378c8023c78f8c598e19fa5af0b39a8454",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 2,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "57229cbd3991f8d4fe47642c991825ad6e6cd7dbf7b04ea07a79e8d052d498f5",
+            "sha256_old": "57229cbd3991f8d4fe47642c991825ad6e6cd7dbf7b04ea07a79e8d052d498f5",
+            "sha256_transfer_only": "57229cbd3991f8d4fe47642c991825ad6e6cd7dbf7b04ea07a79e8d052d498f5",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 3,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "a2cb797f4ef048594b28e9fb0fee9e07274241c66305e5bc53098d9420fee480",
+            "sha256_old": "a2cb797f4ef048594b28e9fb0fee9e07274241c66305e5bc53098d9420fee480",
+            "sha256_transfer_only": "a2cb797f4ef048594b28e9fb0fee9e07274241c66305e5bc53098d9420fee480",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 4,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "e0717b2347cd8836c1a9cb0ff2023f90175bc5a19c8d2be1831dc1131e9b2253",
+            "sha256_old": "e0717b2347cd8836c1a9cb0ff2023f90175bc5a19c8d2be1831dc1131e9b2253",
+            "sha256_transfer_only": "e0717b2347cd8836c1a9cb0ff2023f90175bc5a19c8d2be1831dc1131e9b2253",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 5,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "d1311ece4cff6e0021dce816b7efef3f2e6c865d24c50b67932649bd7cd78163",
+            "sha256_old": "d1311ece4cff6e0021dce816b7efef3f2e6c865d24c50b67932649bd7cd78163",
+            "sha256_transfer_only": "d1311ece4cff6e0021dce816b7efef3f2e6c865d24c50b67932649bd7cd78163",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 6,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "65fb139938f3780bab876238b7038e772cb1507a786a919a1d3b16df2a6486bf",
+            "sha256_old": "65fb139938f3780bab876238b7038e772cb1507a786a919a1d3b16df2a6486bf",
+            "sha256_transfer_only": "65fb139938f3780bab876238b7038e772cb1507a786a919a1d3b16df2a6486bf",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 7,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "71da497e43cd31e5f55bd5e69a07af969b0ce97cc8fd0be84bc39ae3df820e32",
+            "sha256_old": "71da497e43cd31e5f55bd5e69a07af969b0ce97cc8fd0be84bc39ae3df820e32",
+            "sha256_transfer_only": "71da497e43cd31e5f55bd5e69a07af969b0ce97cc8fd0be84bc39ae3df820e32",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 8,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "3b83b8ebc9ef1c454d11eed902c72695afa2c60769efb61106592b109f6e9caa",
+            "sha256_old": "3b83b8ebc9ef1c454d11eed902c72695afa2c60769efb61106592b109f6e9caa",
+            "sha256_transfer_only": "3b83b8ebc9ef1c454d11eed902c72695afa2c60769efb61106592b109f6e9caa",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 9,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "affa81da0125d9b0a7ba3cf5b57c8af4c13dee60b151aa677e62ca43aa202881",
+            "sha256_old": "affa81da0125d9b0a7ba3cf5b57c8af4c13dee60b151aa677e62ca43aa202881",
+            "sha256_transfer_only": "affa81da0125d9b0a7ba3cf5b57c8af4c13dee60b151aa677e62ca43aa202881",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 10,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "fc8af00b94e828329260f851f8312f20520b95faed632ff35102a600d30816ed",
+            "sha256_old": "fc8af00b94e828329260f851f8312f20520b95faed632ff35102a600d30816ed",
+            "sha256_transfer_only": "fc8af00b94e828329260f851f8312f20520b95faed632ff35102a600d30816ed",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 11,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "a0dda0e4e45c545474a5ad9e8a0338e9b651bb16b3bd994794bbf0882ceb1d4b",
+            "sha256_old": "a0dda0e4e45c545474a5ad9e8a0338e9b651bb16b3bd994794bbf0882ceb1d4b",
+            "sha256_transfer_only": "a0dda0e4e45c545474a5ad9e8a0338e9b651bb16b3bd994794bbf0882ceb1d4b",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 12,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "79b5cdc6b405a288f45c35f80d8b23713f3253376c4603458714ea928eabe72c",
+            "sha256_old": "79b5cdc6b405a288f45c35f80d8b23713f3253376c4603458714ea928eabe72c",
+            "sha256_transfer_only": "79b5cdc6b405a288f45c35f80d8b23713f3253376c4603458714ea928eabe72c",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 13,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "2ea1f3b42cd79368bbcce36a757785c435cf11cfcdec18f195c53080a777eb84",
+            "sha256_old": "2ea1f3b42cd79368bbcce36a757785c435cf11cfcdec18f195c53080a777eb84",
+            "sha256_transfer_only": "2ea1f3b42cd79368bbcce36a757785c435cf11cfcdec18f195c53080a777eb84",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 14,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "c165c336353b9a9ac33fac01cc002b3c4df58c0a50f57954523df1de7f117e31",
+            "sha256_old": "c165c336353b9a9ac33fac01cc002b3c4df58c0a50f57954523df1de7f117e31",
+            "sha256_transfer_only": "c165c336353b9a9ac33fac01cc002b3c4df58c0a50f57954523df1de7f117e31",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 15,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "f71122bf7940888381a7bced0387c75581307f4edfbc7ca23e5c8241975dc382",
+            "sha256_old": "f71122bf7940888381a7bced0387c75581307f4edfbc7ca23e5c8241975dc382",
+            "sha256_transfer_only": "f71122bf7940888381a7bced0387c75581307f4edfbc7ca23e5c8241975dc382",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 16,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "0dda8d7d80c0bbf949baf5a1c410917dabc3b9d2f1edce9d6362367026a6441c",
+            "sha256_old": "0dda8d7d80c0bbf949baf5a1c410917dabc3b9d2f1edce9d6362367026a6441c",
+            "sha256_transfer_only": "0dda8d7d80c0bbf949baf5a1c410917dabc3b9d2f1edce9d6362367026a6441c",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 17,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "207f438c9bf6e2ec2829a4450d958c86e54bbeb5ae4c9b0896ae5007ffc30e16",
+            "sha256_old": "207f438c9bf6e2ec2829a4450d958c86e54bbeb5ae4c9b0896ae5007ffc30e16",
+            "sha256_transfer_only": "207f438c9bf6e2ec2829a4450d958c86e54bbeb5ae4c9b0896ae5007ffc30e16",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 18,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "c837c7b2f16d1b8c359561009ceeae6f74e1fc8d3b0b1937dd6758d39afa48d1",
+            "sha256_old": "c837c7b2f16d1b8c359561009ceeae6f74e1fc8d3b0b1937dd6758d39afa48d1",
+            "sha256_transfer_only": "c837c7b2f16d1b8c359561009ceeae6f74e1fc8d3b0b1937dd6758d39afa48d1",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 19,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "65844ccb74c7fd31ac2c8afb4379f66c6c78cae2f479e65a861e9d65114a61b8",
+            "sha256_old": "65844ccb74c7fd31ac2c8afb4379f66c6c78cae2f479e65a861e9d65114a61b8",
+            "sha256_transfer_only": "65844ccb74c7fd31ac2c8afb4379f66c6c78cae2f479e65a861e9d65114a61b8",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 20,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "639855f3006569751dc4735e898e90c0119faa612444d29689d9399eb52d5a29",
+            "sha256_old": "639855f3006569751dc4735e898e90c0119faa612444d29689d9399eb52d5a29",
+            "sha256_transfer_only": "639855f3006569751dc4735e898e90c0119faa612444d29689d9399eb52d5a29",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 21,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "387606080d1cfcaf8bb684ce97ce2c622a8b2858814efd702136d71dd2e152aa",
+            "sha256_old": "387606080d1cfcaf8bb684ce97ce2c622a8b2858814efd702136d71dd2e152aa",
+            "sha256_transfer_only": "387606080d1cfcaf8bb684ce97ce2c622a8b2858814efd702136d71dd2e152aa",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 22,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "d4c19830b24cbcd9711c1283d09c264ccbeb583362393fd9a0902a5a16c58f5e",
+            "sha256_old": "d4c19830b24cbcd9711c1283d09c264ccbeb583362393fd9a0902a5a16c58f5e",
+            "sha256_transfer_only": "d4c19830b24cbcd9711c1283d09c264ccbeb583362393fd9a0902a5a16c58f5e",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 23,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "6598277c0d5e9a20633c69c4e1357d827e0fcddbaf6ca1243ae125c4e6d2d842",
+            "sha256_old": "6598277c0d5e9a20633c69c4e1357d827e0fcddbaf6ca1243ae125c4e6d2d842",
+            "sha256_transfer_only": "6598277c0d5e9a20633c69c4e1357d827e0fcddbaf6ca1243ae125c4e6d2d842",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 24,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "0c31b2c30277da2cf1a91b756bf9a3d5f82f5f8745d5fb3f8825099b82b54958",
+            "sha256_old": "0c31b2c30277da2cf1a91b756bf9a3d5f82f5f8745d5fb3f8825099b82b54958",
+            "sha256_transfer_only": "0c31b2c30277da2cf1a91b756bf9a3d5f82f5f8745d5fb3f8825099b82b54958",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 25,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "e7a8fe1752431f939e31772c2f2214c16df05a0f096b361d960534fd740f3b10",
+            "sha256_old": "e7a8fe1752431f939e31772c2f2214c16df05a0f096b361d960534fd740f3b10",
+            "sha256_transfer_only": "e7a8fe1752431f939e31772c2f2214c16df05a0f096b361d960534fd740f3b10",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 26,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "1980b86232063e5320086ec8345f9eee5a7dad10944674858430e410dbead402",
+            "sha256_old": "1980b86232063e5320086ec8345f9eee5a7dad10944674858430e410dbead402",
+            "sha256_transfer_only": "1980b86232063e5320086ec8345f9eee5a7dad10944674858430e410dbead402",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          },
+          {
+            "layer": 27,
+            "new_contiguous": true,
+            "new_pinned": true,
+            "old_contiguous": true,
+            "old_pinned": false,
+            "sha256_new": "b5637478b73d6a733eabcef292260cd6c073ac15a44865fa8fae92a7697af553",
+            "sha256_old": "b5637478b73d6a733eabcef292260cd6c073ac15a44865fa8fae92a7697af553",
+            "sha256_transfer_only": "b5637478b73d6a733eabcef292260cd6c073ac15a44865fa8fae92a7697af553",
+            "shape": [
+              77,
+              16,
+              4,
+              256
+            ],
+            "stride": [
+              16384,
+              1024,
+              256,
+              1
+            ],
+            "torch_equal": true,
+            "transfer_contiguous": true
+          }
+        ]
+      }
+    }
+  },
+  "schema_version": 1,
+  "seed": 4201701,
+  "torch": "2.13.0+cu130",
+  "torch_num_threads": 48,
+  "warmup": 2
+}

@@ -1,0 +1,9 @@
+{
+  "image": "ghcr.io/thyn-ai/telys-worker-vllm:0.1.2-rc.9",
+  "digest": "sha256:8d84aa45d5578421696f67d2e7ae2e6fb475c4d8ffb5d0429b7ea748dfd0fea2",
+  "connector_version": "0.1.2",
+  "vllm_version": "0.32.0",
+  "telys_version": "0.1.14",
+  "source_files_match": true,
+  "compared_python_files": 10
+}

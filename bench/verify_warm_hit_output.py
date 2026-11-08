@@ -31,8 +31,6 @@ from pathlib import Path
 from typing import Any
 
 from benchmark_prefix_caching_metrics import sample_requests_from_random
-
-LOGGER = logging.getLogger(__name__)
 from vllm import LLM, SamplingParams
 from vllm.engine.arg_utils import EngineArgs
 from vllm.utils.argparse_utils import FlexibleArgumentParser
@@ -42,6 +40,8 @@ try:
 except ImportError:  # pragma: no cover - older vLLM layouts
     from backend_request_func import get_tokenizer
 
+
+LOGGER = logging.getLogger(__name__)
 
 DEFAULT_KV_TRANSFER_CONFIG: dict[str, Any] = {
     "kv_connector": "TelysKVConnector",
@@ -112,7 +112,8 @@ def _run_once(llm: LLM, prompt: str, output_len: int, seed: int) -> dict[str, An
     }
 
 
-def main() -> int:
+def parse_args(slab_path: str, argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse arguments and apply the explicit no-connector override."""
     parser = FlexibleArgumentParser(
         description="Verify warm-hit output equals cold output through Telys."
     )
@@ -121,16 +122,30 @@ def main() -> int:
     parser.add_argument("--prefix-len", type=int, default=64)
     parser.add_argument("--input-length-range", type=str, default="64:128")
     parser.add_argument("--reset-telys", action="store_true")
+    parser.add_argument(
+        "--disable-kv-connector",
+        action="store_true",
+        help=(
+            "Disable the KV connector for a no-cache reference. This overrides "
+            "the verifier's default Telys config and any --kv-transfer-config."
+        ),
+    )
     parser = EngineArgs.add_cli_args(parser)
 
     # Disable native prefix caching by default so Telys must carry the full hit.
     parser.set_defaults(enable_prefix_caching=False)
-
-    telys_path, slab_path = _ensure_telys_path()
     # Set a default kv-transfer-config unless the caller provided one.
     parser.set_defaults(kv_transfer_config=_build_kv_transfer_config(slab_path))
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+    if args.disable_kv_connector:
+        args.kv_transfer_config = None
+    return args
+
+
+def main() -> int:
+    telys_path, slab_path = _ensure_telys_path()
+    args = parse_args(slab_path)
     logging.basicConfig(level=logging.INFO)
 
     if args.reset_telys:

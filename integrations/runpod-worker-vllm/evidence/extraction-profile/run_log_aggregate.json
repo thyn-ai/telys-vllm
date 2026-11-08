@@ -1,0 +1,543 @@
+{
+  "benchmark_runs": [
+    {
+      "arm": "A",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": null,
+      "label": "no cache",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": 1,
+      "phase": "cold",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 26.89919465389999,
+      "total_output_tokens": 64,
+      "total_time_s": 2.379253387451172,
+      "ttft_mean_s": 0.5889942646026611,
+      "ttft_p50_s": 0.5889942646026611,
+      "ttft_p95_s": 0.5889942646026611
+    },
+    {
+      "arm": "A",
+      "external_hit_evidence": "external hit rate=unreported",
+      "external_hit_rate_pct": null,
+      "first_warm_ttft_s": 1.5196075439453125,
+      "label": "no cache",
+      "later_warm_ttft_p50_s": 10.293736934661865,
+      "num_prompts": 20,
+      "phase": "warm",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 62.38722853897277,
+      "total_output_tokens": 1280,
+      "total_time_s": 20.517019748687744,
+      "ttft_mean_s": 10.335993015766144,
+      "ttft_p50_s": 10.285178542137146,
+      "ttft_p95_s": 17.71626169681549
+    },
+    {
+      "arm": "B",
+      "external_hit_evidence": "vLLM external hit rate=0.0%",
+      "external_hit_rate_pct": 0.0,
+      "first_warm_ttft_s": null,
+      "label": "filesystem",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": 1,
+      "phase": "cold",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 26.65423919695149,
+      "total_output_tokens": 64,
+      "total_time_s": 2.4011189937591553,
+      "ttft_mean_s": 0.6105575561523438,
+      "ttft_p50_s": 0.6105575561523438,
+      "ttft_p95_s": 0.6105575561523438
+    },
+    {
+      "arm": "B",
+      "external_hit_evidence": "vLLM external hit rate=67.4%",
+      "external_hit_rate_pct": 67.4,
+      "first_warm_ttft_s": 5.953975439071655,
+      "label": "filesystem",
+      "later_warm_ttft_p50_s": 7.752368450164795,
+      "num_prompts": 20,
+      "phase": "warm",
+      "result_present": true,
+      "telys_last_lookup": null,
+      "throughput_tokens_per_s": 94.59582795524241,
+      "total_output_tokens": 1280,
+      "total_time_s": 13.531252145767212,
+      "ttft_mean_s": 8.20626665353775,
+      "ttft_p50_s": 7.744242310523987,
+      "ttft_p95_s": 10.694498753547668
+    },
+    {
+      "arm": "C",
+      "external_hit_evidence": "vLLM external hit rate=0.0%; Telys last lookup hit_blocks=0,hit_tokens=0",
+      "external_hit_rate_pct": 0.0,
+      "first_warm_ttft_s": null,
+      "label": "Telys",
+      "later_warm_ttft_p50_s": null,
+      "num_prompts": 1,
+      "phase": "cold",
+      "result_present": true,
+      "telys_last_lookup": {
+        "hit_blocks": 0,
+        "hit_tokens": 0
+      },
+      "throughput_tokens_per_s": 18.68476594331231,
+      "total_output_tokens": 64,
+      "total_time_s": 3.425250291824341,
+      "ttft_mean_s": 1.4009037017822266,
+      "ttft_p50_s": 1.4009037017822266,
+      "ttft_p95_s": 1.4009037017822266
+    },
+    {
+      "arm": "C",
+      "external_hit_evidence": "vLLM external hit rate=67.4%; Telys last lookup hit_blocks=269,hit_tokens=4304",
+      "external_hit_rate_pct": 67.4,
+      "first_warm_ttft_s": 7.100872039794922,
+      "label": "Telys",
+      "later_warm_ttft_p50_s": 16.445544481277466,
+      "num_prompts": 20,
+      "phase": "warm",
+      "result_present": true,
+      "telys_last_lookup": {
+        "hit_blocks": 269,
+        "hit_tokens": 4304
+      },
+      "throughput_tokens_per_s": 63.61331700175248,
+      "total_output_tokens": 1280,
+      "total_time_s": 20.121572971343994,
+      "ttft_mean_s": 13.839071142673493,
+      "ttft_p50_s": 14.746935606002808,
+      "ttft_p95_s": 17.300045108795167
+    }
+  ],
+  "environment": {
+    "async_kv_loading": false,
+    "async_save_extraction_commit": "c42303965efaba0cbf2f8e0cf90074206af8ad68",
+    "benchmark_prefix": 4096,
+    "benchmarked_head": "c42303965efaba0cbf2f8e0cf90074206af8ad68",
+    "final_head_delta": "lint-only: __enter__ annotation and async extraction test structure; no runtime behavior change",
+    "gpu": "NVIDIA A40, 46068 MiB, 595.91.07",
+    "gpu_memory_utilization": 0.95,
+    "head": "5ae131d5fea4577c88806f118c3520d588fd9461",
+    "max_model_len": 12288,
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "model_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "native_prefix_caching": false,
+    "output_tokens": 64,
+    "pytest": "9.2.0",
+    "seed": 42,
+    "telys": "0.1.14",
+    "vllm": "0.32.0",
+    "vllm_multiprocessing": false
+  },
+  "evidence_manifest": {
+    "all_hashes_match": true,
+    "evidence_copy": "/tmp/telys-async-c423-agent5/p4096-results",
+    "file_count": 22,
+    "files": [
+      {
+        "bytes": 364,
+        "name": "arm_A_cold.json",
+        "sha256": "fdce1c5e6f11bbf4bcbd4263627082c46155a4ec55e965f6742f0848f4b8d88c"
+      },
+      {
+        "bytes": 24867,
+        "name": "arm_A_cold.log",
+        "sha256": "588a43e94b9f6fda54ff5ac9fa905631e14f0ff17e386ad64ea458e2976b510a"
+      },
+      {
+        "bytes": 41226,
+        "name": "arm_A_run1.json",
+        "sha256": "638f83eaadc3ee5d1a776fc8ec3e992569db07c37990321127bae682ec21e7d4"
+      },
+      {
+        "bytes": 59528,
+        "name": "arm_A_run1.log",
+        "sha256": "a3cb63aa0618fdc574ce84f679f8c461618800f965cded85eecbddf1e2886d37"
+      },
+      {
+        "bytes": 815,
+        "name": "arm_A_warm.json",
+        "sha256": "a8b57df3e8babf78e9095938fcf2fc2d100213a124ff0affaf421a4ef7733e0b"
+      },
+      {
+        "bytes": 19386,
+        "name": "arm_A_warm.log",
+        "sha256": "04d1fd041f230c62916493d6c2d5095b262a6ddff2c2f6a27371fd32b0a28b43"
+      },
+      {
+        "bytes": 365,
+        "name": "arm_B_cold.json",
+        "sha256": "c6da8a2613cfdd6539dd54aa27b2a40d569539169dd97dba58aa3bf0331b67f3"
+      },
+      {
+        "bytes": 19477,
+        "name": "arm_B_cold.log",
+        "sha256": "e39a2b75cbf629e7851119839c22f703ca1cf2b16062b76c9855dbcbc697ff7f"
+      },
+      {
+        "bytes": 41227,
+        "name": "arm_B_run1.json",
+        "sha256": "6b3198306b5ce6d67ac38c5b75ac15025cd4d38d2a2fa62ee68428ab5f70f977"
+      },
+      {
+        "bytes": 66823,
+        "name": "arm_B_run1.log",
+        "sha256": "13315ae7749886043e2aed0fa469a404d4871fb275d3862dd49caf35ecd215e9"
+      },
+      {
+        "bytes": 41226,
+        "name": "arm_B_run2.json",
+        "sha256": "4d42246ffabfccf0f4531f8fa6b9e7f26c9df7a703a2d8cad872500659e0e709"
+      },
+      {
+        "bytes": 66246,
+        "name": "arm_B_run2.log",
+        "sha256": "9ba94eeb03f955719c067596f5b408e01050935ade1a136419d7f05718325ad9"
+      },
+      {
+        "bytes": 800,
+        "name": "arm_B_warm.json",
+        "sha256": "9373c5413bad99c12a8fdd5b1eaefcb5ebf37f1e38f1e72255216e6dfda5555c"
+      },
+      {
+        "bytes": 45630,
+        "name": "arm_B_warm.log",
+        "sha256": "352527881799368e0a8c962cb16a77636371593862c97a6d37e7470e213aec25"
+      },
+      {
+        "bytes": 364,
+        "name": "arm_C_cold.json",
+        "sha256": "915aafd37d1c52f94c9abc827f15018cc06a2d1128a4ac94df93dfd0158fa7a7"
+      },
+      {
+        "bytes": 17280,
+        "name": "arm_C_cold.log",
+        "sha256": "90f816d580568946d794ce41dd8775e1d3534af74323396cd7fa43b2f28c86a1"
+      },
+      {
+        "bytes": 41226,
+        "name": "arm_C_run1.json",
+        "sha256": "267022332dfa1751973141f10cafce8bbcc847a4affaf5ed63a56a199fe62413"
+      },
+      {
+        "bytes": 61238,
+        "name": "arm_C_run1.log",
+        "sha256": "a6178af16970c7f535ea84bffe6a494955ecebc0f98055c8c3bfb1aff01d6519"
+      },
+      {
+        "bytes": 41225,
+        "name": "arm_C_run2.json",
+        "sha256": "c3eb5d226bda6e26f361c924b8a5d7ab30ffe836fd6d2295213fd48537733a1e"
+      },
+      {
+        "bytes": 60881,
+        "name": "arm_C_run2.log",
+        "sha256": "1197a78349642e096ebbc77949c8a99dbabbda066aa4a7c4bd62804ec421272a"
+      },
+      {
+        "bytes": 814,
+        "name": "arm_C_warm.json",
+        "sha256": "a89a5e0980d6a93ce93210d51e1308e7d06a7bca34a3275035af42ec9f6b7e64"
+      },
+      {
+        "bytes": 23794,
+        "name": "arm_C_warm.log",
+        "sha256": "c660275f27b1aad62e054094f35acab5c564e84e8755afc53b648b976929ea9f"
+      }
+    ],
+    "source": "/runpod-volume/telys-vllm-benchmark/p4096-seed42-async-c423-agent5/results"
+  },
+  "notes": [
+    "save_collect and save_encode_persist are wall times parsed from the connector wait_for_save log message; JSONL telemetry was not enabled for these runs.",
+    "No previous fix6 run directory, log, or telemetry JSONL was found under /tmp or /runpod-volume on pod yzyuv82g45dm5b; only the three previous aggregate values in performance-comparison.json are retained.",
+    "p95 uses nearest rank and is not meaningful for the cold single-call sample."
+  ],
+  "output_equality_audit": {
+    "all_output_comparisons_passed": true,
+    "comparisons": [
+      {
+        "arm": "B",
+        "matches_no_cache": true,
+        "phase": "cold",
+        "run": "run1",
+        "verifier_passed": true
+      },
+      {
+        "arm": "B",
+        "matches_no_cache": true,
+        "phase": "warm",
+        "run": "run1",
+        "verifier_passed": true
+      },
+      {
+        "arm": "B",
+        "matches_no_cache": true,
+        "phase": "cold",
+        "run": "run2",
+        "verifier_passed": true
+      },
+      {
+        "arm": "B",
+        "matches_no_cache": true,
+        "phase": "warm",
+        "run": "run2",
+        "verifier_passed": true
+      },
+      {
+        "arm": "C",
+        "matches_no_cache": true,
+        "phase": "cold",
+        "run": "run1",
+        "verifier_passed": true
+      },
+      {
+        "arm": "C",
+        "matches_no_cache": true,
+        "phase": "warm",
+        "run": "run1",
+        "verifier_passed": true
+      },
+      {
+        "arm": "C",
+        "matches_no_cache": true,
+        "phase": "cold",
+        "run": "run2",
+        "verifier_passed": true
+      },
+      {
+        "arm": "C",
+        "matches_no_cache": true,
+        "phase": "warm",
+        "run": "run2",
+        "verifier_passed": true
+      }
+    ]
+  },
+  "performance_comparison": {
+    "A": {
+      "current": {
+        "first_warm_ttft_s": 1.5196075439453125,
+        "throughput_tokens_per_s": 62.38722853897277,
+        "total_time_s": 20.517019748687744,
+        "ttft_mean_s": 10.335993015766144,
+        "ttft_p50_s": 10.285178542137146,
+        "ttft_p95_s": 17.71626169681549
+      },
+      "previous": {
+        "total_time_s": 20.335,
+        "ttft_mean_s": 9.453
+      },
+      "total_change_pct": 0.8951057225854209,
+      "ttft_mean_change_pct": 9.340876079193317
+    },
+    "B": {
+      "current": {
+        "first_warm_ttft_s": 5.953975439071655,
+        "throughput_tokens_per_s": 94.59582795524241,
+        "total_time_s": 13.531252145767212,
+        "ttft_mean_s": 8.20626665353775,
+        "ttft_p50_s": 7.744242310523987,
+        "ttft_p95_s": 10.694498753547668
+      },
+      "previous": {
+        "total_time_s": 11.405662,
+        "ttft_mean_s": 6.220889
+      },
+      "total_change_pct": 18.636271579564713,
+      "ttft_mean_change_pct": 31.91469343911697
+    },
+    "C": {
+      "current": {
+        "first_warm_ttft_s": 7.100872039794922,
+        "throughput_tokens_per_s": 63.61331700175248,
+        "total_time_s": 20.121572971343994,
+        "ttft_mean_s": 13.839071142673493,
+        "ttft_p50_s": 14.746935606002808,
+        "ttft_p95_s": 17.300045108795167
+      },
+      "previous": {
+        "total_time_s": 16.622868,
+        "ttft_mean_s": 10.754255
+      },
+      "total_change_pct": 21.047541082224754,
+      "ttft_mean_change_pct": 28.684610348866492
+    },
+    "current_C_vs_current_A": {
+      "total_change_pct": -1.9274084744644426,
+      "ttft_mean_change_pct": 33.89203264324851
+    },
+    "current_C_vs_current_B": {
+      "total_change_pct": 48.70444179579003,
+      "ttft_mean_change_pct": 68.640280982186
+    }
+  },
+  "persistence_audit": {
+    "all_chunks_read_and_decoded": true,
+    "all_warm_lookups_hit_blocks": 269,
+    "chunk_count_including_cold": 26,
+    "cold_lookup_count": 1,
+    "cold_prefix_blocks_expected": 269,
+    "continuation_chunk_count": 25,
+    "engine_groups_blocks_chunks": [
+      [
+        269,
+        1
+      ],
+      [
+        2596,
+        25
+      ]
+    ],
+    "no_whole_prefix_resave": true,
+    "persistence_passed": true,
+    "suffix_blocks_expected": 2596,
+    "suffix_blocks_persisted": 2596,
+    "total_blocks_including_cold": 2865,
+    "total_payload_bytes": 2628678028,
+    "warm_lookup_count": 20
+  },
+  "runs": {
+    "cold": {
+      "calls": [
+        {
+          "chunks": 1,
+          "expected_chunks": 1,
+          "line": 111,
+          "save_collect_s": 0.888,
+          "save_encode_persist_s": 0.225
+        }
+      ],
+      "chunks": 1,
+      "save_collect": {
+        "count": 1,
+        "max_s": 0.888,
+        "mean_s": 0.888,
+        "median_s": 0.888,
+        "min_s": 0.888,
+        "p95_nearest_rank_s": 0.888,
+        "total_s": 0.888
+      },
+      "save_encode_persist": {
+        "count": 1,
+        "max_s": 0.225,
+        "mean_s": 0.225,
+        "median_s": 0.225,
+        "min_s": 0.225,
+        "p95_nearest_rank_s": 0.225,
+        "total_s": 0.225
+      },
+      "source": "/tmp/telys-async-c423-agent5/p4096-results/arm_C_cold.log"
+    },
+    "correctness_run1": {
+      "calls": [
+        {
+          "chunks": 1,
+          "expected_chunks": 1,
+          "line": 111,
+          "save_collect_s": 0.86,
+          "save_encode_persist_s": 0.169
+        }
+      ],
+      "chunks": 1,
+      "save_collect": {
+        "count": 1,
+        "max_s": 0.86,
+        "mean_s": 0.86,
+        "median_s": 0.86,
+        "min_s": 0.86,
+        "p95_nearest_rank_s": 0.86,
+        "total_s": 0.86
+      },
+      "save_encode_persist": {
+        "count": 1,
+        "max_s": 0.169,
+        "mean_s": 0.169,
+        "median_s": 0.169,
+        "min_s": 0.169,
+        "p95_nearest_rank_s": 0.169,
+        "total_s": 0.169
+      },
+      "source": "/tmp/telys-async-c423-agent5/p4096-results/arm_C_run1.log"
+    },
+    "correctness_run2": {
+      "calls": [],
+      "chunks": 0,
+      "save_collect": null,
+      "save_encode_persist": null,
+      "source": "/tmp/telys-async-c423-agent5/p4096-results/arm_C_run2.log"
+    },
+    "warm": {
+      "calls": [
+        {
+          "chunks": 4,
+          "expected_chunks": 4,
+          "line": 116,
+          "save_collect_s": 1.407,
+          "save_encode_persist_s": 0.755
+        },
+        {
+          "chunks": 3,
+          "expected_chunks": 3,
+          "line": 121,
+          "save_collect_s": 1.235,
+          "save_encode_persist_s": 0.68
+        },
+        {
+          "chunks": 6,
+          "expected_chunks": 6,
+          "line": 132,
+          "save_collect_s": 1.21,
+          "save_encode_persist_s": 0.268
+        },
+        {
+          "chunks": 4,
+          "expected_chunks": 4,
+          "line": 140,
+          "save_collect_s": 1.226,
+          "save_encode_persist_s": 0.507
+        },
+        {
+          "chunks": 6,
+          "expected_chunks": 6,
+          "line": 152,
+          "save_collect_s": 1.237,
+          "save_encode_persist_s": 0.494
+        },
+        {
+          "chunks": 2,
+          "expected_chunks": 2,
+          "line": 156,
+          "save_collect_s": 0.228,
+          "save_encode_persist_s": 0.022
+        }
+      ],
+      "chunks": 25,
+      "save_collect": {
+        "count": 6,
+        "max_s": 1.407,
+        "mean_s": 1.0905,
+        "median_s": 1.2305000000000001,
+        "min_s": 0.228,
+        "p95_nearest_rank_s": 1.407,
+        "total_s": 6.543
+      },
+      "save_encode_persist": {
+        "count": 6,
+        "max_s": 0.755,
+        "mean_s": 0.4543333333333333,
+        "median_s": 0.5005,
+        "min_s": 0.022,
+        "p95_nearest_rank_s": 0.755,
+        "total_s": 2.726
+      },
+      "source": "/tmp/telys-async-c423-agent5/p4096-results/arm_C_warm.log"
+    }
+  },
+  "schema_version": 1
+}

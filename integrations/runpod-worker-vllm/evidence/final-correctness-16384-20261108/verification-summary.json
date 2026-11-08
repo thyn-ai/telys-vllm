@@ -1,0 +1,108 @@
+{
+  "combined": {
+    "expected_blocks": 25414,
+    "expected_prefix_blocks": 25331,
+    "expected_suffix_blocks": 83,
+    "missing_blocks": 0,
+    "prefix_chunks": 89,
+    "requests": 21,
+    "suffix_chunks": 83,
+    "verified_blocks": 25414
+  },
+  "phases": {
+    "cold": {
+      "checks": {
+        "all_expected_blocks_verified": true,
+        "clean_harness_exit": true,
+        "exit_code_zero": true,
+        "no_errors": true,
+        "no_inconclusive_reasons": true,
+        "no_missing_blocks": true,
+        "passed_true": true,
+        "pending_writes_observed": true,
+        "resolved_packed_shapes": true,
+        "status_pass": true
+      },
+      "errors": [],
+      "exit_code": 0,
+      "inconclusive_reasons": [],
+      "lifecycle": {
+        "exit_kind": "completed",
+        "exit_status": 0,
+        "pending_chunks_observed": 7,
+        "pending_write_spans": 7,
+        "persisted_chunk_spans": 7
+      },
+      "manifest_shape_checks_passed": true,
+      "passed": true,
+      "path": "/tmp/telys-final-correctness-validation/p16384/arm_C_cold.verification.json",
+      "resolved_shapes": [
+        [
+          16,
+          4,
+          256
+        ]
+      ],
+      "status": "pass",
+      "summary": {
+        "expected_blocks": 1081,
+        "expected_prefix_blocks": 1077,
+        "expected_suffix_blocks": 4,
+        "missing_blocks": 0,
+        "prefix_chunks": 3,
+        "requests": 1,
+        "suffix_chunks": 4,
+        "verified_blocks": 1081
+      },
+      "vllm_version": "0.32.0"
+    },
+    "warm": {
+      "checks": {
+        "all_expected_blocks_verified": true,
+        "clean_harness_exit": true,
+        "exit_code_zero": true,
+        "no_errors": true,
+        "no_inconclusive_reasons": true,
+        "no_missing_blocks": true,
+        "passed_true": true,
+        "pending_writes_observed": true,
+        "resolved_packed_shapes": true,
+        "status_pass": true
+      },
+      "errors": [],
+      "exit_code": 0,
+      "inconclusive_reasons": [],
+      "lifecycle": {
+        "exit_kind": "completed",
+        "exit_status": 0,
+        "pending_chunks_observed": 105,
+        "pending_write_spans": 52,
+        "persisted_chunk_spans": 105
+      },
+      "manifest_shape_checks_passed": true,
+      "passed": true,
+      "path": "/tmp/telys-final-correctness-validation/p16384/arm_C_warm.verification.json",
+      "resolved_shapes": [
+        [
+          16,
+          4,
+          256
+        ]
+      ],
+      "status": "pass",
+      "summary": {
+        "expected_blocks": 24333,
+        "expected_prefix_blocks": 24254,
+        "expected_suffix_blocks": 79,
+        "missing_blocks": 0,
+        "prefix_chunks": 86,
+        "requests": 20,
+        "suffix_chunks": 79,
+        "verified_blocks": 24333
+      },
+      "vllm_version": "0.32.0"
+    }
+  },
+  "schema_version": 1,
+  "verification_passed": true
+}

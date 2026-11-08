@@ -27,6 +27,8 @@ from dataclasses import dataclass, field
 from types import ModuleType
 from typing import Any, ClassVar
 
+import pytest
+
 
 def _install(name: str, module: ModuleType) -> ModuleType:
     sys.modules[name] = module
@@ -310,9 +312,6 @@ _install_factory()
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
-
-
-import pytest
 
 
 @pytest.fixture(autouse=True)

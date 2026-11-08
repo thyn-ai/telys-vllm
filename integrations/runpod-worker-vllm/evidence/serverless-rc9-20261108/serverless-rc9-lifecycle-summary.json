@@ -1,0 +1,18 @@
+{
+  "cold_worker": "yutiyuykg0g2gc",
+  "after_zero_worker": "1gsk5j29rzcz0s",
+  "statuses": [
+    "COMPLETED",
+    "COMPLETED"
+  ],
+  "execution_times_s": [
+    7.042,
+    6.735
+  ],
+  "after_zero_delay_s": 59.055,
+  "outputs_match": true,
+  "prompt_tokens": [
+    8619,
+    8619
+  ]
+}

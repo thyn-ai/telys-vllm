@@ -1,0 +1,164 @@
+{
+  "abrupt_sigterm": {
+    "abrupt_sigterm_lost_pending_write": true,
+    "pending_at_put": 1,
+    "record_present_after_fresh_open": false,
+    "sigterm_exit_code": 143
+  },
+  "graceful": {
+    "decoded_blocks": 2,
+    "pending_at_put": 1,
+    "record_present": true
+  },
+  "restart_prefixes": {
+    "16384": {
+      "correctness": {
+        "arm": "C",
+        "fresh_warm_matches_reference": true,
+        "label": "Telys",
+        "status": "pass"
+      },
+      "raw_evidence_hashes": [
+        {
+          "bytes": 155482,
+          "name": "arm_A_run1.json",
+          "sha256": "f67c8a3ce3d2bee4d8bed84fd057dad8ae16a928f74e289929a546c9cc3518ca"
+        },
+        {
+          "bytes": 155483,
+          "name": "arm_C_run1.json",
+          "sha256": "9a93c995c98f7510aff1653b91893237ec692eab40247e01a0c13a378b266cb1"
+        },
+        {
+          "bytes": 155484,
+          "name": "arm_C_run2.json",
+          "sha256": "6e52ab9b3100fc9b98e20897135b4e4692ddd3bb6e82502a8cafaaeb78a7ffb2"
+        },
+        {
+          "bytes": 173265,
+          "name": "arm_A_run1.log",
+          "sha256": "1753725705e6302de4f4c55e27b4ef36b430bca369c28f2ad7e092be7ab300b7"
+        },
+        {
+          "bytes": 175925,
+          "name": "arm_C_run1.log",
+          "sha256": "28554e93f02f69033161ad560fb20d1e9fede4e622b00147bec16530da5a0541"
+        },
+        {
+          "bytes": 175451,
+          "name": "arm_C_run2.log",
+          "sha256": "5760aeb80fc78611f362853d030f70728d8cc6911c72eadef741713f13be6fc8"
+        }
+      ],
+      "store": {
+        "all_decoded": true,
+        "blocks": 1077,
+        "chunks": 3,
+        "payload_bytes": 988155162
+      },
+      "workers": [
+        {
+          "engine_id": "b3e4c71d-cfcc-4acf-9e33-4826655d20ff",
+          "hit_blocks": [
+            0,
+            1077
+          ],
+          "lookup_lines": [
+            "INFO:telys_vllm.connector:telys lookup: req=0-b21b5993 num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=0 hit_tokens=0",
+            "INFO:telys_vllm.connector:telys lookup: req=1-b92198b0 num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=1077 hit_tokens=17232"
+          ],
+          "main_pid": 9614,
+          "run": "run1"
+        },
+        {
+          "engine_id": "069da43d-df39-40c7-9467-6216c976b192",
+          "hit_blocks": [
+            1077,
+            1077
+          ],
+          "lookup_lines": [
+            "Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]INFO:telys_vllm.connector:telys lookup: req=0-9bce273b num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=1077 hit_tokens=17232",
+            "Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]INFO:telys_vllm.connector:telys lookup: req=1-82fa2f5e num_tokens=17241 num_computed=0 start_block=0 max_block=1077 hit_blocks=1077 hit_tokens=17232"
+          ],
+          "main_pid": 10062,
+          "run": "run2"
+        }
+      ]
+    },
+    "8192": {
+      "correctness": {
+        "arm": "C",
+        "fresh_warm_matches_reference": true,
+        "label": "Telys",
+        "status": "pass"
+      },
+      "raw_evidence_hashes": [
+        {
+          "bytes": 78659,
+          "name": "arm_A_run1.json",
+          "sha256": "c25df6ab5b464004cc82e7bdbcd576647529373ad576646c3f479eea83584416"
+        },
+        {
+          "bytes": 78659,
+          "name": "arm_C_run1.json",
+          "sha256": "e344b6c3934c9ae42a77b9414604fe53c32c4085740b1495c9af6286f8610984"
+        },
+        {
+          "bytes": 78658,
+          "name": "arm_C_run2.json",
+          "sha256": "a56ef705c6d451baab7f08b5a32b1b838d5eb85f29b957fd9bd5c1dff2255938"
+        },
+        {
+          "bytes": 96445,
+          "name": "arm_A_run1.log",
+          "sha256": "eaa0fb5ed100254b525061fed60ae4d8544d497b6b8d8b59aff171f19fc916bb"
+        },
+        {
+          "bytes": 99009,
+          "name": "arm_C_run1.log",
+          "sha256": "70a60357dda495c4b67527e4d6d46e873db24ba61c44eec28267c1abe0c9bf52"
+        },
+        {
+          "bytes": 98567,
+          "name": "arm_C_run2.log",
+          "sha256": "103aa5446e9c24f7115ec078a0b25edbf114ff462cb34e0db483e8af69641146"
+        }
+      ],
+      "store": {
+        "all_decoded": true,
+        "blocks": 538,
+        "chunks": 2,
+        "payload_bytes": 493619388
+      },
+      "workers": [
+        {
+          "engine_id": "d9f57af5-b54d-4807-bd50-656fb9cdf3e8",
+          "hit_blocks": [
+            0,
+            538
+          ],
+          "lookup_lines": [
+            "INFO:telys_vllm.connector:telys lookup: req=0-853f6758 num_tokens=8619 num_computed=0 start_block=0 max_block=538 hit_blocks=0 hit_tokens=0",
+            "INFO:telys_vllm.connector:telys lookup: req=1-aa926c3f num_tokens=8619 num_computed=0 start_block=0 max_block=538 hit_blocks=538 hit_tokens=8608"
+          ],
+          "main_pid": 8173,
+          "run": "run1"
+        },
+        {
+          "engine_id": "04129434-c13f-4da1-9e10-fb5ef9d930c1",
+          "hit_blocks": [
+            538,
+            538
+          ],
+          "lookup_lines": [
+            "Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]INFO:telys_vllm.connector:telys lookup: req=0-93228a4d num_tokens=8619 num_computed=0 start_block=0 max_block=538 hit_blocks=538 hit_tokens=8608",
+            "Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]INFO:telys_vllm.connector:telys lookup: req=1-b87767f6 num_tokens=8619 num_computed=0 start_block=0 max_block=538 hit_blocks=538 hit_tokens=8608"
+          ],
+          "main_pid": 8606,
+          "run": "run2"
+        }
+      ]
+    }
+  },
+  "scale_to_zero_executed": false
+}

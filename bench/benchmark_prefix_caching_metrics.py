@@ -5,14 +5,20 @@
 Based on vLLM benchmarks/benchmark_prefix_caching.py at commit
 5df63a7203cdb932 (tag v0.32.0).  Adds deterministic JSON output with
 per-request TTFT, throughput, and (when available) prefix-cache hit rate.
+Optional lifecycle manifests preserve actual token IDs and chunk-hash inputs.
 """
 
 import dataclasses
+import hashlib
 import json
 import logging
+import os
 import random
+import tempfile
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import Any
 
 from transformers import PreTrainedTokenizerBase
 from vllm import LLM, SamplingParams
@@ -90,7 +96,233 @@ def _percentile(values: list[float], pct: float) -> float:
     return s[f] + (s[c] - s[f]) * (k - f)
 
 
-def run_benchmark(llm, prompts, sampling_params, output_json_path: str | None):
+def _token_ids_digest(token_ids: list[int]) -> str:
+    encoded = json.dumps(token_ids, separators=(",", ":")).encode("ascii")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary_name = tempfile.mkstemp(
+        prefix=f"{path.name}.", suffix=".tmp", dir=path.parent
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as stream:
+            json.dump(payload, stream, indent=2, sort_keys=True, ensure_ascii=False)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary_name, path)
+        directory_fd = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+    finally:
+        if os.path.exists(temporary_name):
+            os.unlink(temporary_name)
+
+
+def _actual_token_ids(raw_ids: Any, *, field_name: str) -> list[int]:
+    token_ids = list(raw_ids)
+    if any(
+        isinstance(token_id, bool) or not isinstance(token_id, int) or token_id < 0
+        for token_id in token_ids
+    ):
+        raise ValueError(f"{field_name} must contain non-negative integer token IDs")
+    return token_ids
+
+
+def _positive_dimension(value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        raise ValueError(f"expected a positive integer dimension, got {value!r}")
+    return value
+
+
+def _attention_block_shape(
+    spec: Any, block_size: int, kv_dtype: Any
+) -> tuple[list[int] | None, str | None]:
+    from vllm.utils.torch_utils import get_dtype_size
+    from vllm.v1.kv_cache_interface import AttentionSpec, FullAttentionSpec
+
+    if type(spec) not in (AttentionSpec, FullAttentionSpec):
+        return None, f"unsupported KV cache spec {type(spec).__name__}"
+    try:
+        spec_block_size = _positive_dimension(spec.block_size)
+        num_states = _positive_dimension(spec.num_states)
+        num_heads = _positive_dimension(spec.num_heads)
+        content_bytes = _positive_dimension(spec.state_content_size_bytes)
+        dtype_size = _positive_dimension(get_dtype_size(spec.dtype))
+    except (AttributeError, TypeError, ValueError, NotImplementedError) as exc:
+        return None, f"unresolved AttentionSpec layout: {exc}"
+    if spec.dtype != kv_dtype:
+        return None, "AttentionSpec dtype differs from the resolved KV dtype"
+    if spec_block_size != block_size or num_states != block_size:
+        return None, "AttentionSpec does not have one stored state per block token"
+    if content_bytes % dtype_size:
+        return None, "AttentionSpec state bytes are not whole dtype elements"
+    return [block_size, num_heads, content_bytes // dtype_size], None
+
+
+def _resolve_kv_block_shape(
+    worker_specs: Any, block_size: int, kv_dtype: Any
+) -> tuple[list[int] | None, str | None]:
+    if not isinstance(worker_specs, Sequence) or isinstance(
+        worker_specs, (str, bytes, bytearray)
+    ):
+        return None, "worker KV cache specs are not a sequence"
+    specs = []
+    for worker_spec in worker_specs:
+        if not isinstance(worker_spec, Mapping):
+            return None, "worker KV cache spec result is not a mapping"
+        specs.extend(worker_spec.values())
+    if not specs:
+        return None, "no worker KV cache specs were returned"
+    shapes: set[tuple[int, ...]] = set()
+    for spec in specs:
+        shape, reason = _attention_block_shape(spec, block_size, kv_dtype)
+        if reason is not None:
+            return None, reason
+        assert shape is not None
+        shapes.add(tuple(shape))
+    if len(shapes) != 1:
+        return None, "worker KV cache specs resolve to different block shapes"
+    return list(next(iter(shapes))), None
+
+
+def _kv_manifest_context(
+    vllm_config: Any, block_size: int, worker_specs: Any
+) -> dict[str, Any]:
+    from vllm.utils.torch_utils import get_kv_cache_torch_dtype
+
+    model_config = vllm_config.model_config
+    parallel_config = vllm_config.parallel_config
+    kv_dtype = get_kv_cache_torch_dtype(
+        vllm_config.cache_config.cache_dtype, model_config.dtype
+    )
+    expected_shape, unresolved_reason = _resolve_kv_block_shape(
+        worker_specs, block_size, kv_dtype
+    )
+    return {
+        "dtype": str(kv_dtype),
+        "expected_block_shape": expected_shape,
+        "expected_layer_count": int(model_config.get_num_layers(parallel_config)),
+        "shape_kind": "full_attention" if expected_shape is not None else "unresolved",
+        "shape_unresolved_reason": unresolved_reason,
+    }
+
+
+def build_manifest_context(llm: Any, args: Any) -> dict[str, Any]:
+    from vllm.v1.core.kv_cache_utils import get_none_hash_seed
+
+    vllm_config = llm.llm_engine.vllm_config
+    cache_config = vllm_config.cache_config
+    block_size = int(cache_config.block_size)
+    hash_block_size = int(cache_config.hash_block_size or block_size)
+    algorithm = str(cache_config.prefix_caching_hash_algo)
+    if block_size <= 0 or hash_block_size <= 0:
+        raise ValueError("resolved vLLM block sizes must be positive")
+    if algorithm not in ("sha256", "sha256_cbor"):
+        raise ValueError("lifecycle manifests require a cryptographic block hash")
+    if args.manifest_max_chunk_blocks < 0:
+        raise ValueError("--manifest-max-chunk-blocks must be non-negative")
+    if not args.manifest_namespace.strip():
+        raise ValueError("--manifest-namespace must not be empty")
+    return {
+        "schema_version": 1,
+        "kind": "telys_vllm_request_manifest",
+        "model": str(vllm_config.model_config.model),
+        "run": {"arm": args.manifest_arm, "phase": args.manifest_phase},
+        "token_digest": "sha256-json-array-utf8-v1",
+        "block_hash": {
+            "algorithm": algorithm,
+            "none_hash_seed": get_none_hash_seed(),
+            "block_size": block_size,
+            "hash_block_size": hash_block_size,
+            "extra_keys_per_block": None,
+        },
+        "kv": _kv_manifest_context(
+            vllm_config,
+            block_size,
+            llm.collective_rpc("get_kv_cache_spec"),
+        ),
+        "storage": {
+            "namespace": args.manifest_namespace,
+            "max_chunk_blocks": args.manifest_max_chunk_blocks,
+        },
+    }
+
+
+def _request_manifest(out: Any, request_index: int, context: dict[str, Any]) -> dict:
+    if len(out.outputs) != 1:
+        raise ValueError(
+            "lifecycle manifests require exactly one completion per request"
+        )
+    completion = out.outputs[0]
+    prompt_ids = _actual_token_ids(out.prompt_token_ids, field_name="prompt_token_ids")
+    generated_ids = _actual_token_ids(
+        completion.token_ids, field_name="generated_token_ids"
+    )
+    all_ids = prompt_ids + generated_ids
+    block_size = context["block_hash"]["block_size"]
+    persisted_count = max(0, (len(all_ids) - 1) // block_size)
+    prefix_count = min(len(prompt_ids) // block_size, persisted_count)
+    request_id = str(out.request_id)
+    return {
+        **context,
+        "response": {
+            "request_id": request_id,
+            "request_index": request_index,
+            "completion_index": int(completion.index),
+            "finish_reason": completion.finish_reason,
+            "stop_reason": completion.stop_reason,
+            "text_sha256": hashlib.sha256(completion.text.encode("utf-8")).hexdigest(),
+        },
+        "prompt": {
+            "token_ids": prompt_ids,
+            "count": len(prompt_ids),
+            "sha256": _token_ids_digest(prompt_ids),
+        },
+        "generated": {
+            "token_ids": generated_ids,
+            "count": len(generated_ids),
+            "sha256": _token_ids_digest(generated_ids),
+        },
+        "expected": {
+            "all_token_count": len(all_ids),
+            "all_token_sha256": _token_ids_digest(all_ids),
+            "full_block_count": len(all_ids) // block_size,
+            "persisted_block_count": persisted_count,
+            "prefix_block_count": prefix_count,
+            "suffix_block_count": persisted_count - prefix_count,
+            "suffix_start_block": prefix_count,
+            "suffix_start_token": prefix_count * block_size,
+            "last_token_excluded": True,
+        },
+    }
+
+
+def write_request_manifests(
+    outputs: list[Any], manifest_dir: str, context: dict[str, Any]
+) -> None:
+    directory = Path(manifest_dir)
+    for request_index, out in enumerate(outputs):
+        manifest = _request_manifest(out, request_index, context)
+        request_id = manifest["response"]["request_id"]
+        identity = hashlib.sha256(request_id.encode("utf-8")).hexdigest()[:16]
+        path = directory / f"{request_index:06d}-{identity}.json"
+        _write_json_atomic(path, manifest)
+
+
+def run_benchmark(
+    llm,
+    prompts,
+    sampling_params,
+    output_json_path: str | None,
+    *,
+    manifest_dir: str | None = None,
+    manifest_context: dict[str, Any] | None = None,
+):
     start_time = time.time()
     outputs = llm.generate(prompts, sampling_params=sampling_params)
     end_time = time.time()
@@ -108,6 +340,12 @@ def run_benchmark(llm, prompts, sampling_params, output_json_path: str | None):
         # vLLM 0.32.0 V1 engine: first_token_latency is the full TTFT.
         ttfts.append(float(m.first_token_latency))
         total_output_tokens += len(out.outputs[0].token_ids)
+
+    if manifest_dir is not None:
+        if manifest_context is None:
+            raise ValueError("manifest_context is required when manifest_dir is set")
+        write_request_manifests(outputs, manifest_dir, manifest_context)
+        print(f"Wrote {len(outputs)} request manifests to {manifest_dir}")
 
     total_time = end_time - start_time
     throughput = total_output_tokens / total_time if total_time > 0 else 0.0
@@ -167,8 +405,19 @@ def main(args):
         filtered_requests, repeat_count=args.repeat_count, sort=args.sort
     )
 
+    manifest_context = None
+    if args.manifest_dir is not None:
+        manifest_context = build_manifest_context(llm, args)
+
     print("------start generating------")
-    run_benchmark(llm, prompts, sampling_params, args.output_json)
+    run_benchmark(
+        llm,
+        prompts,
+        sampling_params,
+        args.output_json,
+        manifest_dir=args.manifest_dir,
+        manifest_context=manifest_context,
+    )
 
 
 def create_argument_parser():
@@ -187,6 +436,11 @@ def create_argument_parser():
     )
     parser.add_argument("--prefix-len", type=int, default=0)
     parser.add_argument("--disable-detokenize", action="store_true")
+    parser.add_argument("--manifest-dir", type=str, default=None)
+    parser.add_argument("--manifest-arm", type=str, default=None)
+    parser.add_argument("--manifest-phase", type=str, default=None)
+    parser.add_argument("--manifest-namespace", type=str, default="telys-vllm")
+    parser.add_argument("--manifest-max-chunk-blocks", type=int, default=0)
     parser = EngineArgs.add_cli_args(parser)
     return parser
 

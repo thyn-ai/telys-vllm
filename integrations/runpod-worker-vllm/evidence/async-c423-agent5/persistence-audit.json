@@ -1,0 +1,25 @@
+{
+  "all_chunks_read_and_decoded": true,
+  "all_warm_lookups_hit_blocks": 269,
+  "chunk_count_including_cold": 26,
+  "cold_lookup_count": 1,
+  "cold_prefix_blocks_expected": 269,
+  "continuation_chunk_count": 25,
+  "engine_groups_blocks_chunks": [
+    [
+      269,
+      1
+    ],
+    [
+      2596,
+      25
+    ]
+  ],
+  "no_whole_prefix_resave": true,
+  "persistence_passed": true,
+  "suffix_blocks_expected": 2596,
+  "suffix_blocks_persisted": 2596,
+  "total_blocks_including_cold": 2865,
+  "total_payload_bytes": 2628678028,
+  "warm_lookup_count": 20
+}

@@ -1,0 +1,211 @@
+{
+  "errors": [],
+  "evidence_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/arm_C_cold.lifecycle.json",
+  "inconclusive_reasons": [],
+  "kind": "telys_vllm_persisted_chunk_verification",
+  "lifecycle": {
+    "exit_kind": "completed",
+    "exit_status": 0,
+    "pending_chunks_observed": 7,
+    "pending_write_spans": 7,
+    "persisted_chunk_spans": 7
+  },
+  "passed": true,
+  "requests": [
+    {
+      "chunks": [
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/3c9087c4560bcda01e03a683ca0e30f8dc2cca3b8136dcdd380cd9eb5c47161e/6549fa82554b37f9c91b862087de131530b2845ccd8c7e4ec4328b51711cadd7/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "dec5eab9e2ad6c37ffa28b07722d49ad6b867f95b3b1ec8a1b4247129f123a7c",
+          "start_block": 0,
+          "token_end_exclusive": 8192,
+          "token_start": 0
+        },
+        {
+          "block_count": 512,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/9f145964812923a5ab2e734255205f74688d4667d4c185580c22e180cde4b9a9/aa1bf48a785ca8cff7a66cbf3571eb9cf4d8d07c4fc77985cbe41967b13591c0/512",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 469763166,
+          "payload_sha256": "ec9f536145f7a0e91498b02d4eeaeee2961bb51b1ab1be3409b12969c0171165",
+          "start_block": 512,
+          "token_end_exclusive": 16384,
+          "token_start": 8192
+        },
+        {
+          "block_count": 53,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/52d4bcd29419166e7575906a19a8d8796ee5ee19c66958cbf42d4d84838b7a48/e3fe48795a61475df7164ecaf691fce64ca5194710a6871fd6b38b17894cda93/53",
+          "layer_count": 28,
+          "origin": "prefix",
+          "payload_bytes": 48628830,
+          "payload_sha256": "ff9c91f1d6cd33e6771f07b3c6af90b6ad4a235bc8622a1a37048ab9d02c2489",
+          "start_block": 1024,
+          "token_end_exclusive": 17232,
+          "token_start": 16384
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/96d139f803053d8ee0e115bcb04c09948a275d32cf3c6d3c2ae2616637d100a5/96d139f803053d8ee0e115bcb04c09948a275d32cf3c6d3c2ae2616637d100a5/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "bd47c0be33feaa97b58192211df91f85f1f838027267de71244f63968880af68",
+          "start_block": 1077,
+          "token_end_exclusive": 17248,
+          "token_start": 17232
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/cd2add0d7388fa9ca72f8f049448725bf482af3873981141121ecdb9a70ae239/cd2add0d7388fa9ca72f8f049448725bf482af3873981141121ecdb9a70ae239/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "33597832a2233b2146de6774c71b4a53f934e102e3ec05497d8cbd7d823c4ed5",
+          "start_block": 1078,
+          "token_end_exclusive": 17264,
+          "token_start": 17248
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/987a955e10c3c18e5cc34d8e8f0b080d39f9c04a5f3d96eea974bbfbe3036240/987a955e10c3c18e5cc34d8e8f0b080d39f9c04a5f3d96eea974bbfbe3036240/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "8cea61f962a5daeab49e8d0db3b614380da5723842fe0972f16d120706b599ab",
+          "start_block": 1079,
+          "token_end_exclusive": 17280,
+          "token_start": 17264
+        },
+        {
+          "block_count": 1,
+          "block_shapes": [
+            [
+              16,
+              4,
+              256
+            ]
+          ],
+          "crosses_prompt_generation_boundary": false,
+          "dtypes": [
+            "torch.bfloat16"
+          ],
+          "format": "fast",
+          "key": "telys-vllm/chunk/6228e6167e257785b53b69cdf1c4d16780f18a4307f9214dc408e301d3c2f7e5/6228e6167e257785b53b69cdf1c4d16780f18a4307f9214dc408e301d3c2f7e5/1",
+          "layer_count": 28,
+          "origin": "suffix",
+          "payload_bytes": 918622,
+          "payload_sha256": "9382c0150dc963b1b19ceb610d2b60db724d63eec306ae4e9373b312e38bb2f8",
+          "start_block": 1080,
+          "token_end_exclusive": 17296,
+          "token_start": 17280
+        }
+      ],
+      "errors": [],
+      "expected": {
+        "prefix_blocks": 1077,
+        "suffix_blocks": 4,
+        "total_blocks": 1081
+      },
+      "inconclusive_reasons": [],
+      "manifest_path": "/runpod-volume/telys-vllm-benchmark/p16384-seed42-final-correctness-20261108-01/results/manifests/arm_C_cold/000000-5feceb66ffc86f38.json",
+      "missing_block_indices": [],
+      "request_id": "0",
+      "status": "pass",
+      "verified": {
+        "blocks": 1081,
+        "boundary_chunks": 0,
+        "prefix_chunks": 3,
+        "suffix_chunks": 4
+      }
+    }
+  ],
+  "schema_version": 1,
+  "status": "pass",
+  "summary": {
+    "expected_blocks": 1081,
+    "expected_prefix_blocks": 1077,
+    "expected_suffix_blocks": 4,
+    "missing_blocks": 0,
+    "prefix_chunks": 3,
+    "requests": 1,
+    "suffix_chunks": 4,
+    "verified_blocks": 1081
+  },
+  "vllm_version": "0.32.0"
+}

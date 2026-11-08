@@ -1,0 +1,54 @@
+{
+  "compute_apps": "",
+  "focused_results": {
+    "divergent_prefix_rejection": "pass: original prefix lookup succeeds and divergent load is rejected",
+    "dual_codec": "pass: legacy two-block and metadata-free fast in both directions",
+    "native_v2_meta_blob": "pass: nested payload and metadata decoded; raw search includes vllm.meta_blob",
+    "overlap_put_delete": "pass: first.get/contains and chunk lengths invalidated after second.delete"
+  },
+  "full_profiles_run_at_current_pr": false,
+  "gpu": "NVIDIA A40, 0 MiB, 46068 MiB, 0 %",
+  "overall_status": "pass",
+  "prior_results": {
+    "focused_compatibility_at_4e52b83": {
+      "pod_result": "/tmp/telys-final-compatibility-validation/summary.json",
+      "status": "fail only on native v2 projection; other checks passed"
+    },
+    "full_profiles_at_6cbfe82": {
+      "local_evidence": [
+        "integrations/runpod-worker-vllm/evidence/final-correctness-16384-20261108",
+        "integrations/runpod-worker-vllm/evidence/final-correctness-4096-20261108"
+      ],
+      "pod_result": "/tmp/telys-final-correctness-validation/final-validation.json",
+      "status": "ordinary persistence and chain-key requirements passed"
+    },
+    "note": "Prior focused checks and full profiles are linked as prior results, not runs at 1a100ac.",
+    "reopened_reset_at_4e52b83": {
+      "pod_result": "/tmp/telys-final-compatibility-validation/reopen/read-result.json",
+      "status": "pass"
+    }
+  },
+  "schema_version": 1,
+  "source_head": "1a100ac26dff6a98b8ceafec5cdaebf0f5d49135",
+  "v2_raw_search": {
+    "ids": [
+      "telys-vllm/chunk/v2-final/1"
+    ],
+    "metadata": [
+      {
+        "__key": "telys-vllm/chunk/v2-final/1",
+        "vllm.block_count": null,
+        "vllm.block_size": null,
+        "vllm.block_start_hash": null,
+        "vllm.chunk_format": null,
+        "vllm.engine_id": null,
+        "vllm.meta_blob": "{\"payload\": \"djIgcGF5bG9hZA==\", \"metadata\": {\"vllm.chunk_format\": \"legacy\", \"meta\": \"v2\"}}",
+        "vllm.model": null,
+        "vllm.payload": null
+      }
+    ],
+    "scores": [
+      0.0
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "files": [
+    {
+      "bytes": 332,
+      "path": "environment.json",
+      "sha256": "8aa876167a735ced9b9ecfa6dcc6d7e76f45e9374704cff3ef7b9dfdc24bc70b"
+    },
+    {
+      "bytes": 2047,
+      "path": "focused/compatibility-result.json",
+      "sha256": "329c5ecfcd946c0fa2ac37e25a6dd6137af5c33e7b706b596f8266ef502ebc79"
+    },
+    {
+      "bytes": 453,
+      "path": "focused/divergence-result.json",
+      "sha256": "96ecb9c01e530d48f0093366c81aee459ba72fac2a2afff426572cef23f4021d"
+    },
+    {
+      "bytes": 764,
+      "path": "prior-results.json",
+      "sha256": "a3ca550d878aa9f60c3991ad5e8487fda24284c5a33d7814b9ecf43f6fad5285"
+    },
+    {
+      "bytes": 2110,
+      "path": "summary.json",
+      "sha256": "c0789c3bdbc5b5f9dd2743a122546308d83f6627decc1353dda967600b6f1d08"
+    },
+    {
+      "bytes": 1131,
+      "path": "summary.md",
+      "sha256": "9638b96431a9433abe11e49a43776f2d00c66d912b93edf057d4484e27dc568b"
+    }
+  ],
+  "sanitization": {
+    "credential_like_content_detected": false,
+    "status": "pass"
+  },
+  "schema_version": 1
+}
