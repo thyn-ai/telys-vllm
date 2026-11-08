@@ -13,7 +13,7 @@ dependencies = ["typing_extensions>=4.8"]
 
 [project.optional-dependencies]
 vllm = ["vllm>=0.11"]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "ruff==0.17.3"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["telys_vllm"]

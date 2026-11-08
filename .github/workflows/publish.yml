@@ -60,7 +60,7 @@ jobs:
         run: uv pip install --system -e ".[dev,vllm]"
 
       - name: Install ruff
-        run: uv pip install --system ruff
+        run: uv pip install --system "ruff==0.17.3"
 
       - name: Lint with ruff
         run: ruff check telys_vllm tests bench

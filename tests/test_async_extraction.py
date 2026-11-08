@@ -235,16 +235,16 @@ def test_async_batch_preserves_copy_error_when_synchronization_also_fails():
     _PinnedTestTensor.fail_copy = True
 
     try:
-        with pytest.raises(
-            RuntimeError, match="nonblocking pinned KV extraction failed"
-        ) as exc_info:
-            with (
-                patch.object(torch, "empty", side_effect=_pinned_empty),
-                patch.object(torch.cuda, "current_stream", return_value=stream),
-                patch.object(torch.cuda, "Event", return_value=event),
-                AsyncKVExtractionBatch() as batch,
-            ):
-                batch.extract(layer, [1, 2], BLOCK_SIZE, None)
+        with (
+            patch.object(torch, "empty", side_effect=_pinned_empty),
+            patch.object(torch.cuda, "current_stream", return_value=stream),
+            patch.object(torch.cuda, "Event", return_value=event),
+            pytest.raises(
+                RuntimeError, match="nonblocking pinned KV extraction failed"
+            ) as exc_info,
+            AsyncKVExtractionBatch() as batch,
+        ):
+            batch.extract(layer, [1, 2], BLOCK_SIZE, None)
     finally:
         _PinnedTestTensor.fail_copy = False
 
@@ -264,23 +264,25 @@ def test_async_batch_normal_exit_raises_synchronization_error_and_closes():
     stream = object()
     _PinnedTestTensor.fail_copy = False
 
-    with pytest.raises(
-        RuntimeError, match="failed to synchronize async KV extraction"
-    ) as exc_info:
-        with (
-            patch.object(torch, "empty", side_effect=_pinned_empty),
-            patch.object(torch.cuda, "current_stream", return_value=stream),
-            patch.object(torch.cuda, "Event", return_value=event),
-            AsyncKVExtractionBatch() as batch,
-        ):
-            batch.extract(layer, [1, 2], BLOCK_SIZE, None)
+    with (
+        patch.object(torch, "empty", side_effect=_pinned_empty),
+        patch.object(torch.cuda, "current_stream", return_value=stream),
+        patch.object(torch.cuda, "Event", return_value=event),
+        pytest.raises(
+            RuntimeError, match="failed to synchronize async KV extraction"
+        ) as exc_info,
+        AsyncKVExtractionBatch() as batch,
+    ):
+        batch.extract(layer, [1, 2], BLOCK_SIZE, None)
 
     assert str(exc_info.value.__cause__) == "injected event synchronization failure"
     assert event.synchronize_calls == 1
     assert batch._closed
-    with pytest.raises(RuntimeError, match="async KV extraction batch is closed"):
-        with batch:
-            pass
+    with (
+        pytest.raises(RuntimeError, match="async KV extraction batch is closed"),
+        batch,
+    ):
+        pass
 
 
 def test_async_batch_owns_pinned_storage_until_copy_drains():
