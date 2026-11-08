@@ -104,6 +104,18 @@ class FakeTelysClient(TelysClient):
     def keys(self) -> set[str]:
         return set(_SHARED_STORE)
 
+    def chunk_candidates(self, start_key: str) -> dict[int, str]:
+        candidates: dict[int, str] = {}
+        for key in _SHARED_STORE:
+            if not key.startswith(f"{start_key}/"):
+                continue
+            parts = key[len(start_key) + 1 :].split("/")
+            if len(parts) == 2 and parts[1].isdigit():
+                candidates[int(parts[1])] = key
+            elif len(parts) == 1 and parts[0].isdigit():
+                candidates[int(parts[0])] = key
+        return candidates
+
     def chunk_length(self, start_key: str) -> int:
         return _CHUNK_LENGTHS.get(start_key, 0)
 

@@ -197,12 +197,28 @@ class TelysBlockStore:
         chunk_length: int,
     ) -> tuple[int, str]:
         """Return one exact chain-bound chunk without reading payload data."""
-        length = min(chunk_length, len(block_hashes) - idx)
-        if length <= 0:
-            return 0, ""
-        key = self.chunk_key(block_hashes[idx], length, block_hashes[idx + length - 1])
-        if self._client.contains(key):
-            return length, key
+        start_key = self.chunk_start_key(block_hashes[idx])
+        get_candidates = getattr(self._client, "chunk_candidates", None)
+        candidates = get_candidates(start_key) if callable(get_candidates) else {}
+        remaining = len(block_hashes) - idx
+        length = min(chunk_length, remaining)
+        if length > 0:
+            key = self.chunk_key(
+                block_hashes[idx], length, block_hashes[idx + length - 1]
+            )
+            if candidates:
+                if candidates.get(length) == key:
+                    return length, key
+            elif self._client.contains(key):
+                return length, key
+        for length in sorted(candidates, reverse=True):
+            if length > remaining:
+                continue
+            key = self.chunk_key(
+                block_hashes[idx], length, block_hashes[idx + length - 1]
+            )
+            if candidates[length] == key:
+                return length, key
         return 0, ""
 
     def contains(self, key: str) -> bool:

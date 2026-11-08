@@ -296,6 +296,22 @@ class TelysLocalClient(TelysClient):
         with self._lock:
             return set(self._key_set)
 
+    def chunk_candidates(self, start_key: str) -> dict[int, str]:
+        """Return exact chunk lengths and keys for a start hash without I/O."""
+        self._check_open()
+        self._seed_key_set()
+        candidates: dict[int, str] = {}
+        with self._lock:
+            for key in self._key_set:
+                if not key.startswith(f"{start_key}/"):
+                    continue
+                parts = key[len(start_key) + 1 :].split("/")
+                if len(parts) == 2 and parts[1].isdigit():
+                    candidates[int(parts[1])] = key
+                elif len(parts) == 1 and parts[0].isdigit():
+                    candidates[int(parts[0])] = key
+        return candidates
+
     def chunk_length(self, start_key: str) -> int:
         """Return the number of blocks in the stored chunk starting at ``start_key``."""
         self._check_open()
@@ -670,6 +686,22 @@ class TelysBlobClient(TelysClient):
         self._seed_key_set()
         with self._lock:
             return set(self._key_set)
+
+    def chunk_candidates(self, start_key: str) -> dict[int, str]:
+        """Return exact chunk lengths and keys for a start hash without I/O."""
+        self._check_open()
+        self._seed_key_set()
+        candidates: dict[int, str] = {}
+        with self._lock:
+            for key in self._key_set:
+                if not key.startswith(f"{start_key}/"):
+                    continue
+                parts = key[len(start_key) + 1 :].split("/")
+                if len(parts) == 2 and parts[1].isdigit():
+                    candidates[int(parts[1])] = key
+                elif len(parts) == 1 and parts[0].isdigit():
+                    candidates[int(parts[0])] = key
+        return candidates
 
     def chunk_length(self, start_key: str) -> int:
         """Return the number of blocks in the stored chunk starting at ``start_key``."""

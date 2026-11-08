@@ -470,7 +470,7 @@ def test_reset_deletes_reopened_data_before_clearing_slab(tmp_path, blob_only):
         first.close()
 
 
-def test_divergent_lookup_uses_one_membership_probe(tmp_path):
+def test_divergent_lookup_avoids_payload_reads(tmp_path):
     class CountingClient(FakeTelysClient):
         def __init__(self):
             super().__init__()
@@ -488,6 +488,31 @@ def test_divergent_lookup_uses_one_membership_probe(tmp_path):
     divergent = [hashes[0], make_hashes(1)[0]]
 
     assert store.lookup_prefix(divergent) == 0
+    assert client.contains_calls == 0
+    assert client.get_count == 0
+
+
+def test_stale_max_chunk_length_uses_exact_shorter_candidate(tmp_path):
+    class CountingClient(FakeTelysClient):
+        def __init__(self):
+            super().__init__()
+            self.contains_calls = 0
+
+        def contains(self, key):
+            self.contains_calls += 1
+            return super().contains(key)
+
+    client = CountingClient()
+    store = make_store(tmp_path, client)
+    hashes = make_hashes(2)
+    seed_chunk(store, hashes)
+    store.drain()
+    longer_hashes = make_hashes(4)
+    seed_chunk(store, longer_hashes)
+    store.drain()
+    client.chunk_length = lambda _start_key: len(longer_hashes)
+
+    assert store.lookup_prefix(make_hashes(3)) == 2
     assert client.contains_calls == 1
     assert client.get_count == 0
 
