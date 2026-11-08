@@ -231,6 +231,7 @@ class TelysLocalClient(TelysClient):
         filter_columns = (
             self._key_col,
             self._payload_col,
+            self._legacy_meta_blob_col,
             "vllm.slab_offset",
             "vllm.slab_length",
             "vllm.chunk_format",
@@ -621,6 +622,8 @@ class TelysBlobClient(TelysClient):
         # Only the columns needed for metadata lookups.
         filter_columns = (
             _KEY_COLUMN,
+            _PAYLOAD_COLUMN,
+            _LEGACY_META_BLOB_COLUMN,
             "vllm.chunk_format",
             "vllm.block_start_hash",
             "vllm.block_count",
@@ -751,8 +754,9 @@ class TelysBlobClient(TelysClient):
         self._check_open()
         with self._lock:
             record = self._record_cache.get(key)
-            if record is not None:
-                return record
+        if record is not None:
+            self._cache_record_for_overlapping_clients(key, record)
+            return record
 
         blob_found = False
         payload = b""
@@ -810,10 +814,7 @@ class TelysBlobClient(TelysClient):
                 provenance=_derived_provenance(key),
                 metadata=raw_metadata,
             )
-        with self._lock:
-            self._key_set.add(key)
-            self._record_cache[key] = record
-            self._track_chunk_key(key)
+        self._cache_record_for_overlapping_clients(key, record)
         return record
 
     def get_batch(self, keys: list[str]) -> list[TelysRecord | None]:
@@ -887,6 +888,12 @@ class TelysBlobClient(TelysClient):
 
     def close(self) -> None:
         self._closed = True
+        with _BLOB_CLIENT_REGISTRY_LOCK:
+            clients = _BLOB_CLIENT_REGISTRY.get(self._shared_key)
+            if clients is not None:
+                clients.discard(self)
+                if not clients:
+                    _BLOB_CLIENT_REGISTRY.pop(self._shared_key, None)
         with _BLOB_SHARED_LOCK:
             shared = _BLOB_SHARED.get(self._shared_key)
             if shared is None:

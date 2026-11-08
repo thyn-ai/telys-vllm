@@ -77,6 +77,7 @@ class _StubEngine:
     def create_collection(
         self, name, dim, partition_by, *, filter_columns=(), **kwargs
     ):
+        self.last_filter_columns = filter_columns
         col = _StubCollection()
         self._cols[name] = col
         return col
@@ -543,8 +544,37 @@ def test_blob_get_decodes_v2_meta_blob(lc, monkeypatch, tmp_path, blob_store_ena
         assert record is not None
         assert record.value == b"v2 payload"
         assert record.metadata == metadata
+        assert lc._LEGACY_META_BLOB_COLUMN in client._engine.last_filter_columns
+        assert lc._PAYLOAD_COLUMN in client._engine.last_filter_columns
     finally:
         client.close()
+
+
+def test_blob_get_populates_overlapping_client_caches(lc, monkeypatch, tmp_path):
+    first = _make_blob_client(lc, monkeypatch, tmp_path / "shared-get")
+    second = _make_blob_client(lc, monkeypatch, tmp_path / "shared-get")
+    key = "test-ns/chunk/shared-get/1"
+
+    try:
+        first.put(key, b"payload", {"meta": "x"})
+        second._record_cache.clear()
+        assert key not in second._record_cache
+
+        assert first.get(key) is not None
+        assert second._record_cache[key].value == b"payload"
+    finally:
+        first.close()
+        second.close()
+
+
+def test_blob_close_prunes_empty_client_registry(lc, monkeypatch, tmp_path):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "registry-cleanup")
+    shared_key = client._shared_key
+    assert shared_key in lc._BLOB_CLIENT_REGISTRY
+
+    client.close()
+
+    assert shared_key not in lc._BLOB_CLIENT_REGISTRY
 
 
 def test_blob_delete_removes_metadata_blob_and_cached_keys(lc, monkeypatch, tmp_path):
