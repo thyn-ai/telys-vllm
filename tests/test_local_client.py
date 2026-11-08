@@ -378,8 +378,10 @@ class _StubBlobStore:
 
     def __init__(self, path: str) -> None:
         self.records = self._stores.setdefault(path, {})
+        self.last_sync = False
 
-    def put(self, key, payload, metadata=None):
+    def put(self, key, payload, metadata=None, *, sync=False):
+        self.last_sync = sync
         self.records[key] = (bytes(payload), dict(metadata or {}))
 
     def get(self, key):
@@ -417,6 +419,7 @@ def test_blob_restart_uses_durable_keys_and_metadata(lc, monkeypatch):
         b"payload",
         {"vllm.chunk_format": "fast", "vllm.block_count": "2"},
     )
+    assert first._blob_store.last_sync is True
     first.close()
 
     # The fresh collection has no rows, matching a worker whose embedded engine

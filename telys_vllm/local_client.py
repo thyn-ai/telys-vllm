@@ -725,7 +725,9 @@ class TelysBlobClient(TelysClient):
     def put(self, key: str, value: bytes, metadata: Mapping[str, str]) -> None:
         self._check_open()
         if self._blob_store is not None:
-            self._blob_store.put(key, value, metadata=dict(metadata))
+            # Make the payload and index durable before acknowledging the save;
+            # buffered writes are not reliably visible to other NFS workers.
+            self._blob_store.put(key, value, metadata=dict(metadata), sync=True)
         row_metadata = {
             _KEY_COLUMN: key,
             **metadata,
