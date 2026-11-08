@@ -21,6 +21,7 @@ import enum
 import importlib
 import inspect
 import logging
+import pytest
 import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -310,9 +311,6 @@ _install_factory()
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
-
-
-import pytest  # noqa: E402
 
 
 @pytest.fixture(autouse=True)

@@ -130,13 +130,15 @@ def test_load_async_true_fails_fast_before_connector_state_is_created(source):
             TelysConnectorConfig.from_sources(env=env, extra=extra)
         config_init.assert_not_called()
 
-    with patch.dict(os.environ, env, clear=False):
-        with pytest.raises(TelysConfigError, match=_ASYNC_UNSUPPORTED):
-            TelysKVConnector(
-                make_vllm_config(extra=extra),
-                KVConnectorRole.SCHEDULER,
-                make_kv_cache_config(),
-            )
+    with (
+        patch.dict(os.environ, env, clear=False),
+        pytest.raises(TelysConfigError, match=_ASYNC_UNSUPPORTED),
+    ):
+        TelysKVConnector(
+            make_vllm_config(extra=extra),
+            KVConnectorRole.SCHEDULER,
+            make_kv_cache_config(),
+        )
     assert not CREATED_CLIENTS
 
 
