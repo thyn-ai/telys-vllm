@@ -7,10 +7,13 @@ will set ``request.num_computed_tokens`` to the hit prefix length and skip
 recomputing those tokens.
 """
 
+from types import SimpleNamespace
+
 from vllm.distributed.kv_transfer.kv_connector.v1.base import KVConnectorRole
 
 from tests.fakes import (
     BLOCK_SIZE,
+    FakeCachedReqs,
     FakeNewReq,
     FakeRequest,
     FakeSchedulerOutput,
@@ -79,3 +82,179 @@ def test_full_prefix_hit_reports_prefix_length_as_computed():
     assert load_spec.block_ids == [100 + i for i in range(NUM_BLOCKS)]
     # The adopted prefix must not be re-saved.
     assert meta.saves == []
+
+
+def _build_new_request_meta(scheduler, request, num_computed_tokens: int):
+    return scheduler.build_connector_meta(
+        FakeSchedulerOutput(
+            scheduled_new_reqs=[
+                FakeNewReq(
+                    request.request_id,
+                    (list(range(NUM_BLOCKS + 1)),),
+                    num_computed_tokens=num_computed_tokens,
+                )
+            ],
+            num_scheduled_tokens={request.request_id: NUM_TOKENS - num_computed_tokens},
+        )
+    )
+
+
+def _build_cached_request_meta(
+    scheduler,
+    request,
+    num_computed_tokens: int,
+    new_block_ids=None,
+    resolved_block_ids=None,
+):
+    scheduler_output = FakeSchedulerOutput(
+        scheduled_cached_reqs=FakeCachedReqs(
+            req_ids=[request.request_id],
+            num_computed_tokens=[num_computed_tokens],
+            new_block_ids=[new_block_ids] if new_block_ids is not None else [],
+        ),
+        num_scheduled_tokens={request.request_id: NUM_TOKENS - num_computed_tokens},
+    )
+    if resolved_block_ids is not None:
+        scheduler_output.kv_connector_block_state = SimpleNamespace(
+            get_block_ids=lambda _req_id: resolved_block_ids
+        )
+    return scheduler.build_connector_meta(scheduler_output)
+
+
+def test_new_native_hit_with_stale_allocation_saves_only_the_new_suffix():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    request = FakeRequest("req-new-native", NUM_TOKENS, block_hashes=hashes)
+    local_blocks = 3
+    local_tokens = local_blocks * BLOCK_SIZE
+    scheduler.on_new_request(request)
+
+    assert scheduler.get_num_new_matched_tokens(request, local_tokens) == (0, False)
+    scheduler.update_state_after_alloc(request, None, 0)
+    assert request.num_computed_tokens == 0
+    meta = _build_new_request_meta(scheduler, request, local_tokens)
+
+    assert meta.loads == []
+    assert len(meta.saves) == 1
+    assert meta.saves[0].block_hashes == hashes[local_blocks:]
+    assert meta.saves[0].block_ids == list(range(local_blocks, NUM_BLOCKS))
+
+
+def test_cached_continuation_uses_scheduler_group_zero_block_ids():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    request = FakeRequest("req-cached-ids", NUM_TOKENS, block_hashes=hashes)
+    local_blocks = 3
+    local_tokens = local_blocks * BLOCK_SIZE
+    allocated = list(range(100, 100 + NUM_BLOCKS + 1))
+    scheduler.on_new_request(request)
+    scheduler.get_num_new_matched_tokens(request, local_tokens)
+    scheduler.update_state_after_alloc(request, None, 0)
+
+    meta = _build_cached_request_meta(
+        scheduler,
+        request,
+        local_tokens,
+        new_block_ids=([999],),
+        resolved_block_ids=(allocated, [888]),
+    )
+
+    assert len(meta.saves) == 1
+    assert meta.saves[0].block_hashes == hashes[local_blocks:]
+    assert meta.saves[0].block_ids == allocated[local_blocks:NUM_BLOCKS]
+
+
+def test_cached_continuation_rejects_delta_ids_shorter_than_save_boundary():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    request = FakeRequest("req-short-delta", NUM_TOKENS, block_hashes=hashes)
+    local_blocks = 3
+    local_tokens = local_blocks * BLOCK_SIZE
+    delta_ids = list(range(100, 100 + local_blocks + 2))
+    scheduler.on_new_request(request)
+    scheduler.get_num_new_matched_tokens(request, local_tokens)
+    scheduler.update_state_after_alloc(request, None, 0)
+
+    meta = _build_cached_request_meta(
+        scheduler, request, local_tokens, new_block_ids=(delta_ids,)
+    )
+
+    assert len(meta.saves) == 1
+    assert meta.saves[0].block_hashes == hashes[local_blocks:]
+    assert meta.saves[0].block_ids == []
+
+
+def test_cached_continuation_falls_back_to_new_group_zero_block_ids():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    request = FakeRequest("req-cached-fallback", NUM_TOKENS, block_hashes=hashes)
+    local_blocks = 3
+    local_tokens = local_blocks * BLOCK_SIZE
+    allocated = list(range(100, 100 + NUM_BLOCKS + 1))
+    scheduler.on_new_request(request)
+    scheduler.get_num_new_matched_tokens(request, local_tokens)
+    scheduler.update_state_after_alloc(request, None, 0)
+
+    meta = _build_cached_request_meta(
+        scheduler, request, local_tokens, new_block_ids=(allocated,)
+    )
+
+    assert len(meta.saves) == 1
+    assert meta.saves[0].block_hashes == hashes[local_blocks:]
+    assert meta.saves[0].block_ids == allocated[local_blocks:NUM_BLOCKS]
+
+
+def test_cached_native_hit_with_stale_allocation_saves_only_the_new_suffix():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    request = FakeRequest("req-native", NUM_TOKENS, block_hashes=hashes)
+    local_blocks = 3
+    local_tokens = local_blocks * BLOCK_SIZE
+    scheduler.on_new_request(request)
+
+    assert scheduler.get_num_new_matched_tokens(request, local_tokens) == (0, False)
+    scheduler.update_state_after_alloc(request, None, 0)
+    assert request.num_computed_tokens == 0
+    meta = _build_cached_request_meta(scheduler, request, local_tokens)
+
+    assert meta.loads == []
+    assert len(meta.saves) == 1
+    assert meta.saves[0].block_hashes == hashes[local_blocks:]
+    assert meta.saves[0].block_ids == []
+
+
+def test_zero_external_miss_still_saves_the_whole_prompt():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    request = FakeRequest("req-miss", NUM_TOKENS, block_hashes=hashes)
+    scheduler.on_new_request(request)
+
+    assert scheduler.get_num_new_matched_tokens(request, 0) == (0, False)
+    scheduler.update_state_after_alloc(request, None, 0)
+    meta = _build_new_request_meta(scheduler, request, 0)
+
+    assert meta.loads == []
+    assert len(meta.saves) == 1
+    assert meta.saves[0].block_hashes == hashes
+    assert meta.saves[0].block_ids == list(range(NUM_BLOCKS))
+
+
+def test_cached_zero_external_allocation_updates_are_idempotent():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    request = FakeRequest("req-repeat", NUM_TOKENS, block_hashes=hashes)
+    local_blocks = 2
+    local_tokens = local_blocks * BLOCK_SIZE
+    scheduler.on_new_request(request)
+    scheduler.get_num_new_matched_tokens(request, local_tokens)
+
+    scheduler.update_state_after_alloc(request, None, 0)
+    scheduler.update_state_after_alloc(request, None, 0)
+    assert request.num_computed_tokens == 0
+    first_meta = _build_cached_request_meta(scheduler, request, local_tokens)
+    assert len(first_meta.saves) == 1
+    assert first_meta.saves[0].block_hashes == hashes[local_blocks:]
+
+    scheduler.update_state_after_alloc(request, None, 0)
+    second_meta = _build_cached_request_meta(scheduler, request, local_tokens)
+    assert second_meta.saves == []

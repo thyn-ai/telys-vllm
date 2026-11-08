@@ -45,6 +45,14 @@ Key takeaways:
 - The **cross-replica / restart story works**: a second, fresh vLLM process with
   an empty native cache warm-hits the Telys store populated by the first process.
 
+Latest Runpod validation (native + Telys, `telys==0.1.14`, A40): **16.623 s total
+and 10.754 s mean TTFT**, versus **20.335 s and 9.453 s** for the no-cache arm.
+All **2,596/2,596 suffix blocks** persisted and every generated token matched the
+no-cache reference with batch-invariant kernels. Stock filesystem KV was faster
+at **11.406 s total and 6.221 s mean TTFT**, so Telys is not a universal latency
+win. See [`integrations/runpod-worker-vllm/RESULTS.md`](integrations/runpod-worker-vllm/RESULTS.md)
+for the full protocol and an actual serverless warm-hit check.
+
 ## When it helps / when it doesn't
 
 | Scenario | Verdict | Why |
@@ -63,10 +71,12 @@ recomputation on the workloads above. It is not yet a universal drop-in win:
 performance depends on prefix length, model size, GPU memory budget, and whether
 the deployment restarts or scales replicas.
 
-- Local tests: **131 passing, 7 skipped** (tests that require a live GPU or the
+- Local tests: **198 passing, 8 skipped** (tests that require a live GPU or the
   full Telys runtime are skipped on headless runners).
 - Supported vLLM: `>=0.11` (tested most recently on `0.32.0`).
 - Supported Python: `>=3.10`.
+- Async loading is unsupported in this revision and fails fast; use synchronous
+  loads (`TELYS_VLLM_LOAD_ASYNC=0`).
 
 ## Install
 

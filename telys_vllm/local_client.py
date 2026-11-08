@@ -625,6 +625,11 @@ class TelysBlobClient(TelysClient):
         if self._closed:
             raise TelysLocalClientError("TelysBlobClient is closed")
 
+    @property
+    def stores_payload_values(self) -> bool:
+        """Whether this client persists ``put`` values in an active BlobStore."""
+        return self._blob_store is not None
+
     def contains(self, key: str) -> bool:
         """Fast in-process membership check; falls back to BlobStore/Telys on miss."""
         self._check_open()

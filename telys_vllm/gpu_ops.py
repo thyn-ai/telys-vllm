@@ -51,22 +51,13 @@ def _is_mla(attn_metadata: AttentionMetadata | None) -> bool:
     return isinstance(attn_metadata, MLACommonMetadata)
 
 
-def extract_kv_blocks(
+def _extract_kv_blocks_stacked(
     kv_layer: torch.Tensor,
     block_ids: list[int],
     block_size: int,
     attn_metadata: AttentionMetadata | None,
-) -> list[torch.Tensor]:
-    """Extract one CPU tensor per block from a paged KV layer.
-
-    Returns a list aligned with ``block_ids``.  Serialization is deferred to
-    the caller so the connector can group blocks into chunks before paying for
-    ``torch.save`` / codec framing.
-    """
-    _require_torch()
-    if not block_ids:
-        return []
-
+) -> torch.Tensor:
+    """Extract all requested blocks and copy them to CPU in one transfer."""
     slot_mapping = _slot_mapping(block_ids, block_size, kv_layer.device)
 
     if _is_mla(attn_metadata):
@@ -82,7 +73,28 @@ def extract_kv_blocks(
             len(block_ids), block_size, extracted.shape[1], extracted.shape[2]
         )
 
-    return [extracted[i].detach().cpu() for i in range(len(block_ids))]
+    return extracted.detach().cpu()
+
+
+def extract_kv_blocks(
+    kv_layer: torch.Tensor,
+    block_ids: list[int],
+    block_size: int,
+    attn_metadata: AttentionMetadata | None,
+) -> list[torch.Tensor]:
+    """Extract one CPU tensor per block from a paged KV layer.
+
+    Returns a list aligned with ``block_ids``. The blocks are views of one
+    stacked CPU allocation, populated by a single device-to-host transfer.
+    Serialization is deferred to the caller so the connector can group blocks
+    into chunks before paying for ``torch.save`` / codec framing.
+    """
+    _require_torch()
+    if not block_ids:
+        return []
+
+    stacked = _extract_kv_blocks_stacked(kv_layer, block_ids, block_size, attn_metadata)
+    return list(stacked.unbind(dim=0))
 
 
 def serialize_kv_tensor(tensor: torch.Tensor) -> bytes:

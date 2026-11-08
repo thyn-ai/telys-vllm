@@ -143,3 +143,34 @@ def test_roundtrip_through_extract_inject(name: str):
             _expected_block(kv_dst, block_id),
             _expected_block(kv_src, block_id),
         )
+
+
+class _CpuCountingTensor(torch.Tensor):
+    cpu_calls = 0
+
+    def cpu(self, *args, **kwargs):
+        _CpuCountingTensor.cpu_calls += 1
+        return super().cpu(*args, **kwargs)
+
+
+def _raw_bytes(tensor: torch.Tensor) -> bytes:
+    return tensor.detach().contiguous().view(torch.uint8).numpy().tobytes()
+
+
+def test_extract_one_cpu_transfer_preserves_bf16_bytes_for_noncontiguous_input():
+    logical_5d, _ = _make_logical_view(LAYOUTS["LBNHC"])
+    kv_layer = logical_5d[LAYER].to(torch.bfloat16).as_subclass(_CpuCountingTensor)
+    assert not kv_layer.is_contiguous()
+    block_ids = [3, 1, 2]
+    base_layer = kv_layer.as_subclass(torch.Tensor)
+    expected = [_expected_block(base_layer, block_id) for block_id in block_ids]
+
+    _CpuCountingTensor.cpu_calls = 0
+    blocks = extract_kv_blocks(kv_layer, block_ids, BLOCK_SIZE, None)
+
+    assert _CpuCountingTensor.cpu_calls == 1
+    assert len(blocks) == len(block_ids)
+    for block, expected_block in zip(blocks, expected):
+        assert block.dtype == torch.bfloat16
+        assert block.shape == expected_block.shape
+        assert _raw_bytes(block) == _raw_bytes(expected_block)

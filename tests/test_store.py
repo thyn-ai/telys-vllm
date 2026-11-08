@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """TelysBlockStore + codec: chunk key mapping, round-trip, errors, async writes."""
 
+from dataclasses import replace
+
 import pytest
 
 from telys_vllm.codec import LengthPrefixedCodec, PayloadCodecError, TelysChunkCodec
@@ -21,6 +23,28 @@ def make_store(tmp_path, client=None, **config_kwargs):
         engine_id="test-engine",
         block_size=16,
     )
+
+
+class FakeBlobStoreClient(FakeTelysClient):
+    """Metadata-compatible fake that also retains values like BlobStore."""
+
+    stores_payload_values = True
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.payload_writes: list[bytes] = []
+        self._values: dict[str, bytes] = {}
+
+    def put(self, key, value, metadata) -> None:
+        self.payload_writes.append(value)
+        self._values[key] = value
+        super().put(key, value, metadata)
+
+    def get(self, key):
+        record = super().get(key)
+        if record is None:
+            return None
+        return replace(record, value=self._values[key])
 
 
 def seed_blocks(
@@ -255,3 +279,102 @@ def test_codec_rejects_malformed_payload():
         codec.decode_block(b"\x05\x00")  # truncated
     with pytest.raises(PayloadCodecError):
         codec.decode_block(b"")  # no layers
+
+
+@pytest.mark.parametrize("write_behind", [False, True])
+def test_blobstore_no_slab_persists_one_payload_copy(tmp_path, write_behind):
+    client = FakeBlobStoreClient()
+    slab_path = tmp_path / "duplicate.slab"
+    store = make_store(
+        tmp_path,
+        client,
+        slab_path=str(slab_path),
+        blobstore_no_slab=True,
+        write_behind=write_behind,
+    )
+    hashes = make_hashes(2)
+    expected_payload = TelysChunkCodec().encode_chunk({LAYER: [b"blob"] * 2})
+
+    try:
+        seed_chunk(store, hashes, b"blob")
+        store.drain()
+
+        assert client.put_count == 1
+        assert client.payload_writes == [expected_payload]
+        assert not slab_path.exists()
+
+        key = store.chunk_key(hashes[0], len(hashes))
+        chunk_record = client.get(key)
+        assert chunk_record is not None
+        assert chunk_record.value == expected_payload
+        assert chunk_record.metadata == {
+            "vllm.block_start_hash": hashes[0].hex(),
+            "vllm.block_count": "2",
+            "vllm.block_size": "16",
+            "vllm.model": "fake-model-v0",
+            "vllm.engine_id": "test-engine",
+        }
+
+        records = store.load_blocks(hashes)
+        assert [decode_record_value(record) for record in records] == [
+            {LAYER: b"blob"},
+            {LAYER: b"blob"},
+        ]
+    finally:
+        store.close()
+
+
+def test_blobstore_slab_persistence_remains_default(tmp_path):
+    client = FakeBlobStoreClient()
+    slab_path = tmp_path / "default.slab"
+    store = make_store(
+        tmp_path,
+        client,
+        slab_path=str(slab_path),
+        write_behind=False,
+    )
+    (block_hash,) = make_hashes(1)
+
+    try:
+        seed_chunk(store, [block_hash], b"default")
+
+        assert len(client.payload_writes) == 1
+        assert slab_path.is_file()
+        chunk_record = client.get(store.chunk_key(block_hash, 1))
+        assert chunk_record is not None
+        assert "vllm.slab_offset" in chunk_record.metadata
+        assert "vllm.slab_length" in chunk_record.metadata
+    finally:
+        store.close()
+
+
+def test_blobstore_no_slab_preserves_legacy_slab_fallback(tmp_path):
+    client = FakeTelysClient()
+    slab_path = tmp_path / "fallback.slab"
+    store = make_store(
+        tmp_path,
+        client,
+        slab_path=str(slab_path),
+        blobstore_no_slab=True,
+        write_behind=False,
+    )
+    hashes = make_hashes(2)
+
+    try:
+        seed_chunk(store, hashes, b"legacy")
+
+        assert slab_path.is_file()
+        key = store.chunk_key(hashes[0], len(hashes))
+        chunk_record = client.get(key)
+        assert chunk_record is not None
+        assert chunk_record.value == b""
+        assert int(chunk_record.metadata["vllm.slab_offset"]) >= 16
+        assert int(chunk_record.metadata["vllm.slab_length"]) > 0
+
+        records = store.load_blocks(hashes)
+        assert [decode_record_value(record) for record in records] == [
+            {LAYER: b"legacy"},
+            {LAYER: b"legacy"},
+        ]
+    finally:
+        store.close()

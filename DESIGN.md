@@ -1,8 +1,10 @@
 # TelysKVConnector — Telys as an external KV/prefix-cache store for vLLM
 
-Design doc for the `telys-vllm` connector. Scope of this revision: design +
-CPU-testable skeleton. No GPU code paths are implemented yet (see
-[Bench-week open questions](#bench-week-open-questions)).
+Design doc for the `telys-vllm` connector. GPU extraction and injection are
+implemented and validated on Runpod A40. Historical notes below describe the
+initial CPU-testable skeleton and earlier iterations; see
+[`integrations/runpod-worker-vllm/RESULTS.md`](integrations/runpod-worker-vllm/RESULTS.md)
+for the current validated implementation and its limits.
 
 API facts below were verified against a shallow clone of `vllm-project/vllm`,
 commit `b689feb9f22129cb9ba65ea72e3e67e4a9c95355` (2026-10-22). All line
@@ -559,25 +561,23 @@ item. Plan:
 
 ---
 
-## 6. What this skeleton deliberately does NOT do
+## 6. Current limitations
 
-- GPU workload has been exercised end-to-end on a Runpod A40 with
-  Qwen2.5-1.5B-Instruct (see section 4 / `bench/RESULTS.md` v3). The
-  CPU-testable skeleton remains fully functional for local development.
-- No async load flow, no KV events, no custom Prometheus metrics.
-- No publishing/PRs; the package is importable locally only.
+- Async loading is disabled by validation in this revision; the completion
+  lifecycle is not implemented, so enabling it fails fast instead of hanging.
+- Continuation chunks may fragment, but every suffix block is persisted and
+  verified after drain. Fast-chunk encoding runs in the write worker.
+- Stock filesystem KV and native same-process caching can be faster. Telys is
+  intended for restart and replica persistence, not universal replacement.
+- Multi-writer, multi-group, and disaggregated topologies require separate
+  validation. No custom Prometheus metrics are emitted.
 
 ---
 
-## 7. Blob API as the native data path (future)
+## 7. Blob API as the native data path
 
-Telys is adding a first-class binary blob / KV fast path to the Python SDK
-(`telys.BlobStore` / `Telys.blob_store(namespace=...)`) specifically to remove
-the need for per-chunk base64-over-JSON workarounds. Once that SDK version is
-available, the connector should migrate its KV payload storage to the native
-blob API and drop the local slab logic.
-
-Until then, the connector's local append-only slab remains the supported
-fallback for SDK versions that do not yet expose the blob API. The fallback
-must keep the same durability and namespace-isolation invariants so the switch
-to the native API is a drop-in replacement.
+The connector uses `telys.BlobStore` for binary payloads when the installed SDK
+provides it. Legacy `TelysLocalClient` deployments keep the local append-only
+slab as a compatibility fallback, with the same durability and namespace
+isolation invariants. BlobStore-only mode can suppress duplicate slab writes;
+it does not change the payload or provenance metadata.

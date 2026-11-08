@@ -5,8 +5,10 @@ Miss must be exactly ``(0, False)`` and hits ``(n_tokens, load_async)``,
 matching the KVConnectorBase_V1 contract (v1/base.py:515-548).
 """
 
+import pytest
 from vllm.distributed.kv_transfer.kv_connector.v1.base import KVConnectorRole
 
+from telys_vllm.config import TelysConfigError
 from telys_vllm.connector import TelysKVConnector
 from telys_vllm.store import TelysBlockStore
 from tests.fakes import (
@@ -121,17 +123,17 @@ class TestHitPath:
     def test_hit_reports_async_flag_only_when_configured(self):
         hashes = make_hashes(3)
         sync_connector = make_scheduler_connector()
-        async_connector = make_scheduler_connector({"telys_load_async": True})
         seed_store(sync_connector.store, hashes)
         request = FakeRequest("r1", num_tokens=3 * BLOCK_SIZE + 3, block_hashes=hashes)
         assert sync_connector.get_num_new_matched_tokens(request, 0) == (
             3 * BLOCK_SIZE,
             False,
         )
-        assert async_connector.get_num_new_matched_tokens(request, 0) == (
-            3 * BLOCK_SIZE,
-            True,
-        )
+        with pytest.raises(
+            TelysConfigError,
+            match="async loading is unsupported in this revision; load_async=false is required",
+        ):
+            make_scheduler_connector({"telys_load_async": True})
 
     def test_repeated_lookup_is_idempotent(self):
         connector = make_scheduler_connector()

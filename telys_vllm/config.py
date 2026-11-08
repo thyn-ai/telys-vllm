@@ -16,6 +16,7 @@ ENV_LOAD_ASYNC = "TELYS_VLLM_LOAD_ASYNC"
 ENV_MAX_LOOKUP_BLOCKS = "TELYS_VLLM_MAX_LOOKUP_BLOCKS"
 ENV_MAX_CHUNK_BLOCKS = "TELYS_VLLM_MAX_CHUNK_BLOCKS"
 ENV_SLAB_PATH = "TELYS_VLLM_SLAB_PATH"
+ENV_BLOBSTORE_NO_SLAB = "TELYS_VLLM_BLOBSTORE_NO_SLAB"
 ENV_WRITE_BEHIND = "TELYS_VLLM_WRITE_BEHIND"
 ENV_MAX_PENDING_WRITES = "TELYS_VLLM_MAX_PENDING_WRITES"
 ENV_TELEMETRY = "TELYS_VLLM_TELEMETRY"
@@ -27,6 +28,7 @@ EXTRA_LOAD_ASYNC = "telys_load_async"
 EXTRA_MAX_LOOKUP_BLOCKS = "telys_max_lookup_blocks"
 EXTRA_MAX_CHUNK_BLOCKS = "telys_max_chunk_blocks"
 EXTRA_SLAB_PATH = "telys_slab_path"
+EXTRA_BLOBSTORE_NO_SLAB = "telys_blobstore_no_slab"
 EXTRA_WRITE_BEHIND = "telys_write_behind"
 EXTRA_MAX_PENDING_WRITES = "telys_max_pending_writes"
 EXTRA_TELEMETRY = "telys_telemetry"
@@ -107,6 +109,7 @@ class TelysConnectorConfig:
     telemetry: bool = False
     telemetry_log: str | None = None
     fast_path: bool = True  # zero-decode + pinned staging + contiguous injection
+    blobstore_no_slab: bool = False
 
     @classmethod
     def from_sources(
@@ -137,7 +140,13 @@ class TelysConnectorConfig:
             values["namespace"] = _parse_namespace(raw, source=source)
         if picked := pick(ENV_LOAD_ASYNC, EXTRA_LOAD_ASYNC):
             raw, source = picked
-            values["load_async"] = _parse_bool(raw, source=source)
+            load_async = _parse_bool(raw, source=source)
+            if load_async:
+                raise TelysConfigError(
+                    f"{source}: async loading is unsupported in this revision; "
+                    "load_async=false is required"
+                )
+            values["load_async"] = False
         if picked := pick(ENV_MAX_LOOKUP_BLOCKS, EXTRA_MAX_LOOKUP_BLOCKS):
             raw, source = picked
             values["max_lookup_blocks"] = _parse_positive_int(
@@ -151,6 +160,9 @@ class TelysConnectorConfig:
         if picked := pick(ENV_SLAB_PATH, EXTRA_SLAB_PATH):
             raw, source = picked
             values["slab_path"] = _parse_slab_path(raw, source=source)
+        if picked := pick(ENV_BLOBSTORE_NO_SLAB, EXTRA_BLOBSTORE_NO_SLAB):
+            raw, source = picked
+            values["blobstore_no_slab"] = _parse_bool(raw, source=source)
         if picked := pick(ENV_WRITE_BEHIND, EXTRA_WRITE_BEHIND):
             raw, source = picked
             values["write_behind"] = _parse_bool(raw, source=source)

@@ -312,7 +312,7 @@ _install_factory()
 # ---------------------------------------------------------------------------
 
 
-import pytest
+import pytest  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
