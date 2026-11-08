@@ -214,6 +214,9 @@ class TelysBlockStore:
                     break
                 start_key = self.chunk_start_key(block_hashes[idx])
                 length = self._client.chunk_length(start_key)
+                if idx == 0:
+                    ctx["first_chunk_start_key"] = start_key
+                    ctx["first_chunk_length"] = length
                 lookups += 1
                 if length == 0:
                     break
