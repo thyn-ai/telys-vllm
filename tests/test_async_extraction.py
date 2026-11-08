@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import ClassVar
 from unittest.mock import patch
 
@@ -10,6 +11,7 @@ import pytest
 import torch
 
 from telys_vllm.gpu_ops import AsyncKVExtractionBatch
+from telys_vllm.telemetry import Telemetry
 from tests.test_gpu_ops_layout import (
     BLOCK_SIZE,
     LAYER,
@@ -88,21 +90,23 @@ def _expected_stacked(kv_layer, block_ids):
     )
 
 
-def test_async_batch_transfers_each_layer_once_and_synchronizes_once():
+def test_async_batch_transfers_each_layer_once_and_synchronizes_once(tmp_path):
     layers = _fake_cuda_layers()
     block_ids = [3, 1, 2]
     expected = [_expected_stacked(layer, block_ids) for layer in layers]
     event = _FakeEvent()
     stream = object()
+    telemetry_log = tmp_path / "async-extraction.jsonl"
     _FakeCudaTensor.cpu_calls = 0
     _PinnedTestTensor.copy_calls = []
     _PinnedTestTensor.fail_copy = False
 
     with (
+        Telemetry(enabled=True, log_path=str(telemetry_log)) as telemetry,
         patch.object(torch, "empty", side_effect=_pinned_empty),
         patch.object(torch.cuda, "current_stream", return_value=stream),
         patch.object(torch.cuda, "Event", return_value=event),
-        AsyncKVExtractionBatch() as batch,
+        AsyncKVExtractionBatch(telemetry=telemetry) as batch,
     ):
         extracted = [
             batch.extract(layer, block_ids, BLOCK_SIZE, None) for layer in layers
@@ -115,7 +119,51 @@ def test_async_batch_transfers_each_layer_once_and_synchronizes_once():
     assert event.record_calls == 1
     assert event.synchronize_calls == 1
     assert event.stream is stream
-    for actual, expected_tensor in zip(extracted, expected):
+    for actual, expected_tensor in zip(extracted, expected, strict=True):
+        assert actual.dtype == torch.bfloat16
+        assert actual.shape == expected_tensor.shape
+        assert _raw_bytes(actual) == _raw_bytes(expected_tensor)
+
+    records = [json.loads(line) for line in telemetry_log.read_text().splitlines()]
+    phases = {record["phase"] for record in records}
+    assert {
+        "save_device_gather",
+        "save_pinned_alloc",
+        "save_d2h_submit",
+        "save_event_sync",
+    } <= phases
+    assert all(record["elapsed_us"] >= 0 for record in records)
+
+
+def test_async_batch_small_save_retains_pinned_path():
+    layers = _fake_cuda_layers()
+    block_ids = [3, 1, 2]
+    expected = [_expected_stacked(layer, block_ids) for layer in layers]
+    event = _FakeEvent()
+    stream = object()
+    _FakeCudaTensor.cpu_calls = 0
+    _PinnedTestTensor.copy_calls = []
+    _PinnedTestTensor.fail_copy = False
+
+    with (
+        patch.object(torch, "empty", side_effect=_pinned_empty) as pinned_alloc,
+        patch.object(torch.cuda, "current_stream", return_value=stream),
+        patch.object(torch.cuda, "Event", return_value=event),
+        AsyncKVExtractionBatch() as batch,
+    ):
+        extracted = [
+            batch.extract(layer, block_ids, BLOCK_SIZE, None) for layer in layers
+        ]
+
+    assert _FakeCudaTensor.cpu_calls == 0
+    assert pinned_alloc.call_count == NUM_LAYERS
+    assert _PinnedTestTensor.copy_calls == [True, True]
+    assert event.record_calls == 1
+    assert event.synchronize_calls == 1
+    assert event.stream is stream
+    assert not batch._copy_started
+    for actual, expected_tensor in zip(extracted, expected, strict=True):
+        assert actual.is_pinned()
         assert actual.dtype == torch.bfloat16
         assert actual.shape == expected_tensor.shape
         assert _raw_bytes(actual) == _raw_bytes(expected_tensor)
@@ -150,7 +198,7 @@ def test_async_batch_falls_back_to_synchronous_cpu_without_pinned_memory():
 
     assert _FakeCudaTensor.cpu_calls == NUM_LAYERS
     assert _PinnedTestTensor.copy_calls == []
-    for actual, expected_tensor in zip(extracted, expected):
+    for actual, expected_tensor in zip(extracted, expected, strict=True):
         assert actual.dtype == torch.bfloat16
         assert actual.shape == expected_tensor.shape
         assert _raw_bytes(actual) == _raw_bytes(expected_tensor)

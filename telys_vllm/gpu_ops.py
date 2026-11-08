@@ -14,6 +14,8 @@ import struct
 import warnings
 from typing import TYPE_CHECKING
 
+from telys_vllm.telemetry import NOOP, Telemetry
+
 try:
     import torch
 except ImportError:  # pragma: no cover - CPU-only dev/test environments
@@ -89,19 +91,23 @@ def _extract_kv_blocks_stacked(
 
 
 class AsyncKVExtractionBatch:
-    """Batched pinned D2H extraction for the connector fast-save path.
+    """Batched D2H extraction for the connector fast-save path.
 
     Outputs must not be read until the context exits. A single CUDA event is
-    recorded and synchronized at exit, and the batch retains pinned buffers
-    until that drain completes. Hosts without pinned memory use the original
-    blocking transfer; nonblocking copy or stream failures are fatal.
+    recorded and synchronized at exit when pinned copies were submitted, and
+    the batch retains pinned buffers until that drain completes. Every CUDA
+    layer uses the batched pinned path, independent of save size. CPU sources
+    and hosts without pinned memory use blocking transfers; nonblocking copy
+    or stream failures are fatal.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, telemetry: Telemetry | None = None) -> None:
         self._stream: torch.cuda.Stream | None = None
         self._copy_started = False
         self._closed = False
         self._pinned_buffers: list[torch.Tensor] = []
+        self._telemetry = NOOP if telemetry is None else telemetry
+        self._total_input_bytes = 0
 
     def __enter__(self):
         if self._closed:
@@ -143,65 +149,95 @@ class AsyncKVExtractionBatch:
         block_size: int,
         attn_metadata: AttentionMetadata | None,
     ) -> torch.Tensor:
-        """Stage one stacked layer, or fall back to a synchronous CPU copy."""
+        """Stage one stacked layer on CPU, using pinned copies for CUDA."""
         _require_torch()
         if self._closed:
             raise RuntimeError("async KV extraction batch is closed")
         if not block_ids:
             raise ValueError("async KV extraction requires at least one block")
 
-        source = _extract_kv_blocks_on_device(
-            kv_layer, block_ids, block_size, attn_metadata
-        )
+        with self._telemetry.span("save_device_gather") as gather_ctx:
+            gather_ctx["block_count"] = len(block_ids)
+            source = _extract_kv_blocks_on_device(
+                kv_layer, block_ids, block_size, attn_metadata
+            )
+            gather_ctx["input_bytes"] = source.nbytes
+        self._total_input_bytes += source.nbytes
         if not source.is_cuda:
-            return source.cpu()
-        try:
-            pinned = torch.empty(
-                source.shape, dtype=source.dtype, device="cpu", pin_memory=True
-            )
-        except (RuntimeError, TypeError) as exc:
-            error_text = str(exc).lower()
-            pinning_unavailable = isinstance(exc, TypeError) or any(
-                marker in error_text
-                for marker in ("pin_memory", "pin memory", "pinned memory")
-            )
-            if pinning_unavailable:
-                return source.cpu()
-            raise
-        if not pinned.is_pinned():
+            return self._copy_to_cpu(source)
+
+        pinned = self._allocate_pinned(source)
+        if pinned is None:
+            return self._copy_to_cpu(source)
+        return self._submit_pinned_copy(source, pinned)
+
+    def _copy_to_cpu(self, source: torch.Tensor) -> torch.Tensor:
+        with self._telemetry.span("save_d2h_submit") as copy_ctx:
+            copy_ctx["strategy"] = "synchronous"
+            copy_ctx["input_bytes"] = source.nbytes
+            copy_ctx["total_input_bytes"] = self._total_input_bytes
             return source.cpu()
 
-        stream = torch.cuda.current_stream(source.device)
-        if self._stream is not None and stream != self._stream:
-            raise RuntimeError(
-                "async KV extraction requires one CUDA stream per save batch; "
-                "use synchronous extraction"
-            )
-        self._stream = stream
-        self._pinned_buffers.append(pinned)
-        self._copy_started = True
-        try:
-            pinned.copy_(source, non_blocking=True)
-        except Exception as exc:
-            raise RuntimeError(
-                "nonblocking pinned KV extraction failed on this stack; "
-                "use synchronous extraction"
-            ) from exc
+    def _allocate_pinned(self, source: torch.Tensor) -> torch.Tensor | None:
+        with self._telemetry.span("save_pinned_alloc") as alloc_ctx:
+            alloc_ctx["input_bytes"] = source.nbytes
+            try:
+                pinned = torch.empty(
+                    source.shape, dtype=source.dtype, device="cpu", pin_memory=True
+                )
+            except (RuntimeError, TypeError) as exc:
+                error_text = str(exc).lower()
+                pinning_unavailable = isinstance(exc, TypeError) or any(
+                    marker in error_text
+                    for marker in ("pin_memory", "pin memory", "pinned memory")
+                )
+                if pinning_unavailable:
+                    return None
+                raise
+        if not pinned.is_pinned():
+            return None
+        return pinned
+
+    def _submit_pinned_copy(
+        self, source: torch.Tensor, pinned: torch.Tensor
+    ) -> torch.Tensor:
+        with self._telemetry.span("save_d2h_submit") as copy_ctx:
+            copy_ctx["strategy"] = "pinned_async"
+            copy_ctx["input_bytes"] = source.nbytes
+            copy_ctx["total_input_bytes"] = self._total_input_bytes
+            stream = torch.cuda.current_stream(source.device)
+            if self._stream is not None and stream != self._stream:
+                raise RuntimeError(
+                    "async KV extraction requires one CUDA stream per save batch; "
+                    "use synchronous extraction"
+                )
+            self._stream = stream
+            self._pinned_buffers.append(pinned)
+            self._copy_started = True
+            try:
+                pinned.copy_(source, non_blocking=True)
+            except Exception as exc:
+                raise RuntimeError(
+                    "nonblocking pinned KV extraction failed on this stack; "
+                    "use synchronous extraction"
+                ) from exc
         return pinned
 
     def _synchronize(self) -> None:
         if not self._copy_started:
             return
         assert self._stream is not None
-        try:
-            event = torch.cuda.Event()
-            event.record(self._stream)
-            event.synchronize()
-        except Exception as exc:
-            raise RuntimeError(
-                "failed to synchronize async KV extraction; use synchronous extraction"
-            ) from exc
-        self._copy_started = False
+        with self._telemetry.span("save_event_sync") as sync_ctx:
+            sync_ctx["pinned_copies"] = len(self._pinned_buffers)
+            try:
+                event = torch.cuda.Event()
+                event.record(self._stream)
+                event.synchronize()
+            except Exception as exc:
+                raise RuntimeError(
+                    "failed to synchronize async KV extraction; use synchronous extraction"
+                ) from exc
+            self._copy_started = False
 
 
 def extract_kv_blocks(

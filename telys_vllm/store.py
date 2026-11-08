@@ -144,6 +144,7 @@ class TelysBlockStore:
         self._pending_count = 0
         self._write_errors: list[tuple[str, Exception]] = []
         self._lock = threading.Lock()
+        self._persistence_lock = threading.Lock()
         self._drain_event = threading.Event()
         self._worker: threading.Thread | None = None
         self._closed = False
@@ -752,18 +753,19 @@ class TelysBlockStore:
             ctx["key"] = key
             ctx["block_count"] = len(block_hashes)
             ctx["payload_bytes"] = len(encoded_chunk)
-            if self._slab is not None:
-                offset, length = self._slab.append(encoded_chunk)
-            else:
-                offset, length = None, None
-            metadata = self._build_metadata(
-                start_hash, block_hashes, extra_metadata, offset, length
-            )
-            # Pass the encoded chunk as the client value. BlobStore-backed
-            # clients store it; legacy slab clients ignore the value and use
-            # the slab pointer in metadata.
-            self._client.put(key, encoded_chunk, metadata)
-            self._track_write_completed(key)
+            with self._persistence_lock:
+                if self._slab is not None:
+                    offset, length = self._slab.append(encoded_chunk)
+                else:
+                    offset, length = None, None
+                metadata = self._build_metadata(
+                    start_hash, block_hashes, extra_metadata, offset, length
+                )
+                # Pass the encoded chunk as the client value. BlobStore-backed
+                # clients store it; legacy slab clients ignore the value and use
+                # the slab pointer in metadata.
+                self._client.put(key, encoded_chunk, metadata)
+                self._track_write_completed(key)
 
     def _write_worker(self) -> None:
         """Background thread: encode fast chunks and persist queued writes."""
@@ -793,19 +795,20 @@ class TelysBlockStore:
             ctx["key"] = item.key
             ctx["block_count"] = len(item.block_hashes)
             ctx["payload_bytes"] = len(encoded_chunk)
-            if self._slab is not None:
-                offset, length = self._slab.append(encoded_chunk)
-            else:
-                offset, length = None, None
-            metadata = self._build_metadata(
-                item.start_hash,
-                item.block_hashes,
-                item.extra_metadata,
-                offset,
-                length,
-            )
-            self._client.put(item.key, encoded_chunk, metadata)
-            self._track_write_completed(item.key)
+            with self._persistence_lock:
+                if self._slab is not None:
+                    offset, length = self._slab.append(encoded_chunk)
+                else:
+                    offset, length = None, None
+                metadata = self._build_metadata(
+                    item.start_hash,
+                    item.block_hashes,
+                    item.extra_metadata,
+                    offset,
+                    length,
+                )
+                self._client.put(item.key, encoded_chunk, metadata)
+                self._track_write_completed(item.key)
 
     def _track_write_completed(self, key: str) -> None:
         """Update in-memory indexes after a successful write."""
@@ -833,16 +836,20 @@ class TelysBlockStore:
         return self._client.compact()
 
     def reset(self) -> None:
-        """Delete every persisted connector key, clear the slab, then compact."""
+        """Delete persisted keys and clear the slab, then compact outside the lock.
+
+        Reset linearizes with writes at the end of the deletion and slab-clearing
+        critical section. A save during the subsequent compaction is therefore
+        ordered after reset and survives it.
+        """
         self.drain()
-        for key in sorted(self._client.keys()):
-            self._client.delete(key)
-        self._known_keys.clear()
-        with self._lock:
-            self._pending_keys.clear()
-            self._pending_count = 0
-        if self._slab is not None:
-            self._slab.clear()
+        with self._persistence_lock:
+            for key in sorted(self._client.keys()):
+                self._client.delete(key)
+            with self._lock:
+                self._known_keys.clear()
+            if self._slab is not None:
+                self._slab.clear()
         self.compact()
 
     def close(self) -> None:
