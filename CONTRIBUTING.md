@@ -73,11 +73,11 @@ PyPI/GHCR/GitHub Release publisher. The tagging workflow does not bump versions,
 push to `main`, merge PRs, move existing tags, or publish artifacts directly.
 A failed or superseded release requires a new version-bump PR, never a re-tag.
 
-The tag-creation step uses the same GitHub App as `thyn-ai/telys`, scoped to
-this repository with contents-write permission. An organization administrator
-must make `TELYS_RELEASE_APP_ID` and `TELYS_RELEASE_APP_PRIVATE_KEY` available
-to this repository in Actions secrets. Missing credentials fail closed; no
-credential or personal access token belongs in source.
+The tag-creation step uses the existing `algenta-sdk-sync` GitHub App, scoped
+to this repository with contents-write permission. Its public App ID is recorded
+in the workflow; the organization secret `ALGENTA_SDK_SYNC_APP_PRIVATE_KEY` must
+be shared with this repository. Missing credentials fail closed; no credential
+or personal access token belongs in source.
 
 ## Recognizing contributors
 

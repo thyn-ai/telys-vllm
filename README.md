@@ -134,17 +134,18 @@ deleted; templates have a normal 90-minute platform hold before deletion.
 drop-in win: performance depends on batching, prefix length, model, GPU memory,
 and whether the deployment restarts or scales replicas.
 
-- PR #4 validation at `ecbb88e25579bdd1fc93d32c34abc34ee808690f`:
+- Merged connector validation at `ecbb88e25579bdd1fc93d32c34abc34ee808690f`:
   **370 local tests passed, 2 skipped**, and Ruff passed. Real Telys `0.1.14` /
-  vLLM `0.32.0` A40 checks completed with no connector blocker, including
-  persistence/reopen/race coverage and two opt-in output-correctness passes.
-  These are not represented as current `main`'s test count.
+  vLLM `0.32.0` A40 checks covered persistence, reopen, reset races and two
+  opt-in output-correctness passes. Final review regressions through `dbde0b`
+  also passed CI.
 - Separate 8K/c1 greedy checks at `c42b049` with `VLLM_BATCH_INVARIANT=1`
   proved exact restored KV and 64-token output equality. Non-invariant mode is
   **not bitwise guaranteed**; see the scoped evidence in
   [`bench/CONCURRENT.md`](bench/CONCURRENT.md#correctness-and-validation).
-- PR #4 remains under review. No merge or stable PyPI/GHCR/GitHub Release
-  publication is claimed by these validation results.
+- Telys `0.1.15` adds durable BlobStore deletion tombstones. Use that SDK
+  version or newer; the connector also rejects orphaned blob-only records on
+  affected older stores instead of injecting deleted KV data.
 - Supported vLLM: `>=0.11` (tested most recently on `0.32.0`).
 - Supported Python: `>=3.10`.
 - Async loading is unsupported in this revision and fails fast; use synchronous
@@ -153,12 +154,13 @@ and whether the deployment restarts or scales replicas.
 ## Install
 
 ```bash
-pip install telys-vllm[vllm]
+pip install "telys>=0.1.15" "telys-vllm[vllm]"
+telys login
 ```
 
 The `[vllm]` extra pulls in `vllm>=0.11`. The connector itself has no runtime
-dependency on the closed Telys engine; the engine is installed separately by
-`pip install telys` and `telys login`.
+dependency on the closed Telys engine; `telys login` installs and verifies the
+signed on-device runtime.
 
 ## Usage
 

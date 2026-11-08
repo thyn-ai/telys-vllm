@@ -52,8 +52,8 @@ jobs:
         if: steps.verify.outputs.ready == 'true'
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          app-id: ${{ secrets.TELYS_RELEASE_APP_ID }}
-          private-key: ${{ secrets.TELYS_RELEASE_APP_PRIVATE_KEY }}
+          app-id: "4614082" # Public App ID: algenta-sdk-sync
+          private-key: ${{ secrets.ALGENTA_SDK_SYNC_APP_PRIVATE_KEY }}
           owner: thyn-ai
           repositories: telys-vllm
           permission-contents: write
