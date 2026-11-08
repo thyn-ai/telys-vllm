@@ -468,3 +468,39 @@ def test_reset_deletes_reopened_data_before_clearing_slab(tmp_path, blob_only):
     finally:
         reopened.close()
         first.close()
+
+
+def test_divergent_lookup_uses_one_membership_probe(tmp_path):
+    class CountingClient(FakeTelysClient):
+        def __init__(self):
+            super().__init__()
+            self.contains_calls = 0
+
+        def contains(self, key):
+            self.contains_calls += 1
+            return super().contains(key)
+
+    client = CountingClient()
+    store = make_store(tmp_path, client)
+    hashes = make_hashes(2)
+    seed_chunk(store, hashes)
+    store.drain()
+    divergent = [hashes[0], make_hashes(1)[0]]
+
+    assert store.lookup_prefix(divergent) == 0
+    assert client.contains_calls == 1
+    assert client.get_count == 0
+
+
+def test_fast_load_rejects_empty_decoded_layers(tmp_path, monkeypatch):
+    store = make_store(tmp_path)
+    hashes = make_hashes(1)
+    seed_chunk(store, hashes)
+    monkeypatch.setattr(
+        store,
+        "_decode_chunk_payload",
+        lambda *_args, **_kwargs: (True, {}),
+    )
+
+    with pytest.raises(TelysStoreError, match="has no layers"):
+        store.load_decoded_blocks_fast(hashes)

@@ -507,6 +507,26 @@ def test_exact_multiple_prompt_retains_prompt_and_generated_coverage(
     }
 
 
+def test_oversized_stored_chunk_is_clamped_without_index_error(
+    persisted_case, monkeypatch
+):
+    original = persisted_case.client.chunk_length
+
+    def oversized(start_key):
+        if start_key.endswith(persisted_case.hashes[0].hex()):
+            return 99
+        return original(start_key)
+
+    monkeypatch.setattr(persisted_case.client, "chunk_length", oversized)
+    result = _verify(persisted_case, persisted_case.record())
+
+    assert result["status"] == "fail"
+    assert any(
+        error["code"] in {"invalid_chunk", "missing_expected_chunks"}
+        for error in result["requests"][0]["errors"]
+    )
+
+
 def test_verifier_recomputes_dynamic_prefix_and_suffix_coverage(persisted_case):
     result = _verify(persisted_case, persisted_case.record())
     assert result["status"] == "pass"

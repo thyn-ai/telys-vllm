@@ -196,15 +196,13 @@ class TelysBlockStore:
         idx: int,
         chunk_length: int,
     ) -> tuple[int, str]:
-        """Find the longest exact chain-bound chunk at ``idx`` without reading data."""
+        """Return one exact chain-bound chunk without reading payload data."""
         length = min(chunk_length, len(block_hashes) - idx)
-        while length > 0:
-            key = self.chunk_key(
-                block_hashes[idx], length, block_hashes[idx + length - 1]
-            )
-            if self._client.contains(key):
-                return length, key
-            length -= 1
+        if length <= 0:
+            return 0, ""
+        key = self.chunk_key(block_hashes[idx], length, block_hashes[idx + length - 1])
+        if self._client.contains(key):
+            return length, key
         return 0, ""
 
     def contains(self, key: str) -> bool:
@@ -474,6 +472,8 @@ class TelysBlockStore:
                 )
                 read_ctx["fast_path"] = is_fast
                 read_ctx["payload_bytes"] = len(payload)
+                if not layer_tensors:
+                    raise TelysStoreError(f"chunk {full_key!r} has no layers")
                 decoded_blocks = len(layer_tensors.get(next(iter(layer_tensors)), []))
                 read_ctx["decoded_blocks"] = decoded_blocks
             if decoded_blocks != chunk_len:
