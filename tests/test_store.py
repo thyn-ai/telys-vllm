@@ -84,7 +84,8 @@ def test_block_key_mapping_is_deterministic(tmp_path):
 def test_chunk_key_mapping_is_deterministic(tmp_path):
     store = make_store(tmp_path)
     hashes = make_hashes(3)
-    assert store.chunk_key(hashes[0], 3) == f"telys-vllm/chunk/{hashes[0].hex()}/3"
+    expected = f"telys-vllm/chunk/{hashes[0].hex()}/{hashes[-1].hex()}/3"
+    assert store.chunk_key(hashes[0], 3, hashes[-1]) == expected
 
 
 def test_namespace_scopes_keys(tmp_path):
@@ -159,7 +160,7 @@ def test_lookup_prefix_uses_chunk_length_not_value_fetch(tmp_path):
 
     client.get_count = 0
     assert store.lookup_prefix(hashes) == 4
-    # lookup_prefix should only call chunk_length(), never get().
+    # lookup_prefix uses metadata/membership probes, never get() payload reads.
     assert client.get_count == 0
 
 
@@ -175,7 +176,9 @@ def test_multi_block_chunk_round_trip_and_slicing(tmp_path):
     for record in records:
         assert decode_record_value(record) == {LAYER: b"block-payload"}
 
-    # Partial load slices the chunk.
+    # A shorter prefix requires its own exact terminal-hash key.
+    seed_chunk(store, hashes[:2], b"block-payload")
+    store.drain()
     partial = store.load_blocks(hashes[:2])
     assert len(partial) == 2
     for record in partial:
@@ -222,7 +225,7 @@ def test_write_behind_dedup_within_store(tmp_path):
 def test_contains_sees_pending_writes(tmp_path):
     store = make_fake_store(tmp_path, write_behind=True, max_pending_writes=10)
     hashes = make_hashes(2)
-    key = store.chunk_key(hashes[0], 2)
+    key = store.chunk_key(hashes[0], 2, hashes[-1])
     assert not store.contains(key)
     seed_chunk(store, hashes, b"pending")
     assert store.contains(key)
@@ -303,7 +306,7 @@ def test_blobstore_no_slab_persists_one_payload_copy(tmp_path, write_behind):
         assert client.payload_writes == [expected_payload]
         assert not slab_path.exists()
 
-        key = store.chunk_key(hashes[0], len(hashes))
+        key = store.chunk_key(hashes[0], len(hashes), hashes[-1])
         chunk_record = client.get(key)
         assert chunk_record is not None
         assert chunk_record.value == expected_payload
@@ -340,7 +343,7 @@ def test_blobstore_slab_persistence_remains_default(tmp_path):
 
         assert len(client.payload_writes) == 1
         assert slab_path.is_file()
-        chunk_record = client.get(store.chunk_key(block_hash, 1))
+        chunk_record = client.get(store.chunk_key(block_hash, 1, block_hash))
         assert chunk_record is not None
         assert "vllm.slab_offset" in chunk_record.metadata
         assert "vllm.slab_length" in chunk_record.metadata
@@ -364,7 +367,7 @@ def test_blobstore_no_slab_preserves_legacy_slab_fallback(tmp_path):
         seed_chunk(store, hashes, b"legacy")
 
         assert slab_path.is_file()
-        key = store.chunk_key(hashes[0], len(hashes))
+        key = store.chunk_key(hashes[0], len(hashes), hashes[-1])
         chunk_record = client.get(key)
         assert chunk_record is not None
         assert chunk_record.value == b""
@@ -378,3 +381,90 @@ def test_blobstore_no_slab_preserves_legacy_slab_fallback(tmp_path):
         ]
     finally:
         store.close()
+
+
+def test_divergent_second_block_does_not_hit_or_load_original_chunk(tmp_path):
+    import hashlib
+
+    client = FakeBlobStoreClient()
+    store = make_store(
+        tmp_path,
+        client,
+        slab_path=None,
+        blobstore_no_slab=True,
+        write_behind=False,
+    )
+    hashes = make_hashes(2)
+    divergent = [hashes[0], hashlib.sha256(hashes[0] + b"divergent").digest()]
+    seed_chunk(store, hashes, b"original")
+
+    client.get_count = 0
+    assert store.lookup_prefix(divergent) == 0
+    assert client.get_count == 0
+    with pytest.raises(TelysStoreError, match="no longer present"):
+        store.load_decoded_blocks(divergent)
+    assert store.lookup_prefix(hashes) == 2
+    loaded = store.load_decoded_blocks(hashes)
+    assert [block.blobs[LAYER] for block in loaded] == [b"original"] * 2
+
+
+def test_legacy_start_and_count_key_misses_safely(tmp_path):
+    client = FakeBlobStoreClient()
+    store = make_store(
+        tmp_path,
+        client,
+        slab_path=None,
+        blobstore_no_slab=True,
+        write_behind=False,
+    )
+    hashes = make_hashes(2)
+    legacy_key = f"{store.chunk_start_key(hashes[0])}/{len(hashes)}"
+    payload = TelysChunkCodec().encode_chunk({LAYER: [b"legacy"] * 2})
+    client.put(legacy_key, payload, {})
+
+    assert store.lookup_prefix(hashes) == 0
+    with pytest.raises(TelysStoreError, match="no longer present"):
+        store.load_decoded_blocks(hashes)
+
+
+@pytest.mark.parametrize("blob_only", [False, True], ids=["slab", "blob-only"])
+def test_reset_deletes_reopened_data_before_clearing_slab(tmp_path, blob_only):
+    client = FakeBlobStoreClient() if blob_only else FakeTelysClient()
+    slab_path = None if blob_only else str(tmp_path / "reopened.slab")
+    config = {
+        "slab_path": slab_path,
+        "blobstore_no_slab": blob_only,
+        "write_behind": False,
+    }
+    first = make_store(tmp_path, client, **config)
+    hashes = make_hashes(2)
+    key = first.save_chunk(hashes[0], hashes, {LAYER: [b"persisted"] * 2})
+    reopened = make_store(tmp_path, client, **config)
+    slab_sizes_at_delete: list[int] = []
+    original_delete = client.delete
+
+    def delete_before_slab_clear(key_to_delete):
+        if slab_path is not None:
+            slab_sizes_at_delete.append((tmp_path / "reopened.slab").stat().st_size)
+        return original_delete(key_to_delete)
+
+    client.delete = delete_before_slab_clear
+    try:
+        assert key not in reopened._known_keys
+        reopened.reset()
+
+        assert client.get(key) is None
+        assert client.deleted == [key]
+        assert reopened.lookup_prefix(hashes) == 0
+        if blob_only:
+            assert slab_sizes_at_delete == []
+        else:
+            assert slab_sizes_at_delete
+            assert all(size > 16 for size in slab_sizes_at_delete)
+            reopened.save_chunk(hashes[0], hashes, {LAYER: [b"new"] * 2})
+            record = client.get(key)
+            assert record is not None
+            assert record.metadata["vllm.slab_offset"] == "16"
+    finally:
+        reopened.close()
+        first.close()

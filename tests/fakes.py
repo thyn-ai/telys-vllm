@@ -35,7 +35,7 @@ BLOCK_SIZE = 16
 # in a KVSlab managed by TelysBlockStore.
 _SHARED_STORE: dict[str, dict[str, str]] = {}
 
-#: Map from chunk start key (without the trailing /count) to max block count.
+#: Map from namespace/chunk/start to the maximum stored block count.
 _CHUNK_LENGTHS: dict[str, int] = {}
 
 #: Every client handed out via make_fake_client, oldest first.
@@ -49,7 +49,11 @@ def reset_fakes() -> None:
 
 
 def _chunk_start_key(key: str) -> str:
-    return key.rsplit("/", 1)[0]
+    prefix, marker, chunk_key = key.rpartition("/chunk/")
+    if not marker:
+        return key.rsplit("/", 1)[0]
+    start_hash = chunk_key.split("/", 1)[0]
+    return f"{prefix}{marker}{start_hash}"
 
 
 def track_chunk_key(key: str) -> None:
@@ -68,6 +72,9 @@ def untrack_chunk_key(key: str) -> None:
     """Remove a chunk key from the shared chunk-length map."""
     start_key = _chunk_start_key(key)
     _CHUNK_LENGTHS.pop(start_key, None)
+    for remaining_key in _SHARED_STORE:
+        if "/chunk/" in remaining_key and _chunk_start_key(remaining_key) == start_key:
+            track_chunk_key(remaining_key)
 
 
 def _provenance(key: str) -> TelysProvenance:
@@ -93,6 +100,9 @@ class FakeTelysClient(TelysClient):
 
     def contains(self, key: str) -> bool:
         return key in _SHARED_STORE
+
+    def keys(self) -> set[str]:
+        return set(_SHARED_STORE)
 
     def chunk_length(self, start_key: str) -> int:
         return _CHUNK_LENGTHS.get(start_key, 0)

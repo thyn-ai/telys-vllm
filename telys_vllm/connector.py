@@ -432,10 +432,14 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
         cached = scheduler_output.scheduled_cached_reqs
         block_state = getattr(scheduler_output, "kv_connector_block_state", None)
         get_block_ids = getattr(block_state, "get_block_ids", None)
+        resumed_req_ids = getattr(cached, "resumed_req_ids", set())
         for i, req_id in enumerate(cached.req_ids):
             total_tokens = cached.num_computed_tokens[i] + num_scheduled[req_id]
             request = self._reqs.get(req_id)
-            if request is not None:
+            load_spec = (
+                self._load_plans.get(req_id) if req_id in resumed_req_ids else None
+            )
+            if request is not None and load_spec is None:
                 local_boundary = min(
                     cached.num_computed_tokens[i] // self._block_size,
                     (request.num_tokens - 1) // self._block_size,
@@ -448,22 +452,37 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
             block_ids = None
             if callable(get_block_ids):
                 resolved_block_ids = get_block_ids(req_id)
-                if resolved_block_ids:
+                if resolved_block_ids and resolved_block_ids[0] is not None:
                     block_ids = list(resolved_block_ids[0])
-            if (
-                block_ids is None
-                and request is not None
-                and i < len(cached.new_block_ids)
-            ):
+            if load_spec is not None and not block_ids:
+                block_ids = None
+            if block_ids is None and i < len(cached.new_block_ids):
                 new_block_ids = cached.new_block_ids[i]
-                if new_block_ids:
-                    delta_block_ids = new_block_ids[0]
-                    save_boundary = min(
-                        total_tokens // self._block_size,
-                        (request.num_tokens - 1) // self._block_size,
+                if new_block_ids and new_block_ids[0] is not None:
+                    if load_spec is not None:
+                        # Resumed requests carry the full replacement table.
+                        block_ids = list(new_block_ids[0])
+                    elif request is not None:
+                        delta_block_ids = new_block_ids[0]
+                        save_boundary = min(
+                            total_tokens // self._block_size,
+                            (request.num_tokens - 1) // self._block_size,
+                        )
+                        if len(delta_block_ids) >= save_boundary:
+                            block_ids = list(delta_block_ids)
+            if load_spec is not None:
+                end = load_spec.start_block + len(load_spec.block_hashes)
+                if block_ids is None or len(block_ids) < end:
+                    raise TelysConnectorError(
+                        f"resumed request {req_id!r} is missing physical group-0 "
+                        f"block IDs for external load blocks "
+                        f"{load_spec.start_block}:{end}"
                     )
-                    if len(delta_block_ids) >= save_boundary:
-                        block_ids = list(delta_block_ids)
+                load_spec.block_ids = list(block_ids[load_spec.start_block : end])
+                meta.loads.append(load_spec)
+                self._load_plans.pop(req_id)
+                # The hit prefix was already accounted for by the load plan.
+                continue
             self._advance_save_cursor(
                 req_id,
                 total_tokens,
@@ -995,7 +1014,7 @@ class TelysKVConnector(KVConnectorBase_V1, SupportsHMA):
                     for block_hash, block_id in zip(save_hashes, spec.block_ids):
                         block_hash_to_id.setdefault(bytes(block_hash), block_id)
                     for run in self._split_into_runs(save_hashes):
-                        key = self._store.chunk_key(run[0], len(run))
+                        key = self._store.chunk_key(run[0], len(run), run[-1])
                         if key in seen_keys or self._store.contains(key):
                             continue
                         seen_keys.add(key)

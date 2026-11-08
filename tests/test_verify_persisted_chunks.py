@@ -537,7 +537,9 @@ def test_complete_chunks_without_pending_write_observation_are_inconclusive(
 
 
 def test_abrupt_exit_evidence_is_supported_but_missing_suffix_fails(persisted_case):
-    suffix_key = persisted_case.store.chunk_key(persisted_case.hashes[2], 1)
+    suffix_key = persisted_case.store.chunk_key(
+        persisted_case.hashes[2], 1, persisted_case.hashes[2]
+    )
     persisted_case.client.delete(suffix_key)
     result = _verify(persisted_case, persisted_case.record(exit_status=137))
     assert result["lifecycle"]["exit_kind"] == "abrupt-exit"
@@ -559,7 +561,9 @@ def test_abrupt_exit_with_complete_chunks_is_inconclusive(persisted_case):
 
 
 def test_corrupt_payload_fails_decoding(persisted_case):
-    prefix_key = persisted_case.store.chunk_key(persisted_case.hashes[0], 2)
+    prefix_key = persisted_case.store.chunk_key(
+        persisted_case.hashes[0], 2, persisted_case.hashes[1]
+    )
     payload = bytearray(persisted_case.client._values[prefix_key])
     payload[0] ^= 0xFF
     persisted_case.client._values[prefix_key] = bytes(payload)
@@ -571,7 +575,9 @@ def test_corrupt_payload_fails_decoding(persisted_case):
 
 
 def test_empty_inline_payload_fails_in_chunk_decoder(persisted_case):
-    prefix_key = persisted_case.store.chunk_key(persisted_case.hashes[0], 2)
+    prefix_key = persisted_case.store.chunk_key(
+        persisted_case.hashes[0], 2, persisted_case.hashes[1]
+    )
     persisted_case.client._values[prefix_key] = b""
     result = _verify(persisted_case, persisted_case.record())
     assert result["status"] == "fail"

@@ -617,7 +617,8 @@ def _verify_request(
         if block_count == 0:
             index += 1
             continue
-        key = f"{start_key}/{block_count}"
+        end_hash = hashes[index + block_count - 1]
+        key = f"{start_key}/{end_hash.hex()}/{block_count}"
         cache_key = (
             key,
             expectation.model,

@@ -29,7 +29,12 @@ from telys_vllm.client import (
     TelysProvenance,
     TelysRecord,
 )
-from telys_vllm.codec import LengthPrefixedCodec, TelysChunkCodec, TelysFastChunkCodec
+from telys_vllm.codec import (
+    LengthPrefixedCodec,
+    PayloadCodecError,
+    TelysChunkCodec,
+    TelysFastChunkCodec,
+)
 from telys_vllm.config import TelysConnectorConfig
 from telys_vllm.slab import KVSlab
 from telys_vllm.telemetry import NOOP, Telemetry, get_telemetry
@@ -87,7 +92,7 @@ class TelysBlockStore:
     """Chunk-granular KV store: Telys index plus BlobStore or slab payloads.
 
     A *chunk* is one contiguous run of full blocks.  The Telys key is
-    ``{namespace}/chunk/{start_block_hash.hex()}/{block_count}``. Slab-backed
+    ``{namespace}/chunk/{start_hash}/{end_hash}/{block_count}``. Slab-backed
     records include an offset/length pointer; BlobStore records carry the payload
     directly as the client value.
     """
@@ -179,9 +184,28 @@ class TelysBlockStore:
         """Key prefix for the chunk (if any) that starts at ``block_hash``."""
         return f"{self._config.namespace}/chunk/{bytes(block_hash).hex()}"
 
-    def chunk_key(self, start_hash: bytes, block_count: int) -> str:
-        """Full Telys key for a chunk of ``block_count`` blocks."""
-        return f"{self.chunk_start_key(start_hash)}/{block_count}"
+    def chunk_key(self, start_hash: bytes, block_count: int, end_hash: bytes) -> str:
+        """Full chain-bound Telys key for a chunk of ``block_count`` blocks."""
+        return (
+            f"{self.chunk_start_key(start_hash)}/{bytes(end_hash).hex()}/{block_count}"
+        )
+
+    def _exact_chunk(
+        self,
+        block_hashes: Sequence[bytes],
+        idx: int,
+        chunk_length: int,
+    ) -> tuple[int, str]:
+        """Find the longest exact chain-bound chunk at ``idx`` without reading data."""
+        length = min(chunk_length, len(block_hashes) - idx)
+        while length > 0:
+            key = self.chunk_key(
+                block_hashes[idx], length, block_hashes[idx + length - 1]
+            )
+            if self._client.contains(key):
+                return length, key
+            length -= 1
+        return 0, ""
 
     def contains(self, key: str) -> bool:
         """Fast membership check backed by the in-memory write tracking.
@@ -213,16 +237,14 @@ class TelysBlockStore:
                 if limit and hits >= limit:
                     break
                 start_key = self.chunk_start_key(block_hashes[idx])
-                length = self._client.chunk_length(start_key)
+                stored_length = self._client.chunk_length(start_key)
                 if idx == 0:
                     ctx["first_chunk_start_key"] = start_key
-                    ctx["first_chunk_length"] = length
+                    ctx["first_chunk_length"] = stored_length
                 lookups += 1
+                length, _ = self._exact_chunk(block_hashes, idx, stored_length)
                 if length == 0:
                     break
-                # A stored chunk may be longer than the remaining queried blocks;
-                # only count what the caller actually asked for.
-                length = min(length, total - idx)
                 hits += length
                 idx += length
             ctx["total_blocks"] = total
@@ -260,20 +282,23 @@ class TelysBlockStore:
         while idx < total:
             start_hash = block_hashes[idx]
             start_key = self.chunk_start_key(start_hash)
-            chunk_len = self._client.chunk_length(start_key)
+            stored_length = self._client.chunk_length(start_key)
+            chunk_len, full_key = self._exact_chunk(block_hashes, idx, stored_length)
             if chunk_len == 0:
                 # The chunk may be pending in the write-behind queue.
-                key = self.chunk_key(start_hash, total - idx)
+                key = self.chunk_key(start_hash, total - idx, block_hashes[-1])
                 if self._is_pending(key):
                     self.drain()
-                    chunk_len = self._client.chunk_length(start_key)
+                    stored_length = self._client.chunk_length(start_key)
+                    chunk_len, full_key = self._exact_chunk(
+                        block_hashes, idx, stored_length
+                    )
                 if chunk_len == 0:
                     raise TelysStoreError(
                         f"planned load failed: block {start_key!r} is no longer present "
                         f"(evicted between lookup and load)"
                     )
             needed = min(chunk_len, total - idx)
-            full_key = self.chunk_key(start_hash, chunk_len)
             chunk_record = self._client.get(full_key)
             if chunk_record is None:
                 raise TelysStoreError(
@@ -336,30 +361,64 @@ class TelysBlockStore:
     def _read_chunk_from_slab(
         self, key: str, record: TelysRecord
     ) -> list[dict[str, bytes]]:
-        """Read the encoded chunk bytes from the client value, slab, or inline metadata."""
+        """Read and decode a chunk into the legacy per-block representation."""
         with self._telemetry.span("store_read_chunk") as read_ctx:
             payload, metadata = self._read_chunk_bytes(key, record)
-            is_fast = metadata.get(self._CHUNK_FORMAT_KEY) == self._CHUNK_FORMAT_FAST
-
+            prefer_fast = (
+                metadata.get(self._CHUNK_FORMAT_KEY) == self._CHUNK_FORMAT_FAST
+            )
+            with self._telemetry.span("store_decode_chunk") as dec_ctx:
+                is_fast, decoded = self._decode_chunk_payload(
+                    payload, metadata, prefer_fast=prefer_fast
+                )
+                dec_ctx["source"] = "fast" if is_fast else "blob"
+                dec_ctx["payload_bytes"] = len(payload)
             if is_fast:
-                # Convert fast stacked tensors back to per-block bytes for the
-                # legacy DecodedBlock view (used by tests and inspection).
                 if torch is None:
                     raise TelysStoreError("torch is required to decode fast chunks")
-                with self._telemetry.span("store_decode_chunk") as dec_ctx:
-                    dec_ctx["source"] = "fast"
-                    dec_ctx["payload_bytes"] = len(payload)
-                    layer_tensors = self._fast_chunk_codec.decode_chunk(payload)
-                result = self._tensors_to_block_blobs(layer_tensors)
-                read_ctx["decoded_blocks"] = len(result)
-                return result
-
-            with self._telemetry.span("store_decode_chunk") as dec_ctx:
-                dec_ctx["source"] = "blob"
-                dec_ctx["payload_bytes"] = len(payload)
-                result = self._chunk_codec.decode_chunk(payload)
+                result = self._tensors_to_block_blobs(decoded)
+            else:
+                result = decoded
             read_ctx["decoded_blocks"] = len(result)
         return result
+
+    def _decode_chunk_payload(
+        self,
+        payload: bytes,
+        metadata: Mapping[str, str],
+        *,
+        prefer_fast: bool,
+    ) -> tuple[bool, list[dict[str, bytes]] | dict[str, "torch.Tensor"]]:
+        """Decode with the intended codec, falling back without magic-byte guesses."""
+        intended_decode = (
+            self._fast_chunk_codec.decode_chunk
+            if prefer_fast
+            else self._chunk_codec.decode_chunk
+        )
+        other_decode = (
+            self._chunk_codec.decode_chunk
+            if prefer_fast
+            else self._fast_chunk_codec.decode_chunk
+        )
+        try:
+            decoded = intended_decode(payload)
+        except PayloadCodecError as intended_error:
+            try:
+                decoded = other_decode(payload)
+            except PayloadCodecError:
+                raise intended_error
+            return not prefer_fast, decoded
+
+        if self._CHUNK_FORMAT_KEY not in metadata:
+            try:
+                other_decode(payload)
+            except PayloadCodecError:
+                pass
+            else:
+                raise PayloadCodecError(
+                    "ambiguous chunk payload: valid as both legacy and fast formats"
+                )
+        return prefer_fast, decoded
 
     def load_decoded_blocks_fast(
         self, block_hashes: Sequence[bytes]
@@ -378,19 +437,22 @@ class TelysBlockStore:
         while idx < total:
             start_hash = block_hashes[idx]
             start_key = self.chunk_start_key(start_hash)
-            chunk_len = self._client.chunk_length(start_key)
+            stored_length = self._client.chunk_length(start_key)
+            chunk_len, full_key = self._exact_chunk(block_hashes, idx, stored_length)
             if chunk_len == 0:
-                key = self.chunk_key(start_hash, total - idx)
+                key = self.chunk_key(start_hash, total - idx, block_hashes[-1])
                 if self._is_pending(key):
                     self.drain()
-                    chunk_len = self._client.chunk_length(start_key)
+                    stored_length = self._client.chunk_length(start_key)
+                    chunk_len, full_key = self._exact_chunk(
+                        block_hashes, idx, stored_length
+                    )
                 if chunk_len == 0:
                     raise TelysStoreError(
                         f"planned load failed: block {start_key!r} is no longer present "
                         f"(evicted between lookup and load)"
                     )
             needed = min(chunk_len, total - idx)
-            full_key = self.chunk_key(start_hash, chunk_len)
             chunk_record = self._client.get(full_key)
             if chunk_record is None:
                 raise TelysStoreError(
@@ -398,27 +460,26 @@ class TelysBlockStore:
                     f"(evicted between lookup and load)"
                 )
             payload, metadata = self._read_chunk_bytes(full_key, chunk_record)
-            is_fast = metadata.get(self._CHUNK_FORMAT_KEY) == self._CHUNK_FORMAT_FAST
-            if (
+            prefer_fast = (
                 self._CHUNK_FORMAT_KEY not in metadata
-                and payload
-                and payload[0] == TelysFastChunkCodec._MAGIC
-            ):
-                # Older BlobStore writes omitted metadata; the codec magic is
-                # authoritative when no explicit format marker exists.
-                is_fast = True
-            if not is_fast:
-                raise TelysStoreError(
-                    f"chunk {full_key!r} was stored with the legacy format; "
-                    f"use load_decoded_blocks() instead"
-                )
+                or metadata.get(self._CHUNK_FORMAT_KEY) == self._CHUNK_FORMAT_FAST
+            )
 
             with self._telemetry.span("store_read_chunk") as read_ctx:
-                read_ctx["fast_path"] = True
+                is_fast, decoded = self._decode_chunk_payload(
+                    payload, metadata, prefer_fast=prefer_fast
+                )
+                layer_tensors = (
+                    decoded if is_fast else self._block_blobs_to_tensors(decoded)
+                )
+                read_ctx["fast_path"] = is_fast
                 read_ctx["payload_bytes"] = len(payload)
-                layer_tensors = self._fast_chunk_codec.decode_chunk(payload)
-                read_ctx["decoded_blocks"] = len(
-                    layer_tensors.get(next(iter(layer_tensors)), [])
+                decoded_blocks = len(layer_tensors.get(next(iter(layer_tensors)), []))
+                read_ctx["decoded_blocks"] = decoded_blocks
+            if decoded_blocks != chunk_len:
+                raise TelysStoreError(
+                    f"chunk {full_key!r} decoded {decoded_blocks} blocks, "
+                    f"expected {chunk_len}"
                 )
 
             chunks.append(
@@ -457,6 +518,40 @@ class TelysBlockStore:
             blocks.append(block_blobs)
         return blocks
 
+    @staticmethod
+    def _block_blobs_to_tensors(
+        block_blobs: Sequence[Mapping[str, bytes]],
+    ) -> dict[str, "torch.Tensor"]:
+        """Convert legacy serialized blocks to stacked tensors for fast loads."""
+        from telys_vllm.gpu_ops import deserialize_kv_tensor
+
+        if not block_blobs:
+            raise PayloadCodecError("legacy chunk contained no blocks")
+        layer_names = set(block_blobs[0])
+        if not layer_names or any(set(block) != layer_names for block in block_blobs):
+            raise PayloadCodecError("legacy chunk layers differ between blocks")
+
+        layer_tensors: dict[str, torch.Tensor] = {}
+        for name in sorted(layer_names):
+            try:
+                tensors = [deserialize_kv_tensor(block[name]) for block in block_blobs]
+                first = tensors[0]
+                if any(
+                    tensor.shape != first.shape or tensor.dtype != first.dtype
+                    for tensor in tensors[1:]
+                ):
+                    raise PayloadCodecError(
+                        f"legacy chunk tensor shape or dtype differs in layer {name!r}"
+                    )
+                layer_tensors[name] = torch.stack(tensors)
+            except PayloadCodecError:
+                raise
+            except Exception as exc:
+                raise PayloadCodecError(
+                    f"invalid serialized tensor in legacy chunk layer {name!r}"
+                ) from exc
+        return layer_tensors
+
     def save_chunk(
         self,
         start_hash: bytes,
@@ -470,7 +565,7 @@ class TelysBlockStore:
         the work.  Call ``drain()`` before relying on the write being readable.
         """
         encoded_chunk = self._encode_chunk(start_hash, block_hashes, layer_blobs)
-        key = self.chunk_key(start_hash, len(block_hashes))
+        key = self.chunk_key(start_hash, len(block_hashes), block_hashes[-1])
         if self._config.write_behind:
             self._enqueue(key, start_hash, block_hashes, encoded_chunk, extra_metadata)
             return key
@@ -501,7 +596,7 @@ class TelysBlockStore:
             raise TelysStoreError(
                 "layer_tensors must contain one entry per block in the chunk"
             )
-        key = self.chunk_key(start_hash, len(block_hashes))
+        key = self.chunk_key(start_hash, len(block_hashes), block_hashes[-1])
         fast_metadata = {"vllm.chunk_format": self._CHUNK_FORMAT_FAST}
         if extra_metadata:
             fast_metadata.update(extra_metadata)
@@ -531,7 +626,7 @@ class TelysBlockStore:
         When write-behind is disabled, the chunk is persisted synchronously so
         callers can rely on it being readable immediately.
         """
-        key = self.chunk_key(start_hash, len(block_hashes))
+        key = self.chunk_key(start_hash, len(block_hashes), block_hashes[-1])
         if self._config.write_behind:
             self._enqueue(key, start_hash, block_hashes, encoded_chunk, extra_metadata)
             return key
@@ -722,9 +817,9 @@ class TelysBlockStore:
         return self._client.compact()
 
     def reset(self) -> None:
-        """Delete every key written by this connector, clear the slab, then compact."""
+        """Delete every persisted connector key, clear the slab, then compact."""
         self.drain()
-        for key in sorted(self._known_keys):
+        for key in sorted(self._client.keys()):
             self._client.delete(key)
         self._known_keys.clear()
         with self._lock:

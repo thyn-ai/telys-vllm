@@ -7,9 +7,11 @@ get/put/delete/compact, bytes payload encoding, metadata passthrough, and the
 login-missing error path.
 """
 
+import base64
 import hashlib
 import importlib
 import importlib.util
+import json
 import sys
 from types import ModuleType
 from typing import Any, ClassVar
@@ -180,10 +182,33 @@ def test_metadata_only_record(lc, monkeypatch):
     assert row["vllm.slab_length"] == "56"
     assert row["meta"] == "x"
 
+    client._record_cache.clear()
     record = client.get("ns/chunk/bb/1")
     assert record.value == b""
     assert record.metadata["vllm.slab_offset"] == "1234"
     assert record.metadata["meta"] == "x"
+
+
+def test_get_decodes_v2_meta_blob(lc, monkeypatch):
+    client = _make_client(lc, monkeypatch, TELYS_PATH="/tmp/stub-telys")
+    key = "ns/chunk/v2/1"
+    metadata = {"vllm.chunk_format": "legacy", "meta": "v2"}
+    raw = json.dumps(
+        {
+            "payload": base64.b64encode(b"v2 payload").decode("ascii"),
+            "metadata": metadata,
+        }
+    )
+    client._collection._rows[key] = {
+        "__key": key,
+        client._legacy_meta_blob_col: raw,
+    }
+
+    record = client.get(key)
+
+    assert record is not None
+    assert record.value == b"v2 payload"
+    assert record.metadata == metadata
 
 
 def test_chunk_length_tracks_longest_chunk(lc, monkeypatch):
@@ -209,6 +234,20 @@ def test_delete_existing_and_missing(lc, monkeypatch):
     assert client.delete("ns/kv/dd") is True
     assert client.delete("ns/kv/dd") is False
     assert client.get("ns/kv/dd") is None
+
+
+def test_local_keys_returns_snapshot_and_tracks_delete(lc, monkeypatch):
+    client = _make_client(lc, monkeypatch, TELYS_PATH="/tmp/stub-telys")
+    client.put("ns/kv/one", b"", {})
+    client.put("ns/kv/two", b"", {})
+
+    snapshot = client.keys()
+    assert snapshot == {"ns/kv/one", "ns/kv/two"}
+    snapshot.clear()
+    assert client.keys() == {"ns/kv/one", "ns/kv/two"}
+
+    assert client.delete("ns/kv/one") is True
+    assert client.keys() == {"ns/kv/two"}
 
 
 def test_compact_parses_report(lc, monkeypatch):
@@ -379,6 +418,9 @@ class _StubBlobStore:
     def __init__(self, path: str) -> None:
         self.records = self._stores.setdefault(path, {})
         self.last_sync = False
+        self.last_delete_sync = False
+        self.sync_calls = 0
+        self.closed = False
 
     def put(self, key, payload, metadata=None, *, sync=False):
         self.last_sync = sync
@@ -397,14 +439,125 @@ class _StubBlobStore:
     def contains(self, key):
         return key in self.records
 
-    def delete(self, key):
+    def delete(self, key, *, sync=False):
+        self.last_delete_sync = sync
         self.records.pop(key, None)
 
     def sync(self):
-        return None
+        self.sync_calls += 1
 
     def close(self):
-        return None
+        self.closed = True
+
+
+def _make_blob_client(lc, monkeypatch, path):
+    monkeypatch.setenv("TELYS_PATH", str(path))
+    monkeypatch.delenv("TELYS_ADDRESS", raising=False)
+    sys.modules["telys"].BlobStore = _StubBlobStore
+    return lc.TelysBlobClient(TelysConnectorConfig(namespace="test-ns"))
+
+
+def test_blob_clients_share_store_across_overlapping_lifetimes(
+    lc, monkeypatch, tmp_path
+):
+    first = _make_blob_client(lc, monkeypatch, tmp_path / "shared")
+    second = _make_blob_client(lc, monkeypatch, tmp_path / "shared")
+    shared_store = first._blob_store
+    first_key = "test-ns/kv/first"
+    second_key = "test-ns/kv/second"
+
+    try:
+        assert second._blob_store is shared_store
+        first.put(first_key, b"first payload", {"meta": "first"})
+        first.close()
+        assert shared_store.closed is False
+
+        record = second.get(first_key)
+        assert record is not None
+        assert record.value == b"first payload"
+        assert record.metadata["meta"] == "first"
+
+        second.put(second_key, b"second payload", {"meta": "second"})
+        assert shared_store.get(second_key) == (
+            b"second payload",
+            {"meta": "second"},
+        )
+    finally:
+        if not first._closed:
+            first.close()
+        second.close()
+
+    assert shared_store.closed is True
+    assert shared_store.sync_calls == 1
+
+
+def test_blob_delete_removes_metadata_blob_and_cached_keys(lc, monkeypatch, tmp_path):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "delete")
+    key = "test-ns/chunk/delete/1"
+    client.put(key, b"payload", {"meta": "x"})
+    assert client.get(key) is not None
+
+    snapshot = client.keys()
+    assert snapshot == {key}
+    snapshot.clear()
+    assert client.keys() == {key}
+
+    assert client.delete(key) is True
+    assert client._blob_store.last_delete_sync is True
+    assert key not in client._blob_store.records
+    assert key not in client._collection._rows
+    assert client.keys() == set()
+    assert client.get(key) is None
+    assert client.delete(key) is False
+    client.close()
+
+
+def test_blob_delete_handles_blob_only_record_without_metadata_collection(
+    lc, monkeypatch, tmp_path
+):
+    path = tmp_path / "blob-only"
+    key = "test-ns/chunk/blob-only/1"
+    blob_store = _StubBlobStore(f"{path}_blobs")
+    blob_store.put(key, b"blob only", {"meta": "blob"})
+    client = _make_blob_client(lc, monkeypatch, path)
+    blob_store = client._blob_store
+
+    def missing_metadata_ids(where=None):
+        if where is not None:
+            raise RuntimeError("unknown filter column: __key")
+        return []
+
+    monkeypatch.setattr(client._collection, "ids", missing_metadata_ids)
+
+    assert client.delete(key) is True
+    assert blob_store.last_delete_sync is True
+    assert key not in blob_store.records
+    assert client.keys() == set()
+    assert client.get(key) is None
+    client.close()
+
+
+def test_blob_delete_propagates_failure_and_clears_caches(lc, monkeypatch, tmp_path):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "delete-failure")
+    key = "test-ns/chunk/failure/1"
+    client.put(key, b"payload", {"meta": "x"})
+    assert client.get(key) is not None
+    blob_store = client._blob_store
+
+    def fail_delete(delete_key, *, sync=False):
+        blob_store.last_delete_sync = sync
+        raise RuntimeError("injected blob delete failure")
+
+    monkeypatch.setattr(blob_store, "delete", fail_delete)
+
+    with pytest.raises(RuntimeError, match="injected blob delete failure"):
+        client.delete(key)
+    assert blob_store.last_delete_sync is True
+    assert key in blob_store.records
+    assert key not in client._key_set
+    assert key not in client._record_cache
+    assert client._chunk_lengths == {}
+    client.close()
 
 
 def test_blob_restart_uses_durable_keys_and_metadata(lc, monkeypatch):
@@ -443,7 +596,7 @@ def test_blob_restart_decodes_legacy_chunk_without_metadata(lc, monkeypatch):
     monkeypatch.setenv("TELYS_PATH", "/tmp/blob-restart-legacy")
     sys.modules["telys"].BlobStore = _StubBlobStore
     block_hash = b"\xaa" * 32
-    key = f"test-ns/chunk/{block_hash.hex()}/1"
+    key = f"test-ns/chunk/{block_hash.hex()}/{block_hash.hex()}/1"
     tensor = torch.arange(16 * 4 * 256, dtype=torch.bfloat16).reshape(1, 16, 4, 256)
     payload = TelysFastChunkCodec().encode_chunk({"layer.0": tensor})
     _StubBlobStore("/tmp/blob-restart-legacy_blobs").put(key, payload)

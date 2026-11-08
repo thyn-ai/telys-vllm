@@ -9,8 +9,10 @@ recomputing those tokens.
 
 from types import SimpleNamespace
 
+import pytest
 from vllm.distributed.kv_transfer.kv_connector.v1.base import KVConnectorRole
 
+from telys_vllm.connector import TelysConnectorError
 from tests.fakes import (
     BLOCK_SIZE,
     FakeCachedReqs,
@@ -105,10 +107,12 @@ def _build_cached_request_meta(
     num_computed_tokens: int,
     new_block_ids=None,
     resolved_block_ids=None,
+    resumed: bool = False,
 ):
     scheduler_output = FakeSchedulerOutput(
         scheduled_cached_reqs=FakeCachedReqs(
             req_ids=[request.request_id],
+            resumed_req_ids={request.request_id} if resumed else set(),
             num_computed_tokens=[num_computed_tokens],
             new_block_ids=[new_block_ids] if new_block_ids is not None else [],
         ),
@@ -119,6 +123,84 @@ def _build_cached_request_meta(
             get_block_ids=lambda _req_id: resolved_block_ids
         )
     return scheduler.build_connector_meta(scheduler_output)
+
+
+def _prepare_resumed_external_hit():
+    scheduler = make_connector(KVConnectorRole.SCHEDULER)
+    hashes = make_hashes(NUM_BLOCKS)
+    for block_hash in hashes:
+        scheduler.store.save_chunk(block_hash, [block_hash], {"layer.0": [b"cached"]})
+
+    request = FakeRequest("req-resumed-hit", NUM_TOKENS, block_hashes=hashes)
+    scheduler.on_new_request(request)
+    local_blocks = 2
+    hit_tokens, _ = scheduler.get_num_new_matched_tokens(
+        request, local_blocks * BLOCK_SIZE
+    )
+    assert hit_tokens == (NUM_BLOCKS - local_blocks) * BLOCK_SIZE
+    scheduler.update_state_after_alloc(request, None, hit_tokens)
+    return scheduler, request, hashes, local_blocks, hit_tokens
+
+
+@pytest.mark.parametrize("use_block_state", [True, False])
+def test_resumed_external_hit_emits_load_once_without_resaving(use_block_state):
+    scheduler, request, hashes, local_blocks, hit_tokens = (
+        _prepare_resumed_external_hit()
+    )
+    allocated = [100 + i for i in range(NUM_BLOCKS + 1)]
+    block_sources = (
+        {"new_block_ids": ([999],), "resolved_block_ids": (allocated, [888])}
+        if use_block_state
+        else {"new_block_ids": (allocated,)}
+    )
+
+    meta = _build_cached_request_meta(
+        scheduler,
+        request,
+        NUM_BLOCKS * BLOCK_SIZE,
+        resumed=True,
+        **block_sources,
+    )
+
+    assert len(meta.loads) == 1
+    load_spec = meta.loads[0]
+    assert load_spec.request_id == request.request_id
+    assert load_spec.start_block == local_blocks
+    assert load_spec.block_hashes == hashes[local_blocks:]
+    assert load_spec.block_ids == allocated[local_blocks:NUM_BLOCKS]
+    assert load_spec.num_tokens == hit_tokens
+    assert meta.saves == []
+    assert scheduler._save_cursors[request.request_id] == NUM_BLOCKS
+    assert scheduler._load_plans == {}
+
+    repeated = _build_cached_request_meta(
+        scheduler,
+        request,
+        NUM_BLOCKS * BLOCK_SIZE,
+        resumed=True,
+        **block_sources,
+    )
+    assert repeated.loads == []
+    assert repeated.saves == []
+
+
+def test_resumed_external_hit_without_full_block_ids_fails_explicitly():
+    scheduler, request, _, _, _ = _prepare_resumed_external_hit()
+
+    with pytest.raises(TelysConnectorError, match=request.request_id):
+        _build_cached_request_meta(
+            scheduler, request, NUM_BLOCKS * BLOCK_SIZE, resumed=True
+        )
+    with pytest.raises(TelysConnectorError, match=request.request_id):
+        _build_cached_request_meta(
+            scheduler,
+            request,
+            NUM_BLOCKS * BLOCK_SIZE,
+            new_block_ids=([999],),
+            resumed=True,
+        )
+
+    assert request.request_id in scheduler._load_plans
 
 
 def test_new_native_hit_with_stale_allocation_saves_only_the_new_suffix():

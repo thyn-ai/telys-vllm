@@ -114,8 +114,12 @@ def _decode_legacy_blob(key: str, raw: str) -> TelysRecord:
 
 
 def _chunk_start_key(chunk_key: str) -> str:
-    """Strip the trailing block-count segment from a chunk key."""
-    return chunk_key.rsplit("/", 1)[0]
+    """Extract the first hash from chain-bound or legacy chunk keys."""
+    prefix, marker, hashes = chunk_key.rpartition("/chunk/")
+    if not marker:
+        return chunk_key.rsplit("/", 1)[0]
+    start_hash = hashes.split("/", 1)[0]
+    return f"{prefix}{marker}{start_hash}"
 
 
 class TelysLocalClient(TelysClient):
@@ -285,6 +289,13 @@ class TelysLocalClient(TelysClient):
                 return True
         return self.get(key) is not None
 
+    def keys(self) -> set[str]:
+        """Return a snapshot of keys in the local cache and Telys collection."""
+        self._check_open()
+        self._seed_key_set()
+        with self._lock:
+            return set(self._key_set)
+
     def chunk_length(self, start_key: str) -> int:
         """Return the number of blocks in the stored chunk starting at ``start_key``."""
         self._check_open()
@@ -332,8 +343,11 @@ class TelysLocalClient(TelysClient):
         # v4: payload lives in the slab; Telys stores only the index metadata.
         # value is empty bytes.  Legacy v3 records carry a base64 string in
         # vllm.payload; v2 records carry a base64-JSON blob in vllm.meta_blob.
+        legacy_blob = raw_metadata.pop(self._legacy_meta_blob_col, None)
         payload = raw_metadata.pop(self._payload_col, None)
-        if isinstance(payload, str):
+        if isinstance(legacy_blob, str):
+            record = _decode_legacy_blob(key, legacy_blob)
+        elif isinstance(payload, str):
             try:
                 value = base64.b64decode(payload, validate=True)
             except (binascii.Error, ValueError):
@@ -468,11 +482,11 @@ class TelysLocalClient(TelysClient):
             engine.close()
 
 
-# Shared engine/collection state reused by both TelysLocalClient and
+# Shared engine/collection/BlobStore state reused by both TelysLocalClient and
 # TelysBlobClient. vLLM constructs separate scheduler and worker connectors
 # inside one process; sharing one engine/collection keeps writes visible
 # immediately and the hot cache coherent.
-_BLOB_SHARED: dict[tuple[str, str, str], tuple[Any, Any, int, bool]] = {}
+_BLOB_SHARED: dict[tuple[str, str, str], tuple[Any, Any, Any, int, bool]] = {}
 _BLOB_SHARED_LOCK = threading.Lock()
 
 
@@ -525,10 +539,17 @@ class TelysBlobClient(TelysClient):
         with _BLOB_SHARED_LOCK:
             shared = _BLOB_SHARED.get(self._shared_key)
             if shared is not None:
-                self._engine, self._collection, refcount, self._remote = shared
+                (
+                    self._engine,
+                    self._collection,
+                    self._blob_store,
+                    refcount,
+                    self._remote,
+                ) = shared
                 _BLOB_SHARED[self._shared_key] = (
                     self._engine,
                     self._collection,
+                    self._blob_store,
                     refcount + 1,
                     self._remote,
                 )
@@ -556,6 +577,7 @@ class TelysBlobClient(TelysClient):
                 _BLOB_SHARED[self._shared_key] = (
                     self._engine,
                     self._collection,
+                    self._blob_store,
                     1,
                     self._remote,
                 )
@@ -641,6 +663,13 @@ class TelysBlobClient(TelysClient):
         if self._blob_store is not None and self._blob_store.contains(key):
             return True
         return self.get(key) is not None
+
+    def keys(self) -> set[str]:
+        """Return a snapshot of keys in the metadata collection and BlobStore."""
+        self._check_open()
+        self._seed_key_set()
+        with self._lock:
+            return set(self._key_set)
 
     def chunk_length(self, start_key: str) -> int:
         """Return the number of blocks in the stored chunk starting at ``start_key``."""
@@ -757,21 +786,18 @@ class TelysBlobClient(TelysClient):
                 present = False
             else:
                 raise
-        if not present:
+        blob_present = self._blob_store is not None and self._blob_store.contains(key)
+        try:
+            if present:
+                self._collection.delete([key])
+            if blob_present:
+                self._blob_store.delete(key, sync=True)
+        finally:
             with self._lock:
                 self._key_set.discard(key)
                 self._record_cache.pop(key, None)
                 self._chunk_lengths.pop(_chunk_start_key(key), None)
-            return False
-        self._collection.delete([key])
-        if self._blob_store is not None:
-            with contextlib.suppress(Exception):
-                self._blob_store.delete(key)
-        with self._lock:
-            self._key_set.discard(key)
-            self._record_cache.pop(key, None)
-            self._chunk_lengths.pop(_chunk_start_key(key), None)
-        return True
+        return present or blob_present
 
     def compact(self) -> TelysMaintenanceReport:
         self._check_open()
@@ -802,17 +828,23 @@ class TelysBlobClient(TelysClient):
             shared = _BLOB_SHARED.get(self._shared_key)
             if shared is None:
                 return
-            engine, collection, refcount, remote = shared
+            engine, collection, blob_store, refcount, remote = shared
             refcount -= 1
             if refcount > 0:
-                _BLOB_SHARED[self._shared_key] = (engine, collection, refcount, remote)
+                _BLOB_SHARED[self._shared_key] = (
+                    engine,
+                    collection,
+                    blob_store,
+                    refcount,
+                    remote,
+                )
                 return
             _BLOB_SHARED.pop(self._shared_key, None)
         # Final client in this process: flush BlobStore and close Telys.
-        if self._blob_store is not None:
+        if blob_store is not None:
             with contextlib.suppress(Exception):
-                self._blob_store.sync()
-                self._blob_store.close()
+                blob_store.sync()
+                blob_store.close()
         with contextlib.suppress(Exception):
             collection.save()
         with contextlib.suppress(Exception):

@@ -11,7 +11,8 @@ from unittest.mock import patch
 import pytest
 import torch
 
-from telys_vllm.codec import TelysFastChunkCodec
+from telys_vllm.codec import PayloadCodecError, TelysChunkCodec, TelysFastChunkCodec
+from telys_vllm.gpu_ops import deserialize_kv_tensor, serialize_kv_tensor
 from tests.fakes import make_hashes
 from tests.test_store import FakeBlobStoreClient, make_store
 
@@ -167,3 +168,92 @@ def test_fast_worker_encoding_failure_surfaces_on_drain_and_allows_retry(tmp_pat
         assert client.put_count == 1
     finally:
         store.close()
+
+
+def _put_metadata_free_chunk(store, client, hashes, payload):
+    key = store.chunk_key(hashes[0], len(hashes), hashes[-1])
+    client.put(key, payload, {})
+    return key
+
+
+def _legacy_payload(tensors):
+    return TelysChunkCodec().encode_chunk(
+        {
+            name: [serialize_kv_tensor(block) for block in tensor]
+            for name, tensor in tensors.items()
+        }
+    )
+
+
+def _assert_fast_chunks_equal(loaded, tensors):
+    assert len(loaded) == 1
+    for name, expected in tensors.items():
+        assert torch.equal(loaded[0].layer_tensors[name], expected)
+
+
+def test_two_block_metadata_free_legacy_chunk_loads_as_fast_tensors(tmp_path):
+    client = FakeBlobStoreClient()
+    store = _make_fast_store(tmp_path, client, write_behind=False)
+    hashes = make_hashes(2)
+    tensors = _layer_tensors()
+    _put_metadata_free_chunk(store, client, hashes, _legacy_payload(tensors))
+
+    loaded = store.load_decoded_blocks_fast(hashes)
+
+    _assert_fast_chunks_equal(loaded, tensors)
+
+
+def test_metadata_free_fast_chunk_loads_in_both_directions(tmp_path):
+    client = FakeBlobStoreClient()
+    store = _make_fast_store(tmp_path, client, write_behind=False)
+    hashes = make_hashes(2)
+    tensors = _layer_tensors()
+    payload = TelysFastChunkCodec().encode_chunk(tensors)
+    _put_metadata_free_chunk(store, client, hashes, payload)
+
+    fast_loaded = store.load_decoded_blocks_fast(hashes)
+    legacy_loaded = store.load_decoded_blocks(hashes)
+
+    _assert_fast_chunks_equal(fast_loaded, tensors)
+    for block_idx, block in enumerate(legacy_loaded):
+        for name, expected in tensors.items():
+            actual = deserialize_kv_tensor(block.blobs[name])
+            assert torch.equal(actual, expected[block_idx])
+
+
+@pytest.mark.parametrize(
+    "loader_name", ["load_decoded_blocks", "load_decoded_blocks_fast"]
+)
+def test_metadata_free_corrupt_chunk_is_rejected_in_both_directions(
+    tmp_path, loader_name
+):
+    client = FakeBlobStoreClient()
+    store = _make_fast_store(tmp_path, client, write_behind=False)
+    hashes = make_hashes(2)
+    payload = TelysFastChunkCodec().encode_chunk(_layer_tensors()) + b"trailing"
+    _put_metadata_free_chunk(store, client, hashes, payload)
+
+    with pytest.raises(PayloadCodecError):
+        getattr(store, loader_name)(hashes)
+
+
+@pytest.mark.parametrize(
+    "loader_name", ["load_decoded_blocks", "load_decoded_blocks_fast"]
+)
+def test_metadata_free_ambiguous_chunk_is_rejected(tmp_path, loader_name):
+    client = FakeBlobStoreClient()
+    store = _make_fast_store(tmp_path, client, write_behind=False)
+    hashes = make_hashes(2)
+    tensors = _layer_tensors()
+    _put_metadata_free_chunk(store, client, hashes, b"\x02ambiguous")
+    legacy_blocks = [
+        {name: serialize_kv_tensor(tensor[idx]) for name, tensor in tensors.items()}
+        for idx in range(len(hashes))
+    ]
+
+    with (
+        patch.object(store._chunk_codec, "decode_chunk", return_value=legacy_blocks),
+        patch.object(store._fast_chunk_codec, "decode_chunk", return_value=tensors),
+        pytest.raises(PayloadCodecError, match="ambiguous"),
+    ):
+        getattr(store, loader_name)(hashes)

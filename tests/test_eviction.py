@@ -37,7 +37,7 @@ def test_reset_cache_deletes_written_keys_and_compacts():
 
     assert connector.reset_cache() is True
     assert sorted(client.deleted) == sorted(
-        connector.store.chunk_key(hashes[0], len(hashes)) for h in [hashes]
+        connector.store.chunk_key(hashes[0], len(hashes), hashes[-1]) for h in [hashes]
     )
     assert client.compact_calls == compacts_before + 1
     # The namespace reads as empty afterwards.
