@@ -32,6 +32,9 @@ class _StubCollection:
 
     def __init__(self) -> None:
         self._rows: dict[str, dict[str, Any]] = {}
+        self.search_calls = 0
+        self.ids_calls = 0
+        self.full_ids_calls = 0
 
     def upsert(self, vectors, ids, metadata):
         for key, row in zip(ids, metadata):
@@ -45,6 +48,7 @@ class _StubCollection:
         explain: bool = False,
         with_metadata: bool = False,
     ):
+        self.search_calls += 1
         key = (where or {}).get("__key")
         row = self._rows.get(key)
         if row is None:
@@ -52,7 +56,11 @@ class _StubCollection:
         return {"ids": [key], "scores": [1.0], "metadata": [dict(row)]}
 
     def ids(self, where=None):
-        key = (where or {}).get("__key")
+        self.ids_calls += 1
+        if where is None:
+            self.full_ids_calls += 1
+            return sorted(self._rows)
+        key = where.get("__key")
         return [key] if key in self._rows else []
 
     def delete(self, ids):
@@ -219,6 +227,8 @@ def test_chunk_length_tracks_longest_chunk(lc, monkeypatch):
     client.put("ns/chunk/cc/3", b"v3", {})
     assert client.chunk_length("ns/chunk/cc") == 3
     client.delete("ns/chunk/cc/3")
+    assert client.chunk_length("ns/chunk/cc") == 1
+    client.delete("ns/chunk/cc/1")
     assert client.chunk_length("ns/chunk/cc") == 0
 
 
@@ -421,6 +431,8 @@ class _StubBlobStore:
         self.last_sync = False
         self.last_delete_sync = False
         self.sync_calls = 0
+        self.get_calls = 0
+        self.keys_calls = 0
         self.closed = False
 
     def put(self, key, payload, metadata=None, *, sync=False):
@@ -428,6 +440,7 @@ class _StubBlobStore:
         self.records[key] = (bytes(payload), dict(metadata or {}))
 
     def get(self, key):
+        self.get_calls += 1
         try:
             payload, metadata = self.records[key]
         except KeyError:
@@ -435,6 +448,7 @@ class _StubBlobStore:
         return payload, dict(metadata)
 
     def keys(self):
+        self.keys_calls += 1
         return set(self.records)
 
     def contains(self, key):
@@ -700,3 +714,392 @@ def test_blob_restart_decodes_legacy_chunk_without_metadata(lc, monkeypatch):
     assert len(chunks) == 1
     assert torch.equal(chunks[0].layer_tensors["layer.0"], tensor)
     client.close()
+
+
+class _IterationCountingSet(set[str]):
+    def __init__(self, values) -> None:
+        super().__init__(values)
+        self.iterations = 0
+
+    def __iter__(self):
+        self.iterations += 1
+        return super().__iter__()
+
+
+def _complete_metadata(**overrides):
+    metadata = {
+        "vllm.block_start_hash": "aa",
+        "vllm.block_count": "2",
+        "vllm.block_size": "16",
+        "vllm.model": "model",
+        "vllm.engine_id": "engine",
+    }
+    metadata.update(overrides)
+    return metadata
+
+
+def _chunk_key(key_format: str, length: int = 2, end_hash: str = "bb") -> str:
+    start_key = "test-ns/chunk/aa"
+    if key_format == "chain":
+        return f"{start_key}/{end_hash}/{length}"
+    return f"{start_key}/{length}"
+
+
+def _make_index_client(lc, monkeypatch, tmp_path, client_kind: str, remote=False):
+    if client_kind == "blob":
+        return _make_blob_client(lc, monkeypatch, tmp_path / "blob")
+    if remote:
+        monkeypatch.setenv("TELYS_ADDRESS", str(tmp_path / "remote.sock"))
+        monkeypatch.delenv("TELYS_PATH", raising=False)
+        return lc.TelysLocalClient(TelysConnectorConfig(namespace="test-ns"))
+    return _make_client(lc, monkeypatch, TELYS_PATH=str(tmp_path / "local"))
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_content_digest_survives_close_reopen(lc, monkeypatch, tmp_path, client_kind):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    engine = client._engine
+    key = _chunk_key("chain")
+    digest = hashlib.sha256(b"payload").hexdigest()
+    metadata = {"vllm.content_sha256": digest}
+    if client_kind == "blob":
+        metadata = _complete_metadata(**metadata)
+
+    try:
+        client.put(key, b"payload", metadata)
+        assert "vllm.content_sha256" in engine.last_filter_columns
+        client.close()
+
+        monkeypatch.setattr(sys.modules["telys"], "Telys", lambda _: engine)
+        client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+        client._collection.search_calls = 0
+        record = client.get(key)
+
+        assert record is not None
+        assert record.metadata["vllm.content_sha256"] == digest
+        if client_kind == "blob":
+            assert record.metadata == metadata
+            assert client._collection.search_calls == 0
+    finally:
+        if not client._closed:
+            client.close()
+
+
+@pytest.mark.parametrize(
+    "digest_override",
+    [
+        pytest.param({}, id="absent"),
+        pytest.param({"vllm.content_sha256": "not-a-sha256"}, id="malformed"),
+    ],
+)
+def test_blob_read_preserves_digest_state_for_connector(
+    lc, monkeypatch, tmp_path, digest_override
+):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "digest-state")
+    key = _chunk_key("chain")
+    metadata = _complete_metadata(**digest_override)
+    client._blob_store.put(key, b"payload", metadata)
+
+    try:
+        record = client.get(key)
+
+        assert record is not None
+        assert record.metadata == metadata
+        assert record.metadata.get("vllm.content_sha256") == digest_override.get(
+            "vllm.content_sha256"
+        )
+    finally:
+        client.close()
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+@pytest.mark.parametrize("key_format", ["chain", "legacy"])
+def test_chunk_candidates_indexed_hit_avoids_reseed_and_key_scan(
+    lc, monkeypatch, tmp_path, client_kind, key_format
+):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    key = _chunk_key(key_format)
+    try:
+        client.put(key, b"payload", {"meta": "first"})
+        client.put(_chunk_key(key_format, end_hash="cc").replace("/aa/", "/ab/"), b"", {})
+        counting_keys = _IterationCountingSet(client._key_set)
+        client._key_set = counting_keys
+        full_ids_calls = client._collection.full_ids_calls
+        blob_keys_calls = client._blob_store.keys_calls if client_kind == "blob" else 0
+
+        assert client.chunk_candidates("test-ns/chunk/aa") == {2: key}
+        assert counting_keys.iterations == 0
+        assert client._collection.full_ids_calls == full_ids_calls
+        if client_kind == "blob":
+            assert client._blob_store.keys_calls == blob_keys_calls
+    finally:
+        client.close()
+
+
+@pytest.mark.parametrize("remote", [False, True])
+def test_local_second_client_uses_coherent_index_without_reseed(
+    lc, monkeypatch, tmp_path, remote
+):
+    first = _make_index_client(lc, monkeypatch, tmp_path, "local", remote=remote)
+    second = _make_index_client(lc, monkeypatch, tmp_path, "local", remote=remote)
+    key = _chunk_key("chain")
+    try:
+        first.put(key, b"payload", {"meta": "shared"})
+        assert second.chunk_length("test-ns/chunk/aa") == 2
+        full_ids_calls = second._collection.full_ids_calls
+
+        assert second.chunk_candidates("test-ns/chunk/aa") == {2: key}
+        assert second._collection.full_ids_calls == full_ids_calls
+        assert second.get(key).metadata["meta"] == "shared"
+        first.put(key, b"overwritten", {"meta": "overwritten"})
+        assert second.get(key).metadata["meta"] == "overwritten"
+        assert second._collection.search_calls == 0
+        assert first.delete(key) is True
+        assert second.chunk_length("test-ns/chunk/aa") == 0
+        assert second.chunk_candidates("test-ns/chunk/aa") == {}
+
+        first.put(key, b"reinserted", {"meta": "reinserted"})
+        assert second.chunk_length("test-ns/chunk/aa") == 2
+        full_ids_calls = second._collection.full_ids_calls
+        assert second.chunk_candidates("test-ns/chunk/aa") == {2: key}
+        assert second._collection.full_ids_calls == full_ids_calls
+    finally:
+        first.close()
+        second.close()
+
+
+def test_blob_second_client_uses_index_and_complete_metadata_without_search(
+    lc, monkeypatch, tmp_path
+):
+    first = _make_blob_client(lc, monkeypatch, tmp_path / "shared-fast-path")
+    second = _make_blob_client(lc, monkeypatch, tmp_path / "shared-fast-path")
+    key = _chunk_key("chain")
+    metadata = _complete_metadata(meta="complete")
+    try:
+        first.put(key, b"payload", metadata)
+        assert second.chunk_length("test-ns/chunk/aa") == 2
+        full_ids_calls = second._collection.full_ids_calls
+        blob_keys_calls = second._blob_store.keys_calls
+        assert second.chunk_candidates("test-ns/chunk/aa") == {2: key}
+        assert second._collection.full_ids_calls == full_ids_calls
+        assert second._blob_store.keys_calls == blob_keys_calls
+
+        second._record_cache.clear()
+        second._collection.search_calls = 0
+        second._blob_store.get_calls = 0
+        record = second.get(key)
+
+        assert record is not None
+        assert record.value == b"payload"
+        assert record.metadata == metadata
+        assert second._blob_store.get_calls == 1
+        assert second._collection.search_calls == 0
+        digest = hashlib.sha256(key.encode("utf-8")).hexdigest()
+        assert record.provenance.plan_hash == digest[:32]
+        assert record.provenance.result_id == digest[32:56]
+    finally:
+        first.close()
+        second.close()
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+@pytest.mark.parametrize("key_format", ["chain", "legacy"])
+def test_chunk_index_delete_reinsert_and_overwrite(
+    lc, monkeypatch, tmp_path, client_kind, key_format
+):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    key = _chunk_key(key_format)
+    longer_key = _chunk_key(key_format, length=4, end_hash="cc")
+    start_key = "test-ns/chunk/aa"
+    try:
+        client.put(key, b"first", {"meta": "first"})
+        client.put(key, b"second", {"meta": "second"})
+        client.put(longer_key, b"longer", {"meta": "longer"})
+        assert client.chunk_candidates(start_key) == {2: key, 4: longer_key}
+        assert client.get(key).metadata["meta"] == "second"
+
+        assert client.delete(longer_key) is True
+        assert client.chunk_candidates(start_key) == {2: key}
+        assert client.chunk_length(start_key) == 2
+        assert client.delete(key) is True
+        assert client.chunk_candidates(start_key) == {}
+        assert client.chunk_length(start_key) == 0
+
+        client.put(key, b"reinserted", {"meta": "reinserted"})
+        assert client.chunk_candidates(start_key) == {2: key}
+        record = client.get(key)
+        assert record is not None
+        assert record.metadata["meta"] == "reinserted"
+        assert record.value == (b"reinserted" if client_kind == "blob" else b"")
+    finally:
+        client.close()
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_chunk_index_prefers_chain_key_and_restores_legacy_after_delete(
+    lc, monkeypatch, tmp_path, client_kind
+):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    legacy_key = _chunk_key("legacy")
+    chain_key = _chunk_key("chain")
+    start_key = "test-ns/chunk/aa"
+    try:
+        client.put(legacy_key, b"legacy", {})
+        client.put(chain_key, b"chain", {})
+        assert client.chunk_candidates(start_key) == {2: chain_key}
+
+        assert client.delete(chain_key) is True
+        assert client.chunk_candidates(start_key) == {2: legacy_key}
+        client.put(chain_key, b"reinserted", {})
+        assert client.chunk_candidates(start_key) == {2: chain_key}
+    finally:
+        client.close()
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_chunk_candidates_rebuilds_stale_index(
+    lc, monkeypatch, tmp_path, client_kind
+):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    key = _chunk_key("chain")
+    start_key = "test-ns/chunk/aa"
+    try:
+        client.put(key, b"payload", {})
+        client._chunk_key_index[start_key] = {99: "stale/chunk/key/99"}
+        client._chunk_lengths[start_key] = 99
+        assert client.chunk_candidates(start_key) == {2: key}
+
+        client._chunk_key_index.clear()
+        client._chunk_lengths.clear()
+        assert client.chunk_candidates(start_key) == {2: key}
+        assert client.chunk_length(start_key) == 2
+    finally:
+        client.close()
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_chunk_candidates_propagates_seed_backend_failure(
+    lc, monkeypatch, tmp_path, client_kind
+):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    try:
+        def fail_ids(where=None):
+            raise RuntimeError("injected ids failure")
+
+        monkeypatch.setattr(client._collection, "ids", fail_ids)
+        with pytest.raises(lc.TelysLocalClientError, match="Failed to seed") as exc_info:
+            client.chunk_candidates("test-ns/chunk/missing")
+        assert isinstance(exc_info.value.__cause__, RuntimeError)
+    finally:
+        client.close()
+
+
+def test_blob_get_propagates_blob_store_failure(lc, monkeypatch, tmp_path):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "blob-get-failure")
+    key = _chunk_key("chain")
+    client.put(key, b"payload", _complete_metadata())
+    client._record_cache.clear()
+
+    def fail_get(failed_key):
+        raise RuntimeError("injected blob get failure")
+
+    monkeypatch.setattr(client._blob_store, "get", fail_get)
+    with pytest.raises(RuntimeError, match="injected blob get failure"):
+        client.get(key)
+    assert client._collection.search_calls == 0
+    client.close()
+
+
+def test_blob_get_incomplete_metadata_propagates_search_failure(
+    lc, monkeypatch, tmp_path
+):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "search-failure")
+    key = _chunk_key("chain")
+    client._blob_store.put(key, b"payload", {})
+
+    def fail_search(*args, **kwargs):
+        raise RuntimeError("injected collection search failure")
+
+    monkeypatch.setattr(client._collection, "search", fail_search)
+    with pytest.raises(RuntimeError, match="injected collection search failure"):
+        client.get(key)
+    client.close()
+
+
+@pytest.mark.parametrize("metadata_case", ["empty", "partial", "zero", "wrong_type"])
+def test_blob_get_incomplete_or_invalid_metadata_uses_collection_fallback(
+    lc, monkeypatch, tmp_path, metadata_case
+):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / metadata_case)
+    key = _chunk_key("chain")
+    metadata = {
+        "empty": {},
+        "partial": {"meta": "partial"},
+        "zero": _complete_metadata(**{"vllm.block_count": "0"}),
+        "wrong_type": _complete_metadata(**{"vllm.model": None}),
+    }[metadata_case]
+    client._blob_store.records[key] = (b"payload", metadata)
+    client._collection.search_calls = 0
+
+    record = client.get(key)
+
+    assert record is not None
+    assert record.value == b"payload"
+    assert record.metadata == metadata
+    assert client._collection.search_calls == 1
+    client.close()
+
+
+def test_blob_get_malformed_metadata_does_not_bypass_fallback_errors(
+    lc, monkeypatch, tmp_path
+):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "malformed")
+    key = _chunk_key("chain")
+    monkeypatch.setattr(client._blob_store, "get", lambda _: (b"payload", None))
+    client._collection.search_calls = 0
+
+    with pytest.raises(TypeError):
+        client.get(key)
+    assert client._collection.search_calls == 1
+    client.close()
+
+
+def test_blob_get_legacy_collection_record_wins_when_blob_has_legacy_metadata(
+    lc, monkeypatch, tmp_path
+):
+    client = _make_blob_client(lc, monkeypatch, tmp_path / "legacy-fast-path-guard")
+    key = _chunk_key("chain")
+    legacy_metadata = {"vllm.chunk_format": "legacy", "meta": "v2"}
+    raw = json.dumps(
+        {
+            "payload": base64.b64encode(b"v2 payload").decode("ascii"),
+            "metadata": legacy_metadata,
+        }
+    )
+    blob_metadata = _complete_metadata(**{lc._LEGACY_META_BLOB_COLUMN: raw})
+    client._blob_store.put(key, b"blob payload", blob_metadata)
+    client._collection._rows[key] = {
+        "__key": key,
+        lc._LEGACY_META_BLOB_COLUMN: raw,
+    }
+    client._collection.search_calls = 0
+
+    record = client.get(key)
+
+    assert record is not None
+    assert record.value == b"v2 payload"
+    assert record.metadata == legacy_metadata
+    assert client._collection.search_calls == 1
+    client.close()
+
+
+@pytest.mark.parametrize("client_kind", ["local", "blob"])
+def test_close_resets_chunk_index(lc, monkeypatch, tmp_path, client_kind):
+    client = _make_index_client(lc, monkeypatch, tmp_path, client_kind)
+    client.put(_chunk_key("chain"), b"payload", {})
+    assert client._chunk_key_index
+
+    client.close()
+
+    assert client._chunk_key_index == {}
+    assert client._chunk_lengths == {}

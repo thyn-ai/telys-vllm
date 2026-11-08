@@ -75,6 +75,10 @@ _DEFAULT_KV_DIM = 1
 # Map: (path_or_empty, address_or_empty, collection_name) -> (engine, collection, ref_count, remote)
 _SHARED: dict[tuple[str, str, str], tuple[Any, Any, int, bool]] = {}
 _SHARED_LOCK = threading.Lock()
+_LOCAL_CLIENT_REGISTRY: dict[
+    tuple[str, str, str], weakref.WeakSet[TelysLocalClient]
+] = {}
+_LOCAL_CLIENT_REGISTRY_LOCK = threading.Lock()
 
 
 def _derived_provenance(key: str) -> TelysProvenance:
@@ -121,6 +125,49 @@ def _chunk_start_key(chunk_key: str) -> str:
         return chunk_key.rsplit("/", 1)[0]
     start_hash = hashes.split("/", 1)[0]
     return f"{prefix}{marker}{start_hash}"
+
+
+def _parse_chunk_key(key: str) -> tuple[str, int, bool] | None:
+    """Return the start key, length, and chain-bound flag for a valid chunk key."""
+    if "/chunk/" not in key:
+        return None
+    start_key = _chunk_start_key(key)
+    if not key.startswith(f"{start_key}/"):
+        return None
+    parts = key[len(start_key) + 1 :].split("/")
+    if len(parts) == 2 and parts[1].isdigit():
+        return start_key, int(parts[1]), True
+    if len(parts) == 1 and parts[0].isdigit():
+        return start_key, int(parts[0]), False
+    return None
+
+
+_REQUIRED_BLOB_METADATA_FIELDS = (
+    "vllm.block_start_hash",
+    "vllm.block_count",
+    "vllm.block_size",
+    "vllm.model",
+    "vllm.engine_id",
+)
+
+
+def _complete_blob_metadata(metadata: Any) -> dict[str, Any] | None:
+    """Validate metadata that makes a BlobStore read self-contained."""
+    if not isinstance(metadata, Mapping):
+        return None
+    if _LEGACY_META_BLOB_COLUMN in metadata or _PAYLOAD_COLUMN in metadata:
+        return None
+    if any(field not in metadata for field in _REQUIRED_BLOB_METADATA_FIELDS):
+        return None
+    if any(not isinstance(metadata[field], str) for field in _REQUIRED_BLOB_METADATA_FIELDS):
+        return None
+    if not metadata["vllm.block_start_hash"]:
+        return None
+    for field in ("vllm.block_count", "vllm.block_size"):
+        value = metadata[field]
+        if not value.isdigit() or int(value) <= 0:
+            return None
+    return dict(metadata)
 
 
 class TelysLocalClient(TelysClient):
@@ -217,7 +264,12 @@ class TelysLocalClient(TelysClient):
         self._key_set: set[str] = set()
         self._record_cache: dict[str, TelysRecord] = {}
         self._chunk_lengths: dict[str, int] = {}
+        self._chunk_key_index: dict[str, dict[int, str]] = {}
         self._seed_key_set()
+        with _LOCAL_CLIENT_REGISTRY_LOCK:
+            _LOCAL_CLIENT_REGISTRY.setdefault(
+                self._shared_key, weakref.WeakSet()
+            ).add(self)
 
     def _open_or_create_collection(self) -> Any:
         """Open an existing collection or create the KV backing collection."""
@@ -235,6 +287,7 @@ class TelysLocalClient(TelysClient):
             "vllm.slab_offset",
             "vllm.slab_length",
             "vllm.chunk_format",
+            "vllm.content_sha256",
             "vllm.block_start_hash",
             "vllm.block_count",
             "vllm.block_size",
@@ -250,12 +303,15 @@ class TelysLocalClient(TelysClient):
         )
 
     def _seed_key_set(self) -> None:
-        """Load existing chunk keys and chunk-length map from Telys."""
+        """Load existing chunk keys and rebuild the exact chunk index."""
         try:
             ids = self._collection.ids()
-            for key in ids:
-                self._key_set.add(key)
-                self._track_chunk_key(key)
+            with self._lock:
+                self._key_set.update(ids)
+                self._chunk_lengths.clear()
+                self._chunk_key_index.clear()
+                for key in sorted(self._key_set):
+                    self._track_chunk_key(key)
             logger.info(
                 "telys seeded key set with %d keys (%d chunk starts)",
                 len(self._key_set),
@@ -267,17 +323,52 @@ class TelysLocalClient(TelysClient):
             ) from exc
 
     def _track_chunk_key(self, key: str) -> None:
-        """Update the chunk-length map from a chunk key."""
-        if "/chunk/" not in key:
+        """Update the exact candidate index and chunk-length map."""
+        parsed = _parse_chunk_key(key)
+        if parsed is None:
             return
-        start_key = _chunk_start_key(key)
-        try:
-            length = int(key.rsplit("/", 1)[1])
-        except (ValueError, IndexError):
-            return
-        self._chunk_lengths[start_key] = max(
-            self._chunk_lengths.get(start_key, 0), length
-        )
+        start_key, length, chain_bound = parsed
+        candidates = self._chunk_key_index.setdefault(start_key, {})
+        existing = candidates.get(length)
+        if existing is not None:
+            existing_chain_bound = "/" in existing[len(start_key) + 1 :]
+            if chain_bound != existing_chain_bound:
+                if not chain_bound:
+                    return
+            elif key >= existing:
+                return
+        candidates[length] = key
+        self._chunk_lengths[start_key] = max(candidates)
+
+    def _rebuild_chunk_start(self, start_key: str) -> None:
+        self._chunk_key_index.pop(start_key, None)
+        self._chunk_lengths.pop(start_key, None)
+        for key in sorted(self._key_set):
+            parsed = _parse_chunk_key(key)
+            if parsed is not None and parsed[0] == start_key:
+                self._track_chunk_key(key)
+
+    def _cache_record_for_overlapping_clients(
+        self, key: str, record: TelysRecord
+    ) -> None:
+        with _LOCAL_CLIENT_REGISTRY_LOCK:
+            clients = tuple(_LOCAL_CLIENT_REGISTRY.get(self._shared_key, ()))
+        for client in clients:
+            with client._lock:
+                client._key_set.add(key)
+                client._record_cache[key] = record
+                client._track_chunk_key(key)
+
+    def _evict_key_from_overlapping_clients(self, key: str) -> None:
+        parsed = _parse_chunk_key(key)
+        with _LOCAL_CLIENT_REGISTRY_LOCK:
+            clients = tuple(_LOCAL_CLIENT_REGISTRY.get(self._shared_key, ()))
+        for client in clients:
+            with client._lock:
+                client._key_set.discard(key)
+                client._record_cache.pop(key, None)
+                if parsed is not None:
+                    client._rebuild_chunk_start(parsed[0])
 
     def _check_open(self) -> None:
         if self._closed:
@@ -299,20 +390,17 @@ class TelysLocalClient(TelysClient):
             return set(self._key_set)
 
     def chunk_candidates(self, start_key: str) -> dict[int, str]:
-        """Return exact chunk lengths and keys for a start hash without I/O."""
+        """Return exact chunk lengths and keys without I/O on an indexed hit."""
         self._check_open()
-        self._seed_key_set()
-        candidates: dict[int, str] = {}
         with self._lock:
-            for key in self._key_set:
-                if not key.startswith(f"{start_key}/"):
-                    continue
-                parts = key[len(start_key) + 1 :].split("/")
-                if len(parts) == 2 and parts[1].isdigit():
-                    candidates[int(parts[1])] = key
-                elif len(parts) == 1 and parts[0].isdigit():
-                    candidates[int(parts[0])] = key
-        return candidates
+            candidates = self._chunk_key_index.get(start_key)
+            if candidates and all(
+                key in self._key_set for key in candidates.values()
+            ):
+                return dict(candidates)
+        self._seed_key_set()
+        with self._lock:
+            return dict(self._chunk_key_index.get(start_key, {}))
 
     def chunk_length(self, start_key: str) -> int:
         """Return the number of blocks in the stored chunk starting at ``start_key``."""
@@ -321,11 +409,8 @@ class TelysLocalClient(TelysClient):
             length = self._chunk_lengths.get(start_key, 0)
         if length:
             return length
-        # Local cache miss: refresh from the shared Telys store.  This is needed
-        # when the scheduler/worker connectors are separate client objects (vLLM
-        # V1 with multiprocessing, or even same-process role-split connectors
-        # created before the first save) and the chunk was written by another
-        # client.  Embedded-engine paths may still return 0 until a save/flush.
+        # Local cache miss: refresh from the shared Telys store before treating
+        # the prefix position as absent.
         self._seed_key_set()
         with self._lock:
             return self._chunk_lengths.get(start_key, 0)
@@ -427,10 +512,7 @@ class TelysLocalClient(TelysClient):
             provenance=_derived_provenance(key),
             metadata=dict(metadata),
         )
-        with self._lock:
-            self._key_set.add(key)
-            self._record_cache[key] = record
-            self._track_chunk_key(key)
+        self._cache_record_for_overlapping_clients(key, record)
 
     def delete(self, key: str) -> bool:
         self._check_open()
@@ -442,16 +524,10 @@ class TelysLocalClient(TelysClient):
             else:
                 raise
         if not present:
-            with self._lock:
-                self._key_set.discard(key)
-                self._record_cache.pop(key, None)
-                self._chunk_lengths.pop(_chunk_start_key(key), None)
+            self._evict_key_from_overlapping_clients(key)
             return False
         self._collection.delete([key])
-        with self._lock:
-            self._key_set.discard(key)
-            self._record_cache.pop(key, None)
-            self._chunk_lengths.pop(_chunk_start_key(key), None)
+        self._evict_key_from_overlapping_clients(key)
         return True
 
     def compact(self) -> TelysMaintenanceReport:
@@ -479,6 +555,15 @@ class TelysLocalClient(TelysClient):
 
     def close(self) -> None:
         self._closed = True
+        with self._lock:
+            self._chunk_lengths.clear()
+            self._chunk_key_index.clear()
+        with _LOCAL_CLIENT_REGISTRY_LOCK:
+            clients = _LOCAL_CLIENT_REGISTRY.get(self._shared_key)
+            if clients is not None:
+                clients.discard(self)
+                if not clients:
+                    _LOCAL_CLIENT_REGISTRY.pop(self._shared_key, None)
         with _SHARED_LOCK:
             shared = _SHARED.get(self._shared_key)
             if shared is None:
@@ -606,6 +691,7 @@ class TelysBlobClient(TelysClient):
         self._key_set: set[str] = set()
         self._record_cache: dict[str, TelysRecord] = {}
         self._chunk_lengths: dict[str, int] = {}
+        self._chunk_key_index: dict[str, dict[int, str]] = {}
         self._seed_key_set()
         with _BLOB_CLIENT_REGISTRY_LOCK:
             _BLOB_CLIENT_REGISTRY.setdefault(self._shared_key, weakref.WeakSet()).add(
@@ -625,6 +711,7 @@ class TelysBlobClient(TelysClient):
             _PAYLOAD_COLUMN,
             _LEGACY_META_BLOB_COLUMN,
             "vllm.chunk_format",
+            "vllm.content_sha256",
             "vllm.block_start_hash",
             "vllm.block_count",
             "vllm.block_size",
@@ -640,14 +727,17 @@ class TelysBlobClient(TelysClient):
         )
 
     def _seed_key_set(self) -> None:
-        """Load chunk keys from collection metadata and durable BlobStore records."""
+        """Load chunk keys and rebuild the exact chunk index."""
         try:
             ids = set(self._collection.ids())
             if self._blob_store is not None:
                 ids.update(self._blob_store.keys())
-            for key in ids:
-                self._key_set.add(key)
-                self._track_chunk_key(key)
+            with self._lock:
+                self._key_set.update(ids)
+                self._chunk_lengths.clear()
+                self._chunk_key_index.clear()
+                for key in sorted(self._key_set):
+                    self._track_chunk_key(key)
             logger.info(
                 "telys blob client seeded key set with %d keys (%d chunk starts)",
                 len(self._key_set),
@@ -659,17 +749,30 @@ class TelysBlobClient(TelysClient):
             ) from exc
 
     def _track_chunk_key(self, key: str) -> None:
-        """Update the chunk-length map from a chunk key."""
-        if "/chunk/" not in key:
+        """Update the exact candidate index and chunk-length map."""
+        parsed = _parse_chunk_key(key)
+        if parsed is None:
             return
-        start_key = _chunk_start_key(key)
-        try:
-            length = int(key.rsplit("/", 1)[1])
-        except (ValueError, IndexError):
-            return
-        self._chunk_lengths[start_key] = max(
-            self._chunk_lengths.get(start_key, 0), length
-        )
+        start_key, length, chain_bound = parsed
+        candidates = self._chunk_key_index.setdefault(start_key, {})
+        existing = candidates.get(length)
+        if existing is not None:
+            existing_chain_bound = "/" in existing[len(start_key) + 1 :]
+            if chain_bound != existing_chain_bound:
+                if not chain_bound:
+                    return
+            elif key >= existing:
+                return
+        candidates[length] = key
+        self._chunk_lengths[start_key] = max(candidates)
+
+    def _rebuild_chunk_start(self, start_key: str) -> None:
+        self._chunk_key_index.pop(start_key, None)
+        self._chunk_lengths.pop(start_key, None)
+        for key in sorted(self._key_set):
+            parsed = _parse_chunk_key(key)
+            if parsed is not None and parsed[0] == start_key:
+                self._track_chunk_key(key)
 
     def _cache_record_for_overlapping_clients(
         self, key: str, record: TelysRecord
@@ -683,14 +786,15 @@ class TelysBlobClient(TelysClient):
                 client._track_chunk_key(key)
 
     def _evict_key_from_overlapping_clients(self, key: str) -> None:
-        start_key = _chunk_start_key(key)
+        parsed = _parse_chunk_key(key)
         with _BLOB_CLIENT_REGISTRY_LOCK:
             clients = tuple(_BLOB_CLIENT_REGISTRY.get(self._shared_key, ()))
         for client in clients:
             with client._lock:
                 client._key_set.discard(key)
                 client._record_cache.pop(key, None)
-                client._chunk_lengths.pop(start_key, None)
+                if parsed is not None:
+                    client._rebuild_chunk_start(parsed[0])
 
     def _check_open(self) -> None:
         if self._closed:
@@ -719,20 +823,17 @@ class TelysBlobClient(TelysClient):
             return set(self._key_set)
 
     def chunk_candidates(self, start_key: str) -> dict[int, str]:
-        """Return exact chunk lengths and keys for a start hash without I/O."""
+        """Return exact chunk lengths and keys without I/O on an indexed hit."""
         self._check_open()
-        self._seed_key_set()
-        candidates: dict[int, str] = {}
         with self._lock:
-            for key in self._key_set:
-                if not key.startswith(f"{start_key}/"):
-                    continue
-                parts = key[len(start_key) + 1 :].split("/")
-                if len(parts) == 2 and parts[1].isdigit():
-                    candidates[int(parts[1])] = key
-                elif len(parts) == 1 and parts[0].isdigit():
-                    candidates[int(parts[0])] = key
-        return candidates
+            candidates = self._chunk_key_index.get(start_key)
+            if candidates and all(
+                key in self._key_set for key in candidates.values()
+            ):
+                return dict(candidates)
+        self._seed_key_set()
+        with self._lock:
+            return dict(self._chunk_key_index.get(start_key, {}))
 
     def chunk_length(self, start_key: str) -> int:
         """Return the number of blocks in the stored chunk starting at ``start_key``."""
@@ -760,7 +861,7 @@ class TelysBlobClient(TelysClient):
 
         blob_found = False
         payload = b""
-        blob_metadata: dict[str, Any] = {}
+        blob_metadata: Any = {}
         legacy_blob: str | None = None
         if self._blob_store is not None:
             try:
@@ -768,6 +869,19 @@ class TelysBlobClient(TelysClient):
                 blob_found = True
             except KeyError:
                 pass
+
+        if blob_found:
+            complete_metadata = _complete_blob_metadata(blob_metadata)
+            if complete_metadata is not None:
+                complete_metadata.pop(_KEY_COLUMN, None)
+                record = TelysRecord(
+                    key=key,
+                    value=payload,
+                    provenance=_derived_provenance(key),
+                    metadata=complete_metadata,
+                )
+                self._cache_record_for_overlapping_clients(key, record)
+                return record
 
         try:
             result = self._collection.search(
@@ -888,6 +1002,9 @@ class TelysBlobClient(TelysClient):
 
     def close(self) -> None:
         self._closed = True
+        with self._lock:
+            self._chunk_lengths.clear()
+            self._chunk_key_index.clear()
         with _BLOB_CLIENT_REGISTRY_LOCK:
             clients = _BLOB_CLIENT_REGISTRY.get(self._shared_key)
             if clients is not None:
