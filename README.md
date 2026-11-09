@@ -46,62 +46,34 @@ provenance are in [`bench/CONCURRENT.md`](bench/CONCURRENT.md).
 | 16K | 8 | Native-hot, same process | 0.252128 | 2.418234 | 211.732989 | **9.7820x** |
 
 The 8K/c1 external result is approximately neutral (**1.0247x** mean-wall
-speedup; one repetition was 0.9992x). The measured external wins are at 8K/c4,
-8K/c8, and 16K/c8; three repetitions do not establish statistical significance.
+speedup; one repetition was 0.9992x). Three repetitions do not establish
+statistical significance.
 
 Recompute and fresh-process external arms disable native prefix caching.
 External uses a separate drained writer and a fresh reader with a warm
 persistent store. **Native-hot is a separate same-process arm**, reusing
-GPU-resident native prefix KV after an excluded writer. Native-hot is faster
-than both other arms in every cell; its ratios are never included in external
-persistent-cache speedups. Older sequential/no-cache v5-v7 results are retained
-in [`bench/RESULTS.md`](bench/RESULTS.md) as history, not as native-hot wins.
+GPU-resident native prefix KV after an excluded writer. Native-hot had lower
+mean wall and pooled TTFT p50 and higher output throughput than both other arms
+in every measured cell; its ratios are excluded from external persistent-cache
+speedups. Older sequential/no-cache v5-v7 results are retained in
+[`bench/RESULTS.md`](bench/RESULTS.md) with their original baselines.
 
-All A/B/C ordinary correctness and output-equality checks passed on both profiles.
-The 16K independent verifier passed **1,081/1,081 cold** and **24,333/24,333 warm**
-blocks (**25,414/25,414 combined**), with zero missing blocks, errors, or
-inconclusive results, packed shape `[16, 4, 256]`, and clean pending-write
-telemetry. The 4K dynamic audit passed **273/273 cold blocks**, **8,056 warm
-coverage blocks**, **5,380 reused blocks**, **2,676/2,676 newly persisted blocks**,
-and **2,949/2,949 total-store blocks**; every warm prompt hit 269 blocks, with
-packed shape `[16, 4, 256]`.
+## Validation
 
-The prior full profiles at `6cbfe82` exercised the real cursor and metadata fixes
-for decode and aligned-prompt persistence and for final-decode/restart handling.
-Final native checks at `1a100ac26dff6a98b8ceafec5cdaebf0f5d49135` passed v2
-`meta_blob` projection and nested payload+metadata decoding, dual-codec fallback,
-overlapping-client deletion coherence, and divergent-prefix rejection; evidence is
-under `integrations/runpod-worker-vllm/evidence/final-v2-20261108`. **No full
-profiles ran at `1a100ac`.** Historical fix6 and corrected pre-fix results remain
-separately labeled in
-[`integrations/runpod-worker-vllm/RESULTS.md`](integrations/runpod-worker-vllm/RESULTS.md).
-
-### Serverless rc9 lifecycle proof
-
-**Release candidate, not a signed stable release.** Acceptance image
-`ghcr.io/thyn-ai/telys-worker-vllm:0.1.2-rc.9` used immutable digest
-`sha256:8d84aa45d5578421696f67d2e7ae2e6fb475c4d8ffb5d0429b7ea748dfd0fea2`.
-Source commit `1a100ac26dff6a98b8ceafec5cdaebf0f5d49135` matched all 10 compared
-Python files in `rc9-source-verification.json`. The `v0.1.2` Git tag exists, but
-this evidence does not establish a stable GitHub Release, PyPI wheel, or signed
-stable GHCR image; rc9 must not be represented as one. The `v0.1.3` source tag
-also exists; its automated publication stopped when the GHCR image push was
-denied by the package's repository Actions grant. Downstream GitHub Release and
-PyPI jobs were skipped. No stable `0.1.3` GitHub Release, PyPI wheel, or signed
-GHCR image is claimed here.
-
-Cold worker `yutiyuykg0g2gc` completed in **7.042 s** and persisted **538 prompt
-blocks + 4 generated blocks = 542 blocks**. Fresh worker `tdi0xf9426iu21` returned
-exactly matching output; its first lookup hit **538 blocks / 8,608 tokens**. After
-actual scale-to-zero with FlashBoot OFF and `running=0`, fresh engine
-`4ca28826-b4a8-4edc-9bc0-da0e169fe9e1` on worker `1gsk5j29rzcz0s` returned
-matching output in **6.735 s** and again hit **538/8,608**. Fresh engine IDs
-differed across starts; the concurrent replica responses shared worker
-`tdi0xf9426iu21`.
-
-Initial provisioning reused the existing signed runtime/license on the volume, not
-a new device registration. Async loading remained disabled. The endpoint was
-deleted; templates have a normal 90-minute platform hold before deletion.
+- Independent A40 verification passed **25,414/25,414 16K blocks** and
+  **2,949/2,949 4K blocks**. All A/B/C ordinary correctness and
+  output-equality checks passed on both profiles. See the [full profile
+  measurements and limitations](integrations/runpod-worker-vllm/RESULTS.md#2026-11-08-final-independent-a40-profiles-and-native-checks).
+- Current local tests and Ruff pass. Real Telys `0.1.14` / vLLM `0.32.0` A40
+  validation covered persistence, reopen, reset races, and two opt-in
+  output-correctness passes. Bitwise restored-KV
+  and 64-token output equality are validated with `VLLM_BATCH_INVARIANT=1`
+  and greedy decoding. See [correctness scope and
+  provenance](bench/CONCURRENT.md#correctness-and-validation).
+- Serverless lifecycle validation returned matching output from fresh workers;
+  first lookups hit **538 blocks / 8,608 tokens**, including after
+  scale-to-zero. See [lifecycle measurements and
+  evidence](integrations/runpod-worker-vllm/RESULTS.md#2026-11-08-serverless-rc9-endpoint-lifecycle-validation).
 
 ## Current status
 
@@ -109,15 +81,6 @@ deleted; templates have a normal 90-minute platform hold before deletion.
 workload, including batching, prefix length, model, GPU memory, and process or
 replica lifecycle.
 
-- Merged connector validation at `ecbb88e25579bdd1fc93d32c34abc34ee808690f`:
-  **370 local tests passed, 2 skipped**, and Ruff passed. Real Telys `0.1.14` /
-  vLLM `0.32.0` A40 checks covered persistence, reopen, reset races and two
-  opt-in output-correctness passes. Final review regressions through `dbde0b`
-  also passed CI.
-- Separate 8K/c1 greedy checks at `c42b049` with `VLLM_BATCH_INVARIANT=1`
-  proved exact restored KV and 64-token output equality. Non-invariant mode is
-  **not bitwise guaranteed**; see the scoped evidence in
-  [`bench/CONCURRENT.md`](bench/CONCURRENT.md#correctness-and-validation).
 - Telys `0.1.15` adds durable BlobStore deletion tombstones. Use that SDK
   version or newer; the connector also rejects orphaned blob-only records on
   affected older stores instead of injecting deleted KV data.

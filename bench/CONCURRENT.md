@@ -1,9 +1,9 @@
 # Concurrent apples-to-apples A40 validation
 
 Run `ca40-20261108T181727Z` measured batched inference on one Runpod NVIDIA A40
-(pod `yzyuv82g45dm5b`). It supersedes the v5-v7 headline as the current
-batching/parallelism comparison. The older sequential tables remain below in
-[`RESULTS.md`](RESULTS.md) as history, not as native-hot evidence.
+(pod `yzyuv82g45dm5b`). It is the current batching/parallelism comparison.
+The older sequential tables remain in [`RESULTS.md`](RESULTS.md) with their
+original scope and baselines.
 
 ## Source and workload identity
 
@@ -26,7 +26,7 @@ batching/parallelism comparison. The older sequential tables remain below in
   repetitions and three arms per cell (36 measured engines). No 4K cell or 16K
   concurrency-1/4 cell was run.
 
-The two later PR #4 commits are **not** the timing source:
+Performance timings use `d5c8c81`; later PR #4 commits have these roles:
 
 | Commit | Role | Delta from the measured source |
 |---|---|---|
@@ -37,8 +37,8 @@ The two later PR #4 commits are **not** the timing source:
 The `d5c8c81..ecbb88e` diff changes `pyproject.toml`, `telys_vllm/connector.py`,
 `gpu_ops.py`, `local_client.py`, and `store.py`, plus the async-extraction,
 compile, local-client, output-correctness, pinned-load-cache, and store tests.
-It does not identify those later persistence fixes as part of the measured
-`d5c8c81` timing source.
+The measured timing source remains `d5c8c81`; later persistence fixes are outside
+that source snapshot.
 
 ## Three-repetition results
 
@@ -65,9 +65,8 @@ recompute wall to the mean wall for the named arm.
 | 16,384 | 8 | Native-hot, same process | 24 | 0.252128 | 2.418234 | 211.732989 | **9.7820x** |
 
 The 8K/c1 external result is approximately neutral: three per-repetition wall
-ratios were 1.0552x, 0.9992x, and 1.0210x, and the ratio of mean walls is only
+ratios were 1.0552x, 0.9992x, and 1.0210x, and the ratio of mean walls is
 1.0247x. Three repetitions do not support a statistical-significance claim.
-The external benefit is clear in the measured 8K/c4, 8K/c8, and 16K/c8 cells.
 
 **Native-hot is a separate comparison.** Recompute and external arms disable
 native prefix caching. External uses a separate, drained writer and a fresh
@@ -75,33 +74,33 @@ reader process with initially empty process-local caches and a warm persistent
 store. Native-hot instead reuses GPU-resident native prefix KV in the same
 engine after an excluded prefix-only writer. Native-hot has lower mean wall and
 pooled TTFT p50 and higher output throughput than both other arms in every
-measured cell. Its ratios never enter the external-hit speedups, and the older
-sequential/no-cache numbers must not be presented as native-hot wins.
+measured cell. Its ratios are excluded from external-hit speedups. Older
+sequential/no-cache measurements use the baselines documented in
+[`RESULTS.md`](RESULTS.md).
 
 ## Correctness and validation
 
-The performance matrix ran with `VLLM_BATCH_INVARIANT` unset. Its differing
-non-invariant token outputs are not a bitwise-equivalence proof.
+The performance matrix ran with `VLLM_BATCH_INVARIANT` unset and produced some
+differing token outputs.
 
 A separate 8K/c1 investigation at `c42b049` compared 28 layers x 512 logical
 blocks. With `VLLM_BATCH_INVARIANT=1` and greedy decoding, writer GPU KV,
 persistent KV, and restored GPU KV had zero mismatches in every compared K/V
 layer/block; fresh external-hit and native-hot outputs both matched recompute
 for all 64 token IDs. Restored GPU KV also remained bit-identical to persistent
-KV in the non-invariant investigation. These scoped runs prove exact restored
-KV and output equality for the validated configuration. **Without batch
-invariance, bitwise output equality is not guaranteed** because floating-point
-execution and reduction order can differ.
+KV in the non-invariant investigation. These scoped runs validate exact restored
+KV and 64-token output equality with `VLLM_BATCH_INVARIANT=1` and greedy
+decoding. Other configurations can differ because floating-point execution and
+reduction order can differ.
 
 At `ecbb88e`, the CI-equivalent local run passed **370 tests with 2 skips**,
 and Ruff passed. Real Telys `0.1.14` / vLLM `0.32.0` A40 validation completed
 42 passing stages plus four expected nonzero diagnostic stages, including
 persistence, reopen, old-schema, overlap, and cross-process race coverage. The
 opt-in real output-correctness wrapper passed two tests with batch invariance
-set only in its verifier child. No connector real-runtime blocker remained;
-the raw SDK delete/reopen defect was fixed in Telys `0.1.15`; the connector
-also fails closed on affected older stores. PR #4 merged after these checks.
-This validation does not claim stable connector artifact publication.
+set only in its verifier child. The SDK delete/reopen defect was fixed in Telys
+`0.1.15`; the connector also fails closed on affected older stores. PR #4 merged
+after these checks.
 
 ## Reproduction and evidence provenance
 

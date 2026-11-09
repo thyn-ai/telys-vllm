@@ -223,7 +223,7 @@ These were native checks only; no full profiles ran at `1a100ac`.
 These full-harness measurements do not establish an end-to-end async extraction
 improvement; async loading remains disabled and fails fast.
 
-## 2026-11-08 serverless rc9 endpoint lifecycle proof
+## 2026-11-08 serverless rc9 endpoint lifecycle validation
 
 Evidence is under
 `integrations/runpod-worker-vllm/evidence/serverless-rc9-20261108`.
@@ -238,8 +238,8 @@ Evidence is under
   Python files, connector `0.1.2`, vLLM `0.32.0`, and Telys `0.1.14`.
 - Later `3f39593` changes are release workflow only.
 
-**This is a release candidate, not a signed final release.** The final release tag
-has not been created, and final signed image publication remains pending.
+The `v0.1.3` source tag exists. Its GHCR image push was denied by the package's
+repository Actions grant; downstream GitHub Release and PyPI jobs were skipped.
 
 ### Lifecycle and correctness results
 
@@ -251,9 +251,9 @@ has not been created, and final signed image publication remains pending.
 | Scale-to-zero | FlashBoot OFF; observed **`running=0`**. |
 | Post-zero fresh engine | Engine `4ca28826-b4a8-4edc-9bc0-da0e169fe9e1` on worker `1gsk5j29rzcz0s` returned matching output in **6.735 s** and again hit **538 blocks / 8,608 tokens**. |
 
-All compared outputs matched exactly. Fresh engine IDs differed across starts. The
-concurrent replica responses both used worker `tdi0xf9426iu21`; this does not claim
-that all concurrent replica worker IDs differed. Async loading remained disabled.
+All compared outputs matched exactly. Fresh engine IDs differed across starts. Both
+concurrent replica responses used worker `tdi0xf9426iu21`. Async loading remained
+disabled.
 
 Initial provisioning reused the existing signed runtime/license on the volume; it
 did not perform a new device registration. The endpoint was deleted. Templates have
