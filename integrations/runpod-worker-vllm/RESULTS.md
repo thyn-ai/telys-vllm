@@ -238,8 +238,11 @@ Evidence is under
   Python files, connector `0.1.2`, vLLM `0.32.0`, and Telys `0.1.14`.
 - Later `3f39593` changes are release workflow only.
 
-The `v0.1.3` source tag exists. Its GHCR image push was denied by the package's
-repository Actions grant; downstream GitHub Release and PyPI jobs were skipped.
+The stable `v0.1.5` release is available on PyPI and GitHub Releases. Its public
+image is `ghcr.io/thyn-ai/telys-worker-vllm:0.1.5` at immutable digest
+`sha256:01b9b967a1d36e61ecb4ec3d2b179329762048e020e7dbbf0bc61285e7fbeb4b`.
+The release workflow verified its Sigstore signature and SLSA provenance; an
+independent anonymous registry read returned the same digest.
 
 ### Lifecycle and correctness results
 
