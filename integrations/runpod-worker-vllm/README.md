@@ -7,7 +7,17 @@ image. It preserves the worker's stock vLLM 0.32.0 installation and original
 or vLLM's built-in filesystem offload tier; configure only one connector per
 endpoint.
 
-## Build
+## Use the release image
+
+The signed `v0.1.5` image is public on GHCR. Pull it by immutable digest:
+
+```bash
+docker pull ghcr.io/thyn-ai/telys-worker-vllm@sha256:01b9b967a1d36e61ecb4ec3d2b179329762048e020e7dbbf0bc61285e7fbeb4b
+```
+
+Its Sigstore signature and SLSA provenance are attached to the [GitHub Release](https://github.com/thyn-ai/telys-vllm/releases/tag/v0.1.5).
+
+## Build a custom image
 
 Run the build from the **repository root**, not from this directory. Use an
 immutable, versioned tag of your own and an x86-64 target for Runpod:
