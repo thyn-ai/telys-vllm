@@ -238,7 +238,7 @@ Because only one C' cold run completed for persistence, warm-cache numbers for t
   ```
   The lookup itself succeeds, but the vLLM EngineCore dies under the load shortly afterwards.
 
-### Honest verdict
+### Observed results
 
 1. **Native caching is really off.** The v5 numbers are the first clean A vs C' comparison: warm headline C' runs show ~99% external prefix-cache hits, and connector lookups report `hit_blocks == max_block`. In v4 the same metric was 0% because vLLM served the prefix natively.
 
@@ -377,7 +377,7 @@ The `inject` median is not directly comparable before vs after: before, each spa
 - `telys_vllm/connector.py`
 - `tests/test_roundtrip.py` (updated assertion for correctly-sliced block ids)
 
-### Honest verdict
+### Observed results
 
 1. **The fix works and is safe.** Local tests pass: **99 passed, 1 skipped**. The warm C′ run no longer crashes; TTFT p50 drops from 361 s to 175 s and total time drops from 516 s to 253 s.
 
@@ -510,7 +510,7 @@ The raw-byte path eliminates `torch.load`/`pickle` parsing; deserialization is n
 5. **`bench/run_autopsy_headline.sh`**: Removed explicit `telys_client_factory` and `TELYS_VLLM_SLAB_PATH`; reset now also deletes `${TELYS_PATH}_blobs`.
 6. **`tests/test_blob_client.py`**: New tests for BlobStore round-trip, BlobStore-backed `TelysBlockStore`, raw-byte serialization, legacy fallback, and auto-factory selection.
 
-### Honest verdict
+### Observed results
 
 1. **The raw-byte + BlobStore optimization works.** Local tests pass: **113 passed**. The warm C′ run completes cleanly; TTFT p50 drops from 174.7 s to 58.4 s and total time drops from 253.4 s to 92.3 s. `tensor_from_blob` is ~8× faster by every telemetry metric.
 
@@ -627,7 +627,7 @@ Source: `bench/autopsy-v3/results/warm_telemetry.jsonl` (≈273 MB, summarized o
 
 Cold and warm outputs are text/token-identical, confirming the connector does not change model behavior.
 
-### Honest verdict
+### Observed results
 
 1. **Telys hit path is still working.** The warm C′ run reports 99.0% external prefix-cache hits and connector lookups show `hit_blocks == max_block` for full-prefix requests.
 
@@ -828,9 +828,9 @@ The `store_read_chunk` median drops from 139 ms (slab file) to 0.59 ms (BlobStor
   - Added `PYTHONPATH=/root/bench/telys-vllm` because the package is used in-place on the pod (no editable install).
   - Changed C′ cold to `repeat_count=1` (20 prompts) to match the previous benchmark cold-population pattern.
 
-### Honest verdict
+### Observed results
 
-1. **BlobStore + fast path is a clear win on warm TTFT.** C′ warm TTFT p50 drops from 50.1 s (v4 slab) to 27.8 s (v5 BlobStore), and total time drops from 78.8 s to 40.4 s. Telys warm-cache is now faster than recomputing on total wall time (40.4 s vs 108.5 s) and within ~1.6× on first-token latency (27.8 s vs 49.3 s).
+1. **BlobStore + fast path reduces warm TTFT.** C′ warm TTFT p50 drops from 50.1 s (v4 slab) to 27.8 s (v5 BlobStore), and total time drops from 78.8 s to 40.4 s. Telys warm-cache is faster than recomputing on total wall time (40.4 s vs 108.5 s) and within ~1.6× on first-token latency (27.8 s vs 49.3 s).
 
 2. **The dominant cost moved from slab read to load/inject.** In v4, `store_read_chunk` was 139 ms per chunk; in v5 it is 0.59 ms. The new dominant warm phase is `start_load_kv` + `inject_block` (97% of telemetry time), which is the contiguous H2D transfer and per-layer batched injection for the full prefix.
 
@@ -912,13 +912,13 @@ All six EngineCore processes shut down cleanly (SIGTERM after normal request pro
 | store_lookup_prefix | 295 | 23.519 | 0.038 | 0.080 | 0.278 | `telys_vllm/store.py:195` |
 | connector_store_init | 2 | 0.757 | 0.378 | 0.378 | 0.393 | `telys_vllm/connector.py:180` |
 
-### Honest verdict
+### Observed results
 
-1. **The crash is gone.** Both 8K and 16K warm C′ runs completed 100% of requests. The previous failure mode (EngineCore exiting mid-run under heavy KV pressure) did not reproduce.
+1. **The 8K and 16K warm runs completed.** Both warm C′ runs completed 100% of requests. The previous failure mode (EngineCore exiting mid-run under heavy KV pressure) did not reproduce.
 
 2. **It is not simply "more GPU memory."** `gpu_memory_utilization=0.95` on a 48 GB A40 still bounds the workload; vLLM allocated the same class of GPU resources as before. The difference is the connector-side batched injection and BlobStore fast path, which keeps the per-request working set predictable.
 
-3. **16K is still expensive, but Telys wins on both latency and throughput.** Warm TTFT at 16K is 48.6 s versus 186.6 s recompute, and total wall time is 74.1 s versus 383.3 s. The warm run is within ~1.7× of the 8K warm TTFT (48.6 s vs 25.1 s) despite doubling the prefix length, which is consistent with the load/inject cost scaling roughly linearly with prefix size.
+3. **The 16K warm arm had lower latency and higher throughput than recompute.** Warm TTFT at 16K is 48.6 s versus 186.6 s recompute, and total wall time is 74.1 s versus 383.3 s. The warm run is within ~1.7× of the 8K warm TTFT (48.6 s vs 25.1 s) despite doubling the prefix length, which is consistent with the load/inject cost scaling roughly linearly with prefix size.
 
 4. **Dominant warm cost remains load + inject.** At 16K, `start_load_kv` + `inject_block` account for ~92% of telemetry time. BlobStore read latency stays negligible (median 0.55 ms), so the remaining headroom is in H2D transfer and per-layer injection parallelism.
 
@@ -974,7 +974,7 @@ Engine B is a separate OS process; the vLLM V1 native prefix cache is empty when
 | store_lookup_prefix | 100 | 1.134 | 0.005 | 0.011 | 0.085 | `telys_vllm/store.py:195` |
 | connector_store_init | 2 | 0.703 | 0.351 | 0.351 | 0.353 | `telys_vllm/connector.py:180` |
 
-### Honest verdict
+### Observed results
 
 1. **Replica sharing works.** Engine B, starting as a completely fresh process with no native prefix-cache state, achieved full-prefix external hits from the Telys store populated by engine A. TTFT p50 dropped from 49.7 s (recompute) to 16.8 s (engine B warm).
 
