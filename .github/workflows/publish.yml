@@ -280,11 +280,23 @@ jobs:
             exit 1
           fi
 
-          manifest="$RUNNER_TEMP/telys-vllm-published-manifest.json"
-          docker buildx imagetools inspect --raw "${tags[0]}" > "$manifest"
-          remote_digest="sha256:$(python3 -c 'import hashlib, pathlib, sys; print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())' "$manifest")"
+          inspection="$RUNNER_TEMP/telys-vllm-published-inspection.txt"
+          docker buildx imagetools inspect "${tags[0]}" > "$inspection"
+          remote_digest="$(
+            python3 - "$inspection" <<'PY'
+          import pathlib
+          import re
+          import sys
+
+          text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+          matches = re.findall(r"(?m)^Digest:\s+(sha256:[0-9a-f]{64})\s*$", text)
+          if len(matches) != 1:
+              raise SystemExit(f"Expected one registry digest, found {len(matches)}")
+          print(matches[0])
+          PY
+          )"
           if [[ "$remote_digest" != "$IMAGE_DIGEST" ]]; then
-            echo "::error::The published tag digest differs from the signed build digest."
+            echo "::error::Published tag digest $remote_digest differs from signed build digest $IMAGE_DIGEST."
             exit 1
           fi
 
@@ -301,7 +313,6 @@ jobs:
           gh attestation verify "oci://$IMAGE_REF" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/publish.yml" \
-            --cert-identity "$EXPECTED_IDENTITY" \
             --source-digest "$GITHUB_SHA" \
             --source-ref "$GITHUB_REF" \
             --deny-self-hosted-runners \
