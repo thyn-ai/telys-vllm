@@ -57,25 +57,6 @@ than both other arms in every cell; its ratios are never included in external
 persistent-cache speedups. Older sequential/no-cache v5-v7 results are retained
 in [`bench/RESULTS.md`](bench/RESULTS.md) as history, not as native-hot wins.
 
-Earlier independent A40 profiles used `telys==0.1.14` and the following
-same-run controls:
-
-| Prefix | Arm / phase | Total time | Mean TTFT |
-|---|---|---:|---:|
-| 16K | No-cache warm | 72.390 s | 35.659 s |
-| 16K | Stock filesystem warm | 26.378 s | 17.936 s |
-| 16K | Telys cold | 7.417 s | 4.712 s |
-| 16K | Telys warm | 42.247 s | 28.955 s |
-| 4K | No-cache warm | 20.541 s | 10.333 s |
-| 4K | Stock filesystem warm | 13.028 s | 7.612 s |
-| 4K | Telys cold | 3.132 s | 1.174 s |
-| 4K | Telys warm | 21.779 s | 14.401 s |
-
-At 16K, Telys warm beat same-run no-cache on total time and mean TTFT; stock
-filesystem KV remained faster. At 4K, Telys warm did **not** beat no-cache, and
-stock filesystem KV was faster. These results do not demonstrate an end-to-end
-async extraction improvement; async loading remains disabled.
-
 All A/B/C ordinary correctness and output-equality checks passed on both profiles.
 The 16K independent verifier passed **1,081/1,081 cold** and **24,333/24,333 warm**
 blocks (**25,414/25,414 combined**), with zero missing blocks, errors, or
@@ -122,21 +103,11 @@ Initial provisioning reused the existing signed runtime/license on the volume, n
 a new device registration. Async loading remained disabled. The endpoint was
 deleted; templates have a normal 90-minute platform hold before deletion.
 
-## When it helps / when it doesn't
-
-| Scenario | Verdict | Why |
-|---|---|---|
-| **Process restart or redeploy** | ✅ Helps | KV blocks live in Telys, so a new process starts warm. |
-| **Multiple replicas / horizontal scale** | ✅ Helps | Replicas share one Telys store; a cold replica warm-hits immediately. |
-| **Prefixes larger than native GPU KV budget** | ✅ Helps | Telys persists blocks that vLLM's native cache would evict. |
-| **Single long-lived engine, prefix fits in GPU cache** | ⚠️ Native caching wins | vLLM's in-memory prefix cache is faster when the engine never restarts and the KV budget is large enough. The connector adds serialization and persistence overhead that only pays off across restarts, replicas, or very long prefixes. |
-| **Short prefixes on small models** | ❌ Not helpful | Recomputing a 512-token prefix on a 1.5B model is cheaper than loading it from an external store. |
-
 ## Current status
 
-**Working connector with source-scoped validation.** It is not a universal
-drop-in win: performance depends on batching, prefix length, model, GPU memory,
-and whether the deployment restarts or scales replicas.
+**Working connector with source-scoped validation.** Performance is reported by
+workload, including batching, prefix length, model, GPU memory, and process or
+replica lifecycle.
 
 - Merged connector validation at `ecbb88e25579bdd1fc93d32c34abc34ee808690f`:
   **370 local tests passed, 2 skipped**, and Ruff passed. Real Telys `0.1.14` /
