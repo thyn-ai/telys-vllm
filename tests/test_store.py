@@ -71,6 +71,24 @@ def seed_chunk(
     )
 
 
+def make_shared_start_chains(block_count: int = 259) -> list[list[bytes]]:
+    import hashlib
+
+    chains = []
+    for chain_index in range(4):
+        parent = b"\xa0" * 32
+        chain = [parent]
+        for block_index in range(1, block_count):
+            parent = hashlib.sha256(
+                parent
+                + chain_index.to_bytes(2, "big")
+                + block_index.to_bytes(4, "big")
+            ).digest()
+            chain.append(parent)
+        chains.append(chain)
+    return chains
+
+
 def decode_record_value(record) -> dict[str, bytes]:
     return LengthPrefixedCodec().decode_block(record.value)
 
@@ -409,6 +427,105 @@ def test_divergent_second_block_does_not_hit_or_load_original_chunk(tmp_path):
     assert [block.blobs[LAYER] for block in loaded] == [b"original"] * 2
 
 
+@pytest.mark.parametrize("blob_only", [False, True], ids=["slab", "blob-only"])
+def test_shared_start_and_length_chains_load_exact_a40_payloads(tmp_path, blob_only):
+    client = FakeBlobStoreClient() if blob_only else FakeTelysClient()
+    store = make_store(
+        tmp_path,
+        client,
+        slab_path=None if blob_only else str(tmp_path / "collision.slab"),
+        blobstore_no_slab=blob_only,
+        write_behind=False,
+    )
+    chains = make_shared_start_chains()
+    payloads = [f"chain-{index}".encode() for index in range(4)]
+    keys = [store.chunk_key(chain[0], len(chain), chain[-1]) for chain in chains]
+    assert len({chain[-1] for chain in chains}) == 4
+    assert len(set(keys)) == 4
+
+    try:
+        for chain, payload in zip(chains, payloads):
+            seed_chunk(store, chain, payload)
+        store.drain()
+
+        start_key = store.chunk_start_key(chains[0][0])
+        selected_key = client.chunk_candidates(start_key)[259]
+        assert client.chunk_candidates(start_key) == {259: selected_key}
+
+        contains_calls = []
+        original_contains = client.contains
+
+        def recording_contains(key):
+            contains_calls.append(key)
+            return original_contains(key)
+
+        client.contains = recording_contains
+        for chain, payload, key in zip(chains, payloads, keys):
+            expected_probes = int(key != selected_key)
+            probe_count = len(contains_calls)
+            get_count = client.get_count
+            assert store.lookup_prefix(chain) == 259
+            assert len(contains_calls) - probe_count == expected_probes
+            assert client.get_count == get_count
+
+            probe_count = len(contains_calls)
+            loaded = store.load_decoded_blocks(chain)
+            assert len(contains_calls) - probe_count == expected_probes
+            assert len(loaded) == 259
+            assert [block.blobs[LAYER] for block in loaded] == [payload] * 259
+            assert [block.metadata["vllm.block_hash"] for block in loaded] == [
+                block_hash.hex() for block_hash in chain
+            ]
+
+        import hashlib
+
+        missing = [
+            *chains[1][:-1],
+            hashlib.sha256(b"nonexistent A40 chain").digest(),
+        ]
+        missing_key = store.chunk_key(missing[0], len(missing), missing[-1])
+        get_count = client.get_count
+        assert store.lookup_prefix(missing) == 0
+        with pytest.raises(TelysStoreError, match="no longer present"):
+            store.load_decoded_blocks(missing)
+        assert client.get_count == get_count
+        assert contains_calls.count(missing_key) == 2
+    finally:
+        store.close()
+
+
+def test_stale_candidate_and_legacy_client_cannot_redirect_exact_chain(tmp_path):
+    client = FakeBlobStoreClient()
+    store = make_store(
+        tmp_path,
+        client,
+        slab_path=None,
+        blobstore_no_slab=True,
+        write_behind=False,
+    )
+    chains = make_shared_start_chains(block_count=3)
+    payloads = [f"chain-{index}".encode() for index in range(4)]
+
+    try:
+        for chain, payload in zip(chains, payloads):
+            seed_chunk(store, chain, payload)
+
+        stale_key = store.chunk_key(chains[0][0], 3, b"\x00" * 32)
+        client.chunk_candidates = lambda _start_key: {3: stale_key}
+        for chain, payload in zip(chains, payloads):
+            assert store.lookup_prefix(chain) == 3
+            loaded = store.load_decoded_blocks(chain)
+            assert [block.blobs[LAYER] for block in loaded] == [payload] * 3
+
+        client.chunk_candidates = None
+        for chain, payload in zip(chains, payloads):
+            assert store.lookup_prefix(chain) == 3
+            loaded = store.load_decoded_blocks(chain)
+            assert [block.blobs[LAYER] for block in loaded] == [payload] * 3
+    finally:
+        store.close()
+
+
 def test_legacy_start_and_count_key_misses_safely(tmp_path):
     client = FakeBlobStoreClient()
     store = make_store(
@@ -489,7 +606,7 @@ def test_divergent_lookup_avoids_payload_reads(tmp_path):
     divergent = [hashes[0], make_hashes(1)[0]]
 
     assert store.lookup_prefix(divergent) == 0
-    assert client.contains_calls == 0
+    assert client.contains_calls == 1
     assert client.get_count == 0
 
 
@@ -514,7 +631,7 @@ def test_stale_max_chunk_length_uses_exact_shorter_candidate(tmp_path):
     client.chunk_length = lambda _start_key: len(longer_hashes)
 
     assert store.lookup_prefix(make_hashes(3)) == 2
-    assert client.contains_calls == 1
+    assert client.contains_calls == 2
     assert client.get_count == 0
 
 

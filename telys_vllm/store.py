@@ -207,19 +207,20 @@ class TelysBlockStore:
             key = self.chunk_key(
                 block_hashes[idx], length, block_hashes[idx + length - 1]
             )
-            if candidates:
-                if candidates.get(length) == key:
-                    return length, key
-            elif self._client.contains(key):
+            if candidates.get(length) == key or self._client.contains(key):
                 return length, key
-        for length in sorted(candidates, reverse=True):
-            if length > remaining:
+        for candidate_length in sorted(candidates, reverse=True):
+            if candidate_length > remaining or (
+                candidate_length == length and length > 0
+            ):
                 continue
             key = self.chunk_key(
-                block_hashes[idx], length, block_hashes[idx + length - 1]
+                block_hashes[idx],
+                candidate_length,
+                block_hashes[idx + candidate_length - 1],
             )
-            if candidates[length] == key:
-                return length, key
+            if candidates[candidate_length] == key or self._client.contains(key):
+                return candidate_length, key
         return 0, ""
 
     def contains(self, key: str) -> bool:
