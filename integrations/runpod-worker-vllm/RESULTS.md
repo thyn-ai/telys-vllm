@@ -238,9 +238,9 @@ Evidence is under
   Python files, connector `0.1.2`, vLLM `0.32.0`, and Telys `0.1.14`.
 - Later `3f39593` changes are release workflow only.
 
-The stable `v0.1.5` release is available on PyPI and GitHub Releases. Its public
-image is `ghcr.io/thyn-ai/telys-worker-vllm:0.1.5` at immutable digest
-`sha256:01b9b967a1d36e61ecb4ec3d2b179329762048e020e7dbbf0bc61285e7fbeb4b`.
+The stable `v0.1.6` release is available on PyPI and GitHub Releases. Its public
+image is `ghcr.io/thyn-ai/telys-worker-vllm:0.1.6` at immutable digest
+`sha256:1b02b3cdac471064e8b9968fe2ab87f99da2d455e04d9cffea6b74b745a4218f`.
 The release workflow verified its Sigstore signature and SLSA provenance; an
 independent anonymous registry read returned the same digest.
 
@@ -261,3 +261,44 @@ disabled.
 Initial provisioning reused the existing signed runtime/license on the volume; it
 did not perform a new device registration. The endpoint was deleted. Templates have
 a normal 90-minute platform hold before deletion.
+
+## 2026-11-12 v0.1.6 exact upstream-worker A40 acceptance
+
+The exact upstream worker Dockerfile at commit
+`49bfa65d76b6611ed845b48a46317c79633f93bc` built and ran. Acceptance used
+connector `0.1.6` at source `2f0c20ccec56afcb613973e296281f51e23cbe26`, SDK
+`0.1.15`, vLLM `0.32.0`, one NVIDIA A40, and `Qwen/Qwen2.5-7B-Instruct`. The
+runtime image digest was
+`sha256:6ce40a639eabb7334d41e73f42858e37add089e574dd6ef3e4d0b21af78c95d8`;
+this acceptance image is distinct from the public release image above.
+
+Four prompts shared a 4,096-token prefix and had distinct 64-token suffixes. Each
+request generated 32 greedy output tokens (128 total), with batch-invariant mode
+enabled and native prefix caching disabled.
+
+| Arm / phase | Mean TTFT (s) | Batch wall (s) | Output throughput (tok/s) |
+|---|---:|---:|---:|
+| Stock forced recompute | 2.611967 | 4.568364 | 28.019 |
+| Telys external cold, empty external cache | 4.310308 | 6.461609 | 19.809 |
+| Telys fresh-process warm, persisted external cache | 2.216870 | 4.167074 | 30.717 |
+
+TTFT is the mean across the four requests; wall time and throughput cover the whole
+batch. External cold began with an empty external cache, while fresh-process warm
+reused persisted external KV. Both are distinct from stock forced recompute, and
+the cold persistence drain is reported separately below.
+
+All **1,044 blocks** verified. All four external-cold and fresh-process warm output
+token-ID sequences and text matched stock. Fresh warm recorded **16,576 external
+hits** (16,384 shared-prefix + 192 suffix), cached tokens per request
+`[4144, 4144, 4144, 4144]`, and zero native hits. Cold drain took **0.295375 s**
+and finished with zero pending keys, pending writes, and write errors.
+
+Default-off behavior, all 12 override rejections, digest/tamper rejection,
+delete/reset, and credential sanitization passed. Pod `p3qu21d37fh3hq`, volume
+`7x9gdvpvzh`, and temporary registry resources were deleted. The sanitized
+machine-readable record is
+[`upstream-vllm-v0.1.6-acceptance.json`](evidence/upstream-vllm-v0.1.6-acceptance.json).
+
+This acceptance covers one A40, one model, and one four-request batch. It does not
+establish universal speedups, native-hot superiority, or performance on other GPUs,
+models, batch shapes, or workloads.

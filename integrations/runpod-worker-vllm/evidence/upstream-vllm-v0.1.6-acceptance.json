@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_vllm_real_gpu_acceptance",
+  "status": "pass",
+  "release": {
+    "connector_version": "0.1.6",
+    "connector_commit": "2f0c20ccec56afcb613973e296281f51e23cbe26",
+    "upstream_worker_commit": "49bfa65d76b6611ed845b48a46317c79633f93bc",
+    "sdk_version": "0.1.15",
+    "vllm_version": "0.32.0",
+    "public_image": "ghcr.io/thyn-ai/telys-worker-vllm@sha256:1b02b3cdac471064e8b9968fe2ab87f99da2d455e04d9cffea6b74b745a4218f"
+  },
+  "acceptance_image": {
+    "digest": "sha256:6ce40a639eabb7334d41e73f42858e37add089e574dd6ef3e4d0b21af78c95d8",
+    "exact_upstream_dockerfile_built_and_ran": true
+  },
+  "environment": {
+    "gpu": "NVIDIA A40",
+    "gpu_count": 1,
+    "model": "Qwen/Qwen2.5-7B-Instruct"
+  },
+  "workload": {
+    "request_count": 4,
+    "shared_prefix_tokens": 4096,
+    "distinct_suffix_tokens_each": 64,
+    "output_tokens_each": 32,
+    "output_tokens_total": 128,
+    "decoding": "greedy",
+    "batch_invariant": true,
+    "native_prefix_caching": false
+  },
+  "measurements": {
+    "stock_forced_recompute": {
+      "ttft_mean_s": 2.611967,
+      "batch_wall_s": 4.568364,
+      "output_tokens_per_s": 28.019
+    },
+    "external_cold": {
+      "ttft_mean_s": 4.310308,
+      "batch_wall_s": 6.461609,
+      "output_tokens_per_s": 19.809
+    },
+    "external_warm_fresh_process": {
+      "ttft_mean_s": 2.216870,
+      "batch_wall_s": 4.167074,
+      "output_tokens_per_s": 30.717
+    }
+  },
+  "warm_cache_evidence": {
+    "external_hits": 16576,
+    "shared_prefix_hits": 16384,
+    "suffix_hits": 192,
+    "cached_tokens_per_request": [4144, 4144, 4144, 4144],
+    "native_hits": 0
+  },
+  "verification": {
+    "persisted_blocks": {
+      "verified": 1044,
+      "expected": 1044,
+      "status": "pass"
+    },
+    "output_equivalence": {
+      "request_count": 4,
+      "cold_and_warm_token_ids_match_stock": true,
+      "cold_and_warm_text_match_stock": true
+    },
+    "default_off": "pass",
+    "override_rejections": {
+      "cases": 12,
+      "status": "pass"
+    },
+    "cold_drain": {
+      "seconds": 0.295375,
+      "pending_keys": 0,
+      "pending_writes": 0,
+      "write_errors": 0
+    },
+    "digest_tamper_rejection": "pass",
+    "delete_reset": "pass",
+    "credential_sanitization": "pass"
+  },
+  "cleanup": {
+    "pod_id": "p3qu21d37fh3hq",
+    "pod_deleted": true,
+    "network_volume_id": "7x9gdvpvzh",
+    "network_volume_deleted": true,
+    "temporary_registry_resources_deleted": true
+  },
+  "limitations": [
+    "One NVIDIA A40, Qwen/Qwen2.5-7B-Instruct, and one four-request batch; no other GPU, model, batch shape, or workload was measured.",
+    "External cold started with an empty external cache; fresh-process warm reused persisted external KV; stock forced recompute is a separate uncached baseline.",
+    "These results do not establish universal speedups or superiority to native-hot caching, and are not a broader performance claim."
+  ]
+}
