@@ -9,13 +9,13 @@ endpoint.
 
 ## Use the release image
 
-The signed `v0.1.5` image is public on GHCR. Pull it by immutable digest:
+The signed `v0.1.6` image is public on GHCR. Pull it by immutable digest:
 
 ```bash
-docker pull ghcr.io/thyn-ai/telys-worker-vllm@sha256:01b9b967a1d36e61ecb4ec3d2b179329762048e020e7dbbf0bc61285e7fbeb4b
+docker pull ghcr.io/thyn-ai/telys-worker-vllm@sha256:1b02b3cdac471064e8b9968fe2ab87f99da2d455e04d9cffea6b74b745a4218f
 ```
 
-Its Sigstore signature and SLSA provenance are attached to the [GitHub Release](https://github.com/thyn-ai/telys-vllm/releases/tag/v0.1.5).
+Its Sigstore signature and SLSA provenance are attached to the [GitHub Release](https://github.com/thyn-ai/telys-vllm/releases/tag/v0.1.6).
 
 ## Build a custom image
 
